@@ -132,7 +132,7 @@ class LYBWin:
             (s_x, s_y, e_x, e_y) = win32gui.GetWindowRect(hwnd)
             w_width = e_x - s_x
             w_height = e_y - s_y
-            # print(str(win32gui.GetWindowText(hwnd)) + '[' + str ( (s_x, s_y) ) + '] [' + str( (w_width, w_height) ) + ']')
+            print(str(win32gui.GetWindowText(hwnd)) + '[' + str ( (s_x, s_y) ) + '] [' + str( (w_width, w_height) ) + ']')
 
         if re.match(wildcard, str(win32gui.GetWindowText(hwnd))) != None and win32gui.IsWindowVisible(hwnd) != 0:
             # print('--------------------> !!! found window DEBUG2 new : ', wildcard, str(win32gui.GetWindowText(hwnd)), ':', self.handle_list, ':')
