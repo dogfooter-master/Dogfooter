@@ -141,24 +141,32 @@ class LYBDarkEden(lybgame.LYBGame):
         # 	return scene_name
 
 
-        tutorial_index = self.get_option('tutorial_index')
-        if tutorial_index == None:
-            tutorial_index = 0
+        tutorial_check_threshold = self.get_option('tutorial_check_threshold')
+        if tutorial_check_threshold == None:
+            tutorial_check_threshold = 0
 
-        if tutorial_index > 5:
-            self.set_option('tutorial_index', 0)
+        if tutorial_check_threshold > 5:
             resource_name = 'tutorial_loc'
             if not resource_name in self.resource_manager.resource_dic:
                 return
 
             resource = self.resource_manager.resource_dic[resource_name]
 
-            for pb_name in resource:
+            tutorial_iterator = self.get_option('tutorial_iterator')
+            if tutorial_iterator is None:
+                tutorial_iterator = 0
+
+            if tutorial_iterator >= len(resource):
+                self.set_option('tutorial_check_threshold', 0)
+                self.set_option('tutorial_iterator', 0)
+            else:
+                pb_name = resource[tutorial_iterator]
+                self.set_option('tutorial_iterator', tutorial_iterator + 1)
                 self.logger.debug(pb_name)
                 self.mouse_click(pb_name)
-                time.sleep(0.1)
+                self.interval = 0.01
         else:
-            self.set_option('tutorial_index', tutorial_index + 1)
+            self.set_option('tutorial_check_threshold', tutorial_check_threshold + 1)
 
         return ''
 
