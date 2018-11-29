@@ -106,6 +106,10 @@ class LYBDarkEden(lybgame.LYBGame):
                 self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                 return 'skip'
 
+        if True:
+            self.process_tutorial()
+
+
         # 패배!
         # (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
         # 					self.window_image,
@@ -137,7 +141,24 @@ class LYBDarkEden(lybgame.LYBGame):
         # 	return scene_name
 
 
-        # self.get_scene('main_scene').click_tutorials()
+        tutorial_index = self.get_option('tutorial_index')
+        if tutorial_index == None:
+            tutorial_index = 0
+
+        if tutorial_index > 5:
+            self.set_option('tutorial_index', 0)
+            resource_name = 'tutorial_loc'
+            if not resource_name in self.resource_manager.resource_dic:
+                return
+
+            resource = self.resource_manager.resource_dic[resource_name]
+
+            for pb_name in resource:
+                self.logger.debug(pb_name)
+                self.mouse_click(pb_name)
+                time.sleep(0.1)
+        else:
+            self.set_option('tutorial_index', tutorial_index + 1)
 
         return ''
 
@@ -234,6 +255,39 @@ class LYBDarkEden(lybgame.LYBGame):
         self.scene_dic[scene_name].setLoggingQueue(self.logging_queue)
         self.scene_dic[scene_name].setGameObject(self)
 
+    def process_tutorial(self):
+        resource_name = 'control_pad_tutorial_loc'
+        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(10):
+            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1,
+                custom_rect=(130, 300, 400, 340)
+            )
+            if loc_x != -1:
+                self.get_scene('main_scene').set_checkpoint(resource_name)
+                self.logger.info('콘트롤 패드 튜토리얼: ' + str(match_rate))
+                self.get_scene('main_scene').lyb_mouse_drag('pad_direction_center', 'pad_direction_1', stop_delay=2)
+                return 'skip'
+    
+        resource_name = 'potion_tutorial_loc'
+        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(10):
+            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1,
+                custom_rect=(5, 180, 150, 210),
+            )
+            if loc_x != -1:
+                self.get_scene('main_scene').set_checkpoint(resource_name)
+                self.logger.info('상점에서 회복 물약 구입' + str(match_rate))
+                self.get_scene('sangjeom_scene').status = 0
+                self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+                return 'skip'
 
 class LYBDarkEdenTab(lybgame.LYBGameTab):
     def __init__(self, root_frame, configure, game_options, inner_frame_dics, width, height,
