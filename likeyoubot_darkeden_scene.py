@@ -857,7 +857,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         return self.isStatusByResource(
             '[우측 자동전투 인식 실패 횟수]',
             'main_scene_auto_loc',
-            0.8,
+            0.6,
             (200, 200, 200), (50, 50, 50),
             (740, 340, 780, 370),
             limit_count=limit_count
