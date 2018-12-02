@@ -391,6 +391,7 @@ class LYBScene():
     def lyb_mouse_drag(self, from_pixelbox, to_pixelbox, delay=0.5, stop_delay=0):
         (from_x, from_y) = self.get_location(from_pixelbox)
         (to_x, to_y) = self.get_location(to_pixelbox)
+        self.logger.info('[마우스 드래그] %s -> %s' % (str(self.get_location(from_pixelbox)), str(self.get_location(to_pixelbox))))
         self.lyb_mouse_drag_location(from_x, from_y, to_x, to_y, delay=delay, stop_delay=stop_delay)
 
     def lyb_mouse_drag_location(self, from_x, from_y, to_x, to_y, delay=0.5, stop_delay=0):

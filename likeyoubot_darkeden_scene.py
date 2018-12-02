@@ -51,6 +51,24 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             rc = self.sangjeom_scene()
         elif self.scene_name == 'buy_confirm_scene':
             rc = self.buy_confirm_scene()
+        elif self.scene_name == 'gejo_tutorial_scene':
+            rc = self.gejo_tutorial_scene()
+        elif self.scene_name == 'gabang_tutorial_scene':
+            rc = self.gejo_tutorial_scene()
+        elif self.scene_name == 'ilil_quest_limit_scene':
+            rc = self.ilil_quest_limit_scene()
+        elif self.scene_name == 'jido_scene':
+            rc = self.jido_scene()
+        elif self.scene_name == 'gabang_scene':
+            rc = self.gabang_scene()
+        elif self.scene_name == 'gabang_sell_scene':
+            rc = self.gabang_sell_scene()
+        elif self.scene_name == 'gasang_sooryeonjang_scene':
+            rc = self.gasang_sooryeonjang_scene()
+        elif self.scene_name == 'party_chode_scene':
+            rc = self.party_chode_scene()
+        elif self.scene_name == 'field_boss_scene':
+            rc = self.field_boss_scene()
 
 
 
@@ -75,6 +93,299 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         return self.status
 
+    def field_boss_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            self.click_resource('field_boss_scene_move')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def party_chode_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1  
+            pb_name = 'party_chode_scene_check_all'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate < 0.9:
+                self.lyb_mouse_click(pb_name, custom_threshold=0)
+                return self.status
+
+            if self.click_resource('party_chode_scene_seontek_chode_loc') is True:
+                self.status = 10
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def gasang_sooryeonjang_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+
+            resource_name = 'gasang_sooryeonjang_scene_limit_loc'
+            match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+            if match_rate > 0.9:
+                self.status = 10
+                return self.status
+
+            resource_name = 'gasang_sooryeonjang_scene_enter_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1)
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def gabang_sell_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            is_clicked = False
+            for i in range(len(lybgamedarkeden.LYBDarkEden.item_list)):
+                cfg_item = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'sell_item_' + str(i))
+                pb_name = 'gabang_sell_scene_item_' + str(i)
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9 and cfg_item is False:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                elif match_rate < 0.9 and cfg_item is True:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+            for i in range(len(lybgamedarkeden.LYBDarkEden.item_quality_list)):
+                cfg_item_quality = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'sell_item_quality_' + str(i))
+                pb_name = 'gabang_sell_scene_item_quality_' + str(i)
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9 and cfg_item_quality is False:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                elif match_rate < 0.9 and cfg_item_quality is True:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+            if is_clicked == False:
+                self.status = 10
+        elif self.status == 10:
+            self.click_resource('gabang_sell_scene_sell_loc')
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def gabang_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            resource_name = 'gabang_scene_jeongri_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1)
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+            self.status += 1
+        elif self.status == 2:
+            resource_name = 'gabang_scene_sell_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1)
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+            self.game_object.get_scene('gabang_sell_scene').status = 0
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+
+    def jido_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            self.lyb_mouse_click('jido_scene_tab_0', custom_threshold=0)
+            self.status += 1
+        elif 2 <= self.status < 10:
+            self.status += 1
+            cfg_area = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_area')
+            cfg_sub_area = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_sub_area')
+            cfg_monster = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_monster')
+
+            if cfg_monster == '선택안함':
+                self.status = 99999
+                return self.status
+
+            pb_name = 'jido_scene_tab_pb_0'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                resource_name = 'jido_scene_area_' + cfg_area + '_loc'
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                    self.window_image,
+                    resource_name,
+                    custom_threshold=0.7,
+                    custom_flag=1)
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+
+                return self.status
+
+            pb_name = 'jido_scene_tab_pb_1'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                resource_name = 'jido_scene_sub_area_' + cfg_sub_area + '_loc'
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                    self.window_image,
+                    resource_name,
+                    custom_threshold=0.7,
+                    custom_flag=1)
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                return self.status
+
+            pb_name = 'jido_scene_tab_pb_2'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                for i in range(6):
+                    resource_name = 'jido_scene_monster_' + cfg_monster + '_loc'
+                    (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                        self.window_image,
+                        resource_name,
+                        custom_threshold=0.7,
+                        custom_flag=1,
+                        custom_rect=(570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60))
+                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                    if loc_x != -1:
+                        self.lyb_mouse_click_location(loc_x, loc_y)
+                        self.status = 10
+                        return self.status
+
+            is_end = True
+            for i in range(4):
+                pb_name = 'jido_scene_monster_last_' + str(i)
+                (loc_x, loc_y) = self.get_location(pb_name)
+                last_pixel = self.get_option('last_pixel_' + pb_name)
+                if last_pixel == None:
+                    is_end = False
+                else:
+                    self.logger.debug(str((loc_x, loc_y)) + ' ' + str(last_pixel) + ' ' + str(
+                        self.game_object.window_pixels[loc_x, loc_y]))
+                    if last_pixel != self.game_object.window_pixels[loc_x, loc_y]:
+                        is_end = False
+
+                self.set_option('last_pixel_' + pb_name, self.game_object.window_pixels[loc_x, loc_y])
+            if is_end == True:
+                self.logger.warn('몬스터 탐색 실패: ' + str(cfg_monster))
+                self.status = 10
+                return self.status
+
+            self.lyb_mouse_drag('jido_scene_monster_drag_bot', 'jido_scene_monster_drag_top')
+            self.game_object.interval = self.period_bot(2)
+        elif 10 <= self.status < 20:
+            self.status += 1
+            pb_name = 'jido_scene_monster_chujeok'
+            (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                self.window_image,
+                self.game_object.resource_manager.pixel_box_dic[pb_name],
+                custom_threshold=0.8,
+                custom_flag=1,
+                custom_rect=(700, 100, 780, 470))
+            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def ilil_quest_limit_scene(self):
+
+        self.game_object.get_scene('quest_scene').status = 20
+        self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+        return self.status
+
+
+    def gejo_tutorial_scene(self):
+
+        resource_name = self.scene_name
+        match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+        if match_rate < 0.9:
+            self.game_object.click_all_tutorial_point()
+            return self.status
+
+        resource_name = 'gejo_tutorial_loc'
+        resource = self.game_object.resource_manager.resource_dic[resource_name]
+
+        tutorial_iterator = self.get_option('tutorial_iterator')
+        if tutorial_iterator is None:
+            tutorial_iterator = 0
+
+        if tutorial_iterator >= len(resource):
+            self.set_option('tutorial_iterator', 0)
+        else:
+            pb_name = resource[tutorial_iterator]
+            self.set_option('tutorial_iterator', tutorial_iterator + 1)
+            self.logger.debug(pb_name)
+            self.lyb_mouse_click(pb_name, custom_threshold=0)
+            self.game_object.interval = 0.01
+
+        return self.status
 
     def buy_confirm_scene(self):
 
@@ -127,7 +438,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         elif self.status == 10:
             self.status += 1
         elif self.status == 11:
-            self.lyb_mouse_click('sangjeom_scene_hp_potion', custom_threshold=0)
+            pb_name = self.get_option('potion_pb_name')
+            if pb_name is None:
+                pb_name = 'sangjeom_scene_hp_potion'
+            self.lyb_mouse_click(pb_name, custom_threshold=0)
             self.game_object.get_scene('buy_confirm_scene').status = 0
             self.status += 1
         else:
@@ -140,12 +454,31 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
     def death_scene(self):
 
+        if time.time() - self.get_checkpoint('last_death') > 60:
+            self.status = 0
+
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
+            self.set_checkpoint('last_death')
             self.status += 1
-        elif self.status == 1:
+        elif 1 <= self.status < 10:
+            self.status += 1
+            pb_name = 'death_scene_help'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.lyb_mouse_click(pb_name, custom_threshold=0)
+                return self.status
+
+            pb_name = 'death_scene_help_guild'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.lyb_mouse_click(pb_name, custom_threshold=0)
+                return self.status
+
             self.end_work()
-            self.status += 1
+            self.status = 10
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -170,20 +503,19 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 return self.status
 
             resource_name = 'tobeolde_main_scene_portal_loc'
-            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.8,
-                custom_flag=1,
-                custom_rect=(500, 420, 580, 470))
+                custom_threshold=0.6,
+                custom_flag=1)
             self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
                 self.status = 0
                 return self.status
             
-            if self.status > 60 and self.status % 5 == 0:
-                self.lyb_mouse_click('character_move_1', custom_threshold=0)
+            if self.status % 5 == 0:
+                self.lyb_mouse_drag('pad_direction_center', 'pad_direction_1', stop_delay=2)
                 return self.status
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -200,9 +532,15 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status += 1
         elif self.status == self.get_work_status('토벌대'):
             self.status = 200
+        elif self.status == self.get_work_status('가상수련장'):
+            self.status = 300
         elif self.status == 200:
             self.game_object.get_scene('tobeolde_scene').status = 0
             self.lyb_mouse_click('dungeon_scene_tobeolde', custom_threshold=0)
+            self.status += 1
+        elif self.status == 300:
+            self.game_object.get_scene('tobeolde_scene').status = 0
+            self.lyb_mouse_click('dungeon_scene_gasang_sooryeonjang', custom_threshold=0)
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -219,8 +557,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.set_option('bottom_bosang_index', 0)
             self.status += 1
         elif self.status == 1:
-            pb_name = 'tobeolde_scene_tab_' + str(0)
-            self.lyb_mouse_click(pb_name, custom_threshold=0)
+            # pb_name = 'tobeolde_scene_tab_' + str(0)
+            # self.lyb_mouse_click(pb_name, custom_threshold=0)
             self.status += 1
         elif 2 <= self.status < 10:
             self.status += 1
@@ -538,9 +876,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             self.logger.debug('inner_status: ' + str(inner_status))
             if inner_status == 0:
+                self.lyb_mouse_drag('main_scene_quest_drag_top', 'main_scene_quest_drag_bot')
+                self.set_option(self.current_work + '_inner_status', inner_status + 1)
+            elif inner_status == 1:                
                 self.lyb_mouse_click('main_scene_quest_0', custom_threshold=0)
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)
-            elif 0 < inner_status < 60:
+            elif 2 <= inner_status < 30:
                 if self.is_complete_quest():
                     self.set_option(self.current_work + '_inner_status', 0)
                     return self.status
@@ -555,8 +896,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         elif self.status == self.get_work_status('자동 사냥'):
 
+            cfg_check_workdmap = int(self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_move_check_period'))
+            cfg_check_sell = int(self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_sell_period'))
+            cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_duration'))
+            
             elapsed_time = self.get_elapsed_time()
-            if elapsed_time > self.period_bot(600):
+            if elapsed_time > cfg_duration:
                 self.set_option(self.current_work + '_end_flag', True)
 
             if self.get_option(self.current_work + '_end_flag'):
@@ -565,28 +910,69 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.status = self.last_status[self.current_work] + 1
                 return self.status
 
+            self.loggingElapsedTime('[' + str(self.current_work) + '] 경과 시간', elapsed_time, cfg_duration, period=60)
+                        
+            elapsed_time = time.time() - self.get_checkpoint('auto_sell_period')
+            if elapsed_time > cfg_check_workdmap:
+                self.game_object.get_scene('gabang_scene').status = 0
+                self.set_checkpoint('auto_sell_period')
+                self.lyb_mouse_click('main_scene_gabang', custom_threshold=0)
+                self.set_option(self.current_work + '_inner_status', 0)
+                return self.status
+
+            elapsed_time = time.time() - self.get_checkpoint('auto_move_check_period')
+            if elapsed_time > cfg_check_workdmap:
+                self.game_object.get_scene('jido_scene').status = 0
+                self.set_checkpoint('auto_move_check_period')
+                self.lyb_mouse_click('main_scene_map', custom_threshold=0)
+                self.set_option(self.current_work + '_inner_status', 0)
+                return self.status   
+
             inner_status = self.get_option(self.current_work + '_inner_status')
             if inner_status is None:
                 inner_status = 0
 
             self.logger.debug('inner_status: ' + str(inner_status))
             if inner_status == 0:
-                self.lyb_mouse_click('main_scene_quest_3', custom_threshold=0)
+                # self.lyb_mouse_click('main_scene_quest_3', custom_threshold=0)
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)
-            elif 0 < inner_status < 60:
+            elif 0 < inner_status < 600:
+                self.set_option(self.current_work + '_inner_status', inner_status + 1)
+
                 if self.is_complete_quest():
                     self.set_option(self.current_work + '_inner_status', 0)
                     return self.status
 
-                if self.isAutoCombat(limit_count=3) is False:
+                if self.isAutoCombat(limit_count=5) is False:
                     self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                     return self.status
 
-                if self.isCenterAutoCombat(limit_count=3) is False:
+                if self.isCenterAutoCombat(limit_count=5) is False:
                     self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                     return self.status
 
+                if inner_status % 60 == 0:
+                    if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party') is True:
+                        self.lyb_mouse_click('main_scene_tab_party', custom_threshold=0)
+                        self.set_option(self.current_work + '_last_inner_status', inner_status)
+                        self.set_option(self.current_work + '_inner_status', 1000)
+                        return self.status
+                elif inner_status % 30 == 0:
+                    if self.drag_quest_list():
+                        return self.status
+            elif 1000 <= inner_status < 1010:
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)
+
+                if self.click_resource('main_scene_party_chode_loc') is True:
+                    self.game_object.get_scene('party_chode_scene').status = 0
+                else:
+                    self.set_option(self.current_work + '_inner_status', 1010)
+            elif inner_status == 1010:
+                self.lyb_mouse_click('main_scene_tab_quest', custom_threshold=0)
+                last_inner_status = self.get_option(self.current_work + '_last_inner_status')
+                if last_inner_status == None:
+                    last_inner_status = 0
+                self.set_option(self.current_work + '_inner_status', last_inner_status)
             else:
                 self.set_option(self.current_work + '_inner_status', 0)
 
@@ -661,6 +1047,40 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             else:
                 self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
 
+        elif self.status == self.get_work_status('가상수련장'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            pb_name = 'main_scene_menu_open'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.lyb_mouse_click('main_scene_menu_dungeon', custom_threshold=0)
+                self.game_object.get_scene('dungeon_scene').status = self.status
+            else:
+                self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+
+        elif self.status == self.get_work_status('판매'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.lyb_mouse_click('main_scene_gabang', custom_threshold=0)
+            self.game_object.get_scene('gabang_scene').status = 0
+
         elif self.status == self.get_work_status('알림'):
 
             try:
@@ -731,9 +1151,89 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         return self.status
 
     def pre_process_main_scene(self):
+
+        elapsed_time = time.time() - self.get_checkpoint('hp_check')
+        if elapsed_time > self.period_bot(5):
+            hp = self.player_hp()        
+            if hp != None:
+                if hp < 50:
+                    self.set_checkpoint('hp_check')
+                    self.logger.warn('HP: ' + str(hp) + '%')
+                    if hp < 20:
+                        for i in range(2):
+                            pb_name = 'main_scene_quick_slot_return_' + str(i)
+                            (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                                self.window_image,
+                                self.game_object.resource_manager.pixel_box_dic[pb_name],
+                                custom_threshold=0.7,
+                                custom_flag=1,
+                                custom_rect=(600, 260, 750, 320))
+                            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                            if loc_x != -1:
+                                self.lyb_mouse_click_location(loc_x, loc_y)
+                                break 
+                    
+                    for i in range(2):
+                        pb_name = 'main_scene_quick_slot_hp_potion_' + str(i)
+                        (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                            self.window_image,
+                            self.game_object.resource_manager.pixel_box_dic[pb_name],
+                            custom_threshold=0.7,
+                            custom_flag=1,
+                            custom_rect=(600, 260, 750, 320))
+                        self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                        if loc_x != -1:
+                            self.lyb_mouse_click_location(loc_x, loc_y)
+                            break
+                    
+                    for i in range(4):
+                        pb_name = 'skill_' + str(i)
+                        self.lyb_mouse_click(pb_name, custom_threshold=0)
+                        time.sleep(0.1)
+
+        pb_name = 'main_scene_mana_potion_empty'        
+        elapsed_time = time.time() - self.get_checkpoint(pb_name)
+        if elapsed_time > self.period_bot(3600):
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.set_checkpoint(pb_name)
+                self.game_object.get_scene('sangjeom_scene').status = 0
+                self.game_object.get_scene('sangjeom_scene').set_option('potion_pb_name', 'sangjeom_scene_mp_potion')
+                self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
+                return True
+
+        pb_name = 'main_scene_hp_potion_empty'        
+        elapsed_time = time.time() - self.get_checkpoint(pb_name)
+        if elapsed_time > self.period_bot(3600):
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.set_checkpoint(pb_name)
+                self.game_object.get_scene('sangjeom_scene').status = 0
+                self.game_object.get_scene('sangjeom_scene').set_option('potion_pb_name', 'sangjeom_scene_hp_potion')
+                self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
+                return True
+
+        # pb_name = 'main_scene_gasang_sooryeonjang_loc'
+        # elapsed_time = time.time() - self.get_checkpoint(pb_name)
+        # if elapsed_time > self.period_bot(30):
+        #     (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+        #         self.window_image,
+        #         self.game_object.resource_manager.pixel_box_dic[pb_name],
+        #         custom_threshold=0.9,
+        #         custom_flag=1,
+        #         custom_rect=(710, 260, 760, 300))
+        #     self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        #     if loc_x != -1:
+        #         self.logger.info('가상 수련장')
+        #         self.set_checkpoint(pb_name)
+        #         self.lyb_mouse_click_location(loc_x, loc_y)
+        #         return True
+
         pb_name = 'main_scene_quick_move'
         elapsed_time = time.time() - self.get_checkpoint(pb_name)
-        if elapsed_time > self.period_bot(5):
+        if elapsed_time > self.period_bot(30):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
@@ -798,37 +1298,47 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click_location(loc_x, loc_y)
                 return True
 
-        # pb_name = 'main_scene_gasang_sooryeonjang_loc'
-        # elapsed_time = time.time() - self.get_checkpoint(pb_name)
-        # if elapsed_time > self.period_bot(30):
-        #     (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
-        #         self.window_image,
-        #         self.game_object.resource_manager.pixel_box_dic[pb_name],
-        #         custom_threshold=0.9,
-        #         custom_flag=1,
-        #         custom_rect=(710, 260, 760, 300))
-        #     self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
-        #     if loc_x != -1:
-        #         self.logger.info('가상 수련장')
-        #         self.set_checkpoint(pb_name)
-        #         self.lyb_mouse_click_location(loc_x, loc_y)
-        #         return True
+        resource_name_list = [
+            'main_scene_chatting_ban_loc',
+            'main_scene_chatting_send_loc',
+        ]
+        for resource_name in resource_name_list:
+            match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+            self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+            if match_rate > 0.9:
+                pb_name = resource_name.replace('_loc', '', 1) + '_close_icon'
+                self.lyb_mouse_click(pb_name, custom_threshold=0)
+                return True
+
+
+        if self.isOpenQuickSlot(limit_count=3) == False:
+            self.lyb_mouse_click('main_scene_quick_slot', custom_threshold=0)
+            return True
 
         pb_name = 'main_scene_looting'
-        elapsed_time = time.time() - self.get_checkpoint(pb_name)
-        if elapsed_time > self.period_bot(5):
-            (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
-                self.window_image,
-                self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
-                custom_top_level=(255, 255, 255),
-                custom_below_level=(100, 100, 100),
-                custom_flag=1,
-                custom_rect=(180, 450, 230, 480))
-            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
-            if loc_x == -1:           
-                # 깜빡일 때 클릭
+        (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+            self.window_image,
+            self.game_object.resource_manager.pixel_box_dic[pb_name],
+            custom_threshold=0.9,
+            custom_top_level=(255, 255, 255),
+            custom_below_level=(100, 100, 100),
+            custom_flag=1,
+            custom_rect=(180, 450, 230, 480))
+        self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        if loc_x == -1:           
+            # 깜빡일 때 클릭            
+            elapsed_time = time.time() - self.get_checkpoint(pb_name)
+            if elapsed_time > self.period_bot(10):
                 self.set_checkpoint(pb_name)
+                self.set_option(pb_name + '_limit', 0)
+
+            limit_count = self.get_option(pb_name + '_limit')
+            if limit_count is None:
+                limit_count = 0
+
+            if limit_count > 1:
+                self.set_checkpoint(pb_name)
+                self.set_option(pb_name + '_limit', 0)
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 self.logger.info('줍기 클릭')
                 return True
@@ -847,19 +1357,15 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     self.window_image,
                     pb_name,
                     custom_threshold=0.6,
-                    custom_top_level=(20, 255, 20),
-                    custom_below_level=(0, 100, 0),
                     custom_flag=1,
-                    custom_rect=(5, 150, 170, 320))
+                    custom_rect=(5, 150, 170, 350))
             else:
                 (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                     self.window_image,
                     self.game_object.resource_manager.pixel_box_dic[pb_name],
-                    custom_threshold=0.65,
-                    custom_top_level=(20, 255, 20),
-                    custom_below_level=(0, 100, 0),
+                    custom_threshold=0.6,
                     custom_flag=1,
-                    custom_rect=(5, 150, 170, 320))
+                    custom_rect=(5, 150, 170, 350))
 
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
@@ -891,11 +1397,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.6,
-                custom_top_level=(255, 255, 255),
-                custom_below_level=(100, 100, 100),
+                custom_threshold=0.65,
                 custom_flag=1,
-                custom_rect=(5, 150 + (quest_index * 25), 170, 180 + (quest_index * 30)))
+                custom_rect=(5, 150 + (quest_index * 25), 200, 180 + (quest_index * 30)))
             self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 threshold = self.get_option(resource_name + '_threshold')
@@ -929,11 +1433,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         self.game_object.get_scene('main_scene').set_option(current_work + '_end_flag', True)
 
+
     def isAutoCombat(self, limit_count=-1):
         return self.isStatusByResource(
             '[우측 자동전투 인식 실패 횟수]',
             'main_scene_auto_loc',
-            0.6,
+            0.5,
             (200, 200, 200), (50, 50, 50),
             (740, 340, 780, 370),
             limit_count=limit_count
@@ -953,9 +1458,19 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         return self.isStatusByResource(
             '[중앙 자동전투 인식 실패 횟수]',
             'main_scene_center_auto_loc',
-            0.6,
+            0.5,
             -1, -1,
             (350, 300, 450, 370),
+            limit_count=limit_count
+        )
+
+    def isOpenQuickSlot(self, limit_count=-1):
+        return self.isStatusByResource(
+            '[퀵슬롯 닫힘 인식 횟수]',
+            'main_scene_quick_slot_config_loc',
+            0.8,
+            -1, -1,
+            (750, 260, 790, 320),
             limit_count=limit_count
         )
 
@@ -992,3 +1507,72 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         self.set_option(resource_name + 'check_count', check_count + 1)
 
         return True
+
+    def drag_quest_list(self):
+        s = self.get_option('drag_start_pb_name')
+        e = self.get_option('drag_end_pb_name')
+
+        if s is None:
+            s = 'main_scene_quest_drag_bot'
+        if e is None:
+            e = 'main_scene_quest_drag_top'
+
+        self.lyb_mouse_drag(s, e)
+        
+        self.set_option('drag_start_pb_name', e)
+        self.set_option('drag_end_pb_name', s)
+
+        return True
+
+    def player_hp(self):
+        return self.horizontal_bar_percent('player_hp_s', 'player_hp_m', 'player_hp_e', adjust=(50, 50, 50))
+
+    # def player_mp(self):
+    #   return self.horizontal_bar_percent('player_mp_s', 'player_mp_m', 'player_mp_e', adjust=(50, 50, 50))
+
+    def horizontal_bar_percent(self, hp_s, hp_m, hp_e, ignore_rgb=-1, adjust=(15, 15, 15), adjust_s=(0, 0),
+                               adjust_e=(0, 0)):
+
+        (s_loc_x, s_loc_y) = self.get_location(hp_s)
+        s_loc_x += adjust_s[0]
+        s_loc_y += adjust_s[1]
+
+        (e_loc_x, e_loc_y) = self.get_location(hp_e)
+        e_loc_x += adjust_e[0]
+        e_loc_y += adjust_e[1]
+
+        hp_pb = self.get_center_pixel_info(hp_m)
+        hp_rgb = hp_pb[1]
+
+        total_length = e_loc_x - s_loc_x
+        j = 0
+
+        hp_percent = None
+
+        while True:
+            (r, g, b) = self.game_object.get_pixel_info(self.window_pixels, e_loc_x - j, e_loc_y)
+            if abs(hp_rgb[0] - r) < adjust[0] and abs(hp_rgb[1] - g) < adjust[1] and abs(hp_rgb[2] - b) < adjust[2]:
+                hp_percent = int(((total_length - j) / total_length) * 100)
+                break
+            if ignore_rgb != -1:
+                if abs(ignore_rgb[0] - r) < adjust[0] and abs(ignore_rgb[1] - g) < adjust[1] and abs(
+                                ignore_rgb[2] - b) < adjust[2]:
+                    break
+
+            j += 1
+            if j > total_length:
+                break
+
+        return hp_percent
+
+    def click_resource(self, resource_name):        
+        (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+            self.window_image,
+            resource_name,
+            custom_threshold=0.7,
+            custom_flag=1)
+        self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        if loc_x != -1:
+            self.lyb_mouse_click_location(loc_x, loc_y)
+            return True
+        return False

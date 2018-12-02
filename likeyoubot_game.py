@@ -828,6 +828,69 @@ class LYBGame():
 
         return (loc_x, loc_y)
 
+
+    def locationResourceOnWindowPart2(self, parent, child_resource,
+                                     custom_threshold=-1,
+                                     custom_below_level=-1,
+                                     custom_top_level=-1,
+                                     source_custom_below_level=-1,
+                                     source_custom_top_level=-1,
+                                     custom_flag=-1,
+                                     average=False,
+                                     debug=False
+                                     ):
+        if not child_resource in self.resource_manager.resource_dic:
+            return ((-1, -1), 0)
+
+        left = likeyoubot_win.LYBWin.WIDTH
+        top = likeyoubot_win.LYBWin.HEIGHT
+        right = -1
+        bottom = -1
+
+        resource = self.resource_manager.resource_dic[child_resource]
+        for each_pixel_box_name in resource:
+            (loc_x, loc_y) = self.get_location(each_pixel_box_name)
+            if loc_x < left:
+                left = loc_x
+            if loc_x > right:
+                right = loc_x
+            if loc_y < top:
+                top = loc_y
+            if loc_y > bottom:
+                bottom = loc_y
+
+
+        adj_x, adj_y = self.get_player_adjust()
+
+        left = left - 32 + adj_x
+        top = top - 32 + adj_y
+        right = right + 32 - adj_x
+        bottom = bottom + 32 - adj_y
+
+        if left < 0:
+            left = 0
+        if top < 40:
+            top = 40
+        if right > likeyoubot_win.LYBWin.WIDTH - adj_x:
+            right = likeyoubot_win.LYBWin.WIDTH - adj_x
+        if bottom > likeyoubot_win.LYBWin.HEIGHT - adj_y:
+            bottom = likeyoubot_win.LYBWin.HEIGHT - adj_y
+
+        near_rect = (left, top, right, bottom) 
+
+        self.logger.warn(near_rect)
+
+        return self.locationResourceOnWindowPart(parent, child_resource,
+            custom_threshold=custom_threshold,
+            custom_below_level=custom_below_level,
+            custom_top_level=custom_top_level,
+            source_custom_below_level=source_custom_below_level,
+            source_custom_top_level=source_custom_top_level,
+            custom_flag=custom_flag,
+            custom_rect=near_rect,
+            average=average,
+            debug=debug)
+
     def locationResourceOnWindowPart(self, parent, child_resource,
                                      custom_threshold=-1,
                                      custom_below_level=-1,
