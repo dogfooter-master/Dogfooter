@@ -341,7 +341,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
                 custom_threshold=0.8,
                 custom_flag=1,
-                custom_rect=(700, 100, 780, 470))
+                custom_rect=(700, 150, 780, 470))
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
@@ -954,7 +954,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 if inner_status % 60 == 0:
                     if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party') is True:
                         self.lyb_mouse_click('main_scene_tab_party', custom_threshold=0)
-                        self.set_option(self.current_work + '_last_inner_status', inner_status)
+                        self.set_option(self.current_work + '_last_inner_status', inner_status + 1)
                         self.set_option(self.current_work + '_inner_status', 1000)
                         return self.status
                 elif inner_status % 30 == 0:

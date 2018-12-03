@@ -60,10 +60,13 @@ class LYBDarkEden(lybgame.LYBGame):
     }
     sub_area_monster_dic = {
         sub_area_list[0][0] : [
+            '선택안함',
+            '미누투스',
             '디오네아',
         ],
         sub_area_list[1][0] : [
             '선택안함',
+            '거터미누투스',
             '블루케니스',
             '미스트앵글러', 
             '튜머뮤턴트',
