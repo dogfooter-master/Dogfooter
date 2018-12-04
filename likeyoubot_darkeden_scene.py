@@ -1343,6 +1343,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.logger.info('줍기 클릭')
                 return True
 
+        if self.click_resource('main_scene_tobeol_ipjang_loc') is True:
+            return True
+
         return False
 
     def is_complete_quest(self, limit=1):
