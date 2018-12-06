@@ -35,6 +35,7 @@ class LYBDarkEden(lybgame.LYBGame):
 
     area_list = [
         '에슬라니안 시',
+        '림보성 지역',
         '드로베타 공단',
         '브랑코 시티'
         ]
@@ -42,6 +43,9 @@ class LYBDarkEden(lybgame.LYBGame):
     sub_area_list = [
         [
             '페이악 터널',
+        ],
+        [
+            '고르고바 터널',
         ],
         [
             '드로베타 MID',
@@ -56,7 +60,8 @@ class LYBDarkEden(lybgame.LYBGame):
     sub_area_dic = {
         area_list[0]: sub_area_list[0],
         area_list[1]: sub_area_list[1],
-        area_list[1]: sub_area_list[1],
+        area_list[2]: sub_area_list[2],
+        area_list[3]: sub_area_list[3],
     }
     sub_area_monster_dic = {
         sub_area_list[0][0] : [
@@ -66,6 +71,11 @@ class LYBDarkEden(lybgame.LYBGame):
         ],
         sub_area_list[1][0] : [
             '선택안함',
+            '미누투스',
+            '디오네아',
+        ],
+        sub_area_list[2][0] : [
+            '선택안함',
             '거터미누투스',
             '블루케니스',
             '미스트앵글러', 
@@ -74,15 +84,15 @@ class LYBDarkEden(lybgame.LYBGame):
             '인펙티드월딩봇',  
             '인펙티드프랜스포트봇',           
         ],
-        sub_area_list[1][1] : [
+        sub_area_list[2][1] : [
             '선택안함',
             '빅맨티스',            
         ],
-        sub_area_list[1][2] : [
+        sub_area_list[2][2] : [
             '선택안함',
             '알칸',            
         ],
-        sub_area_list[2][0] : [
+        sub_area_list[3][0] : [
             '선택안함',
             '디케이리서치',            
         ],

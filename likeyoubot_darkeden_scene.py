@@ -27,6 +27,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             rc = self.init_screen_scene()
         elif self.scene_name == 'main_scene':
             rc = self.main_scene()
+        elif self.scene_name == 'connect_account_scene':
+            rc = self.connect_account_scene()
+        elif self.scene_name == 'google_account_scene':
+            rc = self.google_account_scene()
         elif self.scene_name == 'login_scene':
             rc = self.login_scene()
         elif self.scene_name == 'character_scene':
@@ -69,6 +73,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             rc = self.party_chode_scene()
         elif self.scene_name == 'field_boss_scene':
             rc = self.field_boss_scene()
+        elif self.scene_name == 'event_scene':
+            rc = self.event_scene()
 
 
 
@@ -84,6 +90,69 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def event_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            resource_name = 'event_scene_click_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+
+            tutorial_iterator = self.get_option('tutorial_iterator')
+            if tutorial_iterator is None:
+                tutorial_iterator = 0
+
+            if tutorial_iterator >= len(resource):
+                self.set_option('tutorial_iterator', 0)
+            else:
+                pb_name = resource[tutorial_iterator]
+                self.set_option('tutorial_iterator', tutorial_iterator + 1)
+                self.logger.debug(pb_name)
+                self.lyb_mouse_click(pb_name, custom_threshold=0)
+                self.game_object.interval = 0.01
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def connect_account_scene(self):
+
+        if time.time() - self.get_checkpoint('last_detected') > 120:
+            self.set_checkpoint('last_detected')
+            self.status = 0
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            for i in range(2):
+                pb_name = 'connect_account_scene_check_' + str(i)
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9:
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                    return self.status
+
+            self.status = 10
+        elif self.status == 10:
+            self.lyb_mouse_click('connect_account_scene_google', custom_threshold=0)
+            self.status += 1
+        elif self.status == 11:
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -907,13 +976,15 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             if self.get_option(self.current_work + '_end_flag'):
                 self.set_option(self.current_work + '_end_flag', False)
                 self.set_option(self.current_work + '_inner_status', None)
+                self.checkpoint['auto_sell_period'] = 0
+                self.checkpoint['auto_move_check_period'] = 0
                 self.status = self.last_status[self.current_work] + 1
                 return self.status
 
             self.loggingElapsedTime('[' + str(self.current_work) + '] 경과 시간', elapsed_time, cfg_duration, period=60)
                         
             elapsed_time = time.time() - self.get_checkpoint('auto_sell_period')
-            if elapsed_time > cfg_check_workdmap:
+            if cfg_check_sell != 0 and elapsed_time > cfg_check_sell:
                 self.game_object.get_scene('gabang_scene').status = 0
                 self.set_checkpoint('auto_sell_period')
                 self.lyb_mouse_click('main_scene_gabang', custom_threshold=0)
@@ -921,7 +992,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 return self.status
 
             elapsed_time = time.time() - self.get_checkpoint('auto_move_check_period')
-            if elapsed_time > cfg_check_workdmap:
+            if cfg_check_workdmap != 0 and elapsed_time > cfg_check_workdmap:
                 self.game_object.get_scene('jido_scene').status = 0
                 self.set_checkpoint('auto_move_check_period')
                 self.lyb_mouse_click('main_scene_map', custom_threshold=0)
@@ -1191,6 +1262,21 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         self.lyb_mouse_click(pb_name, custom_threshold=0)
                         time.sleep(0.1)
 
+        resource_name = 'skill_vampire_loc'
+        elapsed_time = time.time() - self.get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(3):
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.6,
+                custom_flag=1,
+                custom_rect=(570, 350, 790, 420))
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.set_checkpoint(resource_name)
+                self.lyb_mouse_click_location(loc_x, loc_y)
+                return self.status
+
         pb_name = 'main_scene_mana_potion_empty'        
         elapsed_time = time.time() - self.get_checkpoint(pb_name)
         if elapsed_time > self.period_bot(3600):
@@ -1203,17 +1289,21 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
                 return True
 
-        pb_name = 'main_scene_hp_potion_empty'        
-        elapsed_time = time.time() - self.get_checkpoint(pb_name)
-        if elapsed_time > self.period_bot(3600):
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
-                self.set_checkpoint(pb_name)
-                self.game_object.get_scene('sangjeom_scene').status = 0
-                self.game_object.get_scene('sangjeom_scene').set_option('potion_pb_name', 'sangjeom_scene_hp_potion')
-                self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
-                return True
+        pb_name_list = [
+            'main_scene_hp_potion_empty',
+            'main_scene_hp_blood_pack_empty',
+        ]
+        for pb_name in pb_name_list:
+            elapsed_time = time.time() - self.get_checkpoint(pb_name)
+            if elapsed_time > self.period_bot(3600):
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9:
+                    self.set_checkpoint(pb_name)
+                    self.game_object.get_scene('sangjeom_scene').status = 0
+                    self.game_object.get_scene('sangjeom_scene').set_option('potion_pb_name', 'sangjeom_scene_hp_potion')
+                    self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
+                    return True
 
         # pb_name = 'main_scene_gasang_sooryeonjang_loc'
         # elapsed_time = time.time() - self.get_checkpoint(pb_name)
