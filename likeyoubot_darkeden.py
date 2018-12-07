@@ -19,7 +19,9 @@ class LYBDarkEden(lybgame.LYBGame):
         '결투장',
         '토벌대',
         '판매',
+        '분해',
         '가상수련장',
+        '특수던전',
 
         '알림',
         '[반복 시작]',
@@ -82,7 +84,7 @@ class LYBDarkEden(lybgame.LYBGame):
             '튜머뮤턴트',
             '튜커클링커',  
             '인펙티드월딩봇',  
-            '인펙티드프랜스포트봇',           
+            '인펙티드트랜스포트봇',           
         ],
         sub_area_list[2][1] : [
             '선택안함',
@@ -111,6 +113,24 @@ class LYBDarkEden(lybgame.LYBGame):
         '희귀',
         '영웅',
         '전설',
+    ]
+
+    special_dungeon_list = [
+        '재료',
+        '경험치',
+        '스킬',
+        '골드',
+    ]
+
+    difficulty_list = [
+        '쉬움',
+        '보통',
+        '어려움',
+    ]
+
+    option_list = [
+        '강화 아이템 포함',
+        '거래가능 아이템 포함',
     ]
 
     def __init__(self, game_name, game_data_name, window):
@@ -459,6 +479,27 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         # 작업 탭 좌측
         frame_l = ttk.Frame(self.inner_frame_dic['work_tab_frame'])
         frame_label = ttk.LabelFrame(frame_l, text='자동 사냥')
+
+        frame = ttk.Frame(frame_label)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'].trace(
+            'w', lambda *args: self.auto_party(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party')
+            )
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'] = False
+
+        check_box = ttk.Checkbutton(
+
+            master              = frame,
+            text                = '파티 초대', 
+            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'],
+            onvalue             = True, 
+            offvalue            = False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
             master              = frame, 
@@ -524,6 +565,37 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
             master              = frame, 
+            text                = self.get_option_text('분해 체크 주기(초)', width=27)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period'].trace(
+            'w', lambda *args: self.auto_bunhe_period(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period')
+            )
+        combobox_list = []
+        for i in range(0, 3601):
+            combobox_list.append(str(i))
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period'] = 300
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 7,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
             text                = self.get_option_text('월드맵 체크 주기(초)', width=27)
             )
         label.pack(side=tkinter.LEFT)
@@ -550,26 +622,6 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
             )
         combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_move_check_period'])
         combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
-        frame.pack(anchor=tkinter.W)
-
-        frame = ttk.Frame(frame_label)
-
-        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'] = tkinter.BooleanVar(frame)
-        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'].trace(
-            'w', lambda *args: self.auto_party(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party')
-            )
-        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party' in self.configure.common_config[self.game_name]:
-            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'] = False
-
-        check_box = ttk.Checkbutton(
-
-            master              = frame,
-            text                = '파티 초대', 
-            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_party'],
-            onvalue             = True, 
-            offvalue            = False
-        )
-        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
 
         frame = ttk.Frame(frame_label)
@@ -668,8 +720,69 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         frame.pack(anchor=tkinter.W)
 
         frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
-        frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
+        frame_label = ttk.LabelFrame(frame_l, text='특수던전')
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('던전 선택', width=19)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon'].trace(
+            'w', lambda *args: self.special_dungeon(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon')
+            )
+        combobox_list = LYBDarkEden.special_dungeon_list
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon'] = combobox_list[1]
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 15,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W) 
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('난이도 선택', width=19)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty'].trace(
+            'w', lambda *args: self.special_dungeon_difficulty(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty')
+            )
+        combobox_list = LYBDarkEden.difficulty_list
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty'] = combobox_list[1]
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 15,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W) 
+
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+        frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
         # 작업 탭 중간
         frame_m = ttk.Frame(self.inner_frame_dic['work_tab_frame'])
         frame_label = ttk.LabelFrame(frame_m, text='판매')
@@ -745,6 +858,73 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
             check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
         frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
+        frame_label = ttk.LabelFrame(frame_m, text='분해')
+
+        frame = ttk.Frame(frame_label)
+        for i in range(len(LYBDarkEden.option_list)):
+            self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i)] = tkinter.BooleanVar(frame)
+            if i == 0:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(0)].trace(
+                    'w', lambda *args: self.bunhe_option_0(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(0))
+                    )
+            elif i == 1:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(1)].trace(
+                    'w', lambda *args: self.bunhe_option_1(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(1))
+                    )
+
+            if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i) in self.configure.common_config[self.game_name]:
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i)] = False
+
+            check_box = ttk.Checkbutton(
+
+                master              = frame,
+                text                = LYBDarkEden.option_list[i], 
+                variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i)],
+                onvalue             = True, 
+                offvalue            = False
+            )
+            check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame = ttk.Frame(frame_label)
+        for i in range(len(LYBDarkEden.item_quality_list)):
+            self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i)] = tkinter.BooleanVar(frame)
+            if i == 0:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(0)].trace(
+                    'w', lambda *args: self.bunhe_item_quality_0(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(0))
+                    )
+            elif i == 1:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(1)].trace(
+                    'w', lambda *args: self.bunhe_item_quality_1(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(1))
+                    )
+            elif i == 2:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(2)].trace(
+                    'w', lambda *args: self.bunhe_item_quality_2(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(2))
+                    )
+            elif i == 3:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(3)].trace(
+                    'w', lambda *args: self.bunhe_item_quality_3(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(3))
+                    )
+            elif i == 4:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(4)].trace(
+                    'w', lambda *args: self.bunhe_item_quality_4(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(4))
+                    )
+            if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i) in self.configure.common_config[self.game_name]:
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i)] = False
+
+            check_box = ttk.Checkbutton(
+
+                master              = frame,
+                text                = LYBDarkEden.item_quality_list[i], 
+                variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i)],
+                onvalue             = True, 
+                offvalue            = False
+            )
+            check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
         frame_m.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 작업 탭 우측
@@ -772,8 +952,11 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def auto_sell_period(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())        
+
+    def auto_bunhe_period(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
-        
+
     def auto_move_check_period(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
@@ -806,6 +989,12 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
     def auto_monster(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
+    def special_dungeon(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def special_dungeon_difficulty(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
     def auto_party(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
@@ -834,5 +1023,26 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def sell_item_quality_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_option_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_option_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_quality_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_quality_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_quality_2(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_quality_3(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_quality_4(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 

@@ -75,6 +75,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             rc = self.field_boss_scene()
         elif self.scene_name == 'event_scene':
             rc = self.event_scene()
+        elif self.scene_name == 'special_dungeon_scene':
+            rc = self.special_dungeon_scene()
+        elif self.scene_name == 'special_dungeon_create_scene':
+            rc = self.special_dungeon_create_scene()
+        elif self.scene_name == 'gejo_scene':
+            rc = self.gejo_scene()
 
 
 
@@ -90,6 +96,113 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def gejo_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            resource_name = 'gejo_scene_tab_bunhe_loc'
+            self.click_resource(resource_name)
+            self.status += 1
+        elif 2 <= self.status < 10:
+            is_clicked = False
+            for i in range(len(lybgamedarkeden.LYBDarkEden.option_list)):
+                cfg_item = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i))
+                pb_name = 'gejo_scene_bunhe_option_' + str(i)
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9 and cfg_item is False:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                elif match_rate < 0.9 and cfg_item is True:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+            for i in range(len(lybgamedarkeden.LYBDarkEden.item_quality_list)):
+                cfg_item_quality = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i))
+                pb_name = 'gejo_scene_item_quality_' + str(i)
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9 and cfg_item_quality is False:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                elif match_rate < 0.9 and cfg_item_quality is True:
+                    is_clicked = True
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+            if is_clicked == False:
+                self.status = 10
+        elif self.status == 10:
+            self.click_resource('gejo_scene_bunhe_loc')
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def special_dungeon_create_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1   
+            resource_name = 'special_dungeon_create_scene_invite_loc'         
+            for i in range(4):
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                    self.window_image,
+                    resource_name,
+                    custom_threshold=0.7,
+                    custom_flag=1,
+                    custom_rect=(460, 190 + (i*50) - 30, 530, 190 + (i*50) + 30))
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                    return self.status
+            self.status = 10
+        elif self.status == 10:
+            self.click_resource('special_dungeon_create_scene_create_loc')
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def special_dungeon_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            cfg_dungeon_name = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon')
+            resource_name = 'special_dungeon_scene_tab_' + cfg_dungeon_name + '_loc'
+            self.click_resource(resource_name)
+            self.status += 1
+        elif self.status == 2:
+            cfg_difficulty = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'special_dungeon_difficulty')
+            resource_name = 'special_dungeon_scene_difficulty_' + cfg_difficulty + '_loc'
+            self.click_resource(resource_name)
+            self.status += 1
+        elif self.status == 3:
+            resource_name = 'special_dungeon_scene_ready_loc'
+            self.game_object.get_scene('special_dungeon_create_scene').status = 0
+            self.click_resource(resource_name)
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -374,8 +487,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         resource_name,
                         custom_threshold=0.7,
                         custom_flag=1,
-                        custom_rect=(570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60))
-                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                        custom_rect=(570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60),
+                        debug=True)
+                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60)))
                     if loc_x != -1:
                         self.lyb_mouse_click_location(loc_x, loc_y)
                         self.status = 10
@@ -599,10 +713,16 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
+        elif self.status == self.get_work_status('특수던전'):
+            self.status = 100
         elif self.status == self.get_work_status('토벌대'):
             self.status = 200
         elif self.status == self.get_work_status('가상수련장'):
             self.status = 300
+        elif self.status == 100:
+            self.game_object.get_scene('special_dungeon_scene').status = 0
+            self.lyb_mouse_click('dungeon_scene_special_dungeon', custom_threshold=0)
+            self.status += 1
         elif self.status == 200:
             self.game_object.get_scene('tobeolde_scene').status = 0
             self.lyb_mouse_click('dungeon_scene_tobeolde', custom_threshold=0)
@@ -1098,6 +1218,26 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             else:
                 self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
 
+        elif self.status == self.get_work_status('특수던전'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            pb_name = 'main_scene_menu_open'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.lyb_mouse_click('main_scene_menu_dungeon', custom_threshold=0)
+                self.game_object.get_scene('dungeon_scene').status = self.status
+            else:
+                self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+
         elif self.status == self.get_work_status('토벌대'):
 
             elapsed_time = self.get_elapsed_time()
@@ -1151,6 +1291,27 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             self.lyb_mouse_click('main_scene_gabang', custom_threshold=0)
             self.game_object.get_scene('gabang_scene').status = 0
+
+        elif self.status == self.get_work_status('분해'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+
+            pb_name = 'main_scene_menu_open'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.lyb_mouse_click('main_scene_menu_gejo', custom_threshold=0)
+                self.game_object.get_scene('gejo_scene').status = 0
+            else:
+                self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
 
         elif self.status == self.get_work_status('알림'):
 
