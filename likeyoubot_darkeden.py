@@ -13,15 +13,17 @@ class LYBDarkEden(lybgame.LYBGame):
     work_list = [
         '게임 시작',
         '로그인',
+        '자동 사냥',
         '메인 퀘스트',
         '일일 퀘스트',
-        '자동 사냥',
+        '종족임무',
         '결투장',
         '토벌대',
         '판매',
         '분해',
         '가상수련장',
         '특수던전',
+        '보상',
 
         '알림',
         '[반복 시작]',
@@ -53,6 +55,7 @@ class LYBDarkEden(lybgame.LYBGame):
             '드로베타 MID',
             '드로베타 SW',
             '드로베타 NE',
+            '드로베타 NW',
         ],
         [
             '브랑코 MID',
@@ -94,12 +97,40 @@ class LYBDarkEden(lybgame.LYBGame):
             '선택안함',
             '알칸',            
         ],
+        sub_area_list[2][3] : [
+            '선택안함',      
+            '솔져',
+            '인페스트 레이디',
+        ],
         sub_area_list[3][0] : [
             '선택안함',
             '디케이리서치',            
         ],
     }
-
+    sub_area_npc_dic = {
+        sub_area_list[0][0] : [
+            '선택안함',
+        ],
+        sub_area_list[1][0] : [
+            '선택안함',
+        ],
+        sub_area_list[2][0] : [
+            '선택안함',          
+        ],
+        sub_area_list[2][1] : [
+            '선택안함',           
+        ],
+        sub_area_list[2][2] : [
+            '선택안함',      
+        ],
+        sub_area_list[2][3] : [
+            '선택안함',    
+            '애슬라니안 SW',  
+        ],
+        sub_area_list[3][0] : [
+            '선택안함',         
+        ],
+    }
     item_list = [
         '무기',
         '방어구',
@@ -499,7 +530,64 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         )
         check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
+        frame = ttk.Frame(frame_label)
 
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jiyeok'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jiyeok'].trace(
+            'w', lambda *args: self.auto_jiyeok(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jiyeok')
+            )
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jiyeok' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jiyeok'] = False
+
+        check_box = ttk.Checkbutton(
+
+            master              = frame,
+            text                = '지역 퀘스트', 
+            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jiyeok'],
+            onvalue             = True, 
+            offvalue            = False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok'].trace(
+            'w', lambda *args: self.auto_jongjok(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok')
+            )
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok'] = False
+
+        check_box = ttk.Checkbutton(
+
+            master              = frame,
+            text                = '종족 퀘스트', 
+            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok'],
+            onvalue             = True, 
+            offvalue            = False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+
+        frame.pack(anchor=tkinter.W)
+        
+        frame = ttk.Frame(frame_label)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'].trace(
+            'w', lambda *args: self.auto_second_monster(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster')
+            )
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'] = False
+
+        check_box = ttk.Checkbutton(
+
+            master              = frame,
+            text                = '두번째 몬스터', 
+            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'],
+            onvalue             = True, 
+            offvalue            = False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+
+        frame.pack(anchor=tkinter.W)
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
             master              = frame, 
@@ -592,6 +680,69 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_bunhe_period'])
         combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('일일 퀘스트 체크 주기(초)', width=27)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period'].trace(
+            'w', lambda *args: self.auto_ilil_quest_period(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period')
+            )
+        combobox_list = []
+        for i in range(0, 3601):
+            combobox_list.append(str(i))
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period'] = 1800
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 7,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_ilil_quest_period'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('종족 퀘스트 수행 횟수(회)', width=27)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count'].trace(
+            'w', lambda *args: self.auto_jongjok_quest_count(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count')
+            )
+        combobox_list = []
+        for i in range(0, 101):
+            combobox_list.append(str(i))
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count'] = 10
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 7,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_jongjok_quest_count'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
 
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
@@ -692,7 +843,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
             master              = frame, 
-            text                = self.get_option_text('몬스터(소분류)', width=19)
+            text                = self.get_option_text('몬스터(소분류1)', width=19)
             )
         label.pack(side=tkinter.LEFT)
 
@@ -717,6 +868,36 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
             )
         self.auto_monster_combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_monster'])
         self.auto_monster_combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('NPC/포탈(소분류2)', width=19)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'].trace(
+            'w', lambda *args: self.auto_npc(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc')
+            )
+
+        combobox_list = LYBDarkEden.sub_area_npc_dic[self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_sub_area']]
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'] = combobox_list[0]
+
+        self.auto_npc_combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 15,
+            font                = lybconstant.LYB_FONT 
+            )
+        self.auto_npc_combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'])
+        self.auto_npc_combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
 
         frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
@@ -957,6 +1138,12 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
     def auto_bunhe_period(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
+    def auto_ilil_quest_period(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())   
+
+    def auto_jongjok_quest_count(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())       
+
     def auto_move_check_period(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
@@ -975,6 +1162,12 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         # self.logger.warn("DEBUG1: " + self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'elite_quest_go'))
         if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_monster') in new_list:
             self.auto_monster_combobox.set(new_list[0])
+
+        new_list = LYBDarkEden.sub_area_npc_dic[self.option_dic[option_name].get()]
+        self.auto_npc_combobox['values'] = new_list
+        # self.logger.warn("DEBUG1: " + self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'elite_quest_go'))
+        if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc') in new_list:
+            self.auto_npc_combobox.set(new_list[0])
         # if not self.elite_quest_go_combobox.get() in new_list:
         #   self.elite_quest_go_combobox.set(new_list[0])
 
@@ -989,6 +1182,9 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
     def auto_monster(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
+    def auto_npc(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
     def special_dungeon(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
@@ -996,6 +1192,15 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def auto_party(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def auto_jiyeok(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def auto_jongjok(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def auto_second_monster(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def sell_item_0(self, args, option_name):
