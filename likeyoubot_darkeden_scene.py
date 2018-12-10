@@ -141,7 +141,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
-        elif 1 <= self.status < 10:
+        elif 1 <= self.status < 9:
             self.status += 1
             resource_name = 'bosang_scene_new_loc'
             resource = self.game_object.resource_manager.resource_dic[resource_name]
@@ -1058,6 +1058,14 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
         elif 1 <= self.status < 10:
+            self.status += 1
+
+            resource_name = 'gyeoltoojang_scene_bosang_loc'
+            match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+            self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+            if match_rate > 0.9:
+                self.click_resource(resource_name)
+                return True
 
             pb_name = 'gyeoltoojang_scene_limit'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
@@ -1076,8 +1084,6 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
-
-            self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1724,7 +1730,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         pb_name = 'main_scene_mana_potion_empty'        
         elapsed_time = time.time() - self.get_checkpoint(pb_name)
-        if elapsed_time > self.period_bot(3600):
+        if elapsed_time > self.period_bot(600):
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             self.logger.debug(pb_name + ' ' + str(match_rate))
             if match_rate > 0.9:
@@ -1740,7 +1746,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         ]
         for pb_name in pb_name_list:
             elapsed_time = time.time() - self.get_checkpoint(pb_name)
-            if elapsed_time > self.period_bot(3600):
+            if elapsed_time > self.period_bot(600):
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                 self.logger.debug(pb_name + ' ' + str(match_rate))
                 if match_rate > 0.9:
