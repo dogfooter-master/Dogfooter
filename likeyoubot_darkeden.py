@@ -1112,7 +1112,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'] = tkinter.BooleanVar(frame)
         self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'].trace(
             'w', lambda *args: self.guild_immu(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'
-            )
+            ))
         if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu' in self.configure.common_config[self.game_name]:
             self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'] = True
 
