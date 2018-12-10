@@ -24,6 +24,7 @@ class LYBDarkEden(lybgame.LYBGame):
         '가상수련장',
         '특수던전',
         '보상',
+        '길드',
 
         '알림',
         '[반복 시작]',
@@ -1104,8 +1105,27 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
             )
             check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
-        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)        
 
+        frame_label = ttk.LabelFrame(frame_m, text='길드')
+        frame = ttk.Frame(frame_label)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'].trace(
+            'w', lambda *args: self.guild_immu(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'
+            )
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'] = True
+
+        check_box = ttk.Checkbutton(
+
+            master              = frame,
+            text                = '길드 임무', 
+            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu'],
+            onvalue             = True, 
+            offvalue            = False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
         frame_m.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 작업 탭 우측
@@ -1249,5 +1269,8 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def bunhe_item_quality_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def guild_immu(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 

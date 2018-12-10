@@ -85,6 +85,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             rc = self.upjeok_scene()
         elif self.scene_name == 'bosang_scene':
             rc = self.bosang_scene()
+        elif self.scene_name == 'guild_scene':
+            rc = self.guild_scene()
 
 
 
@@ -100,6 +102,31 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def guild_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            self.click_resource('guild_scene_tab_길드 정보_loc')
+            self.status += 1
+        elif self.status == 2:
+            self.click_resource('guild_scene_chulseok_loc')            
+            if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu') == True:
+                self.click_resource('guild_scene_tab_길드 임무_loc')
+                self.status = 100
+            else:
+                self.status += 1
+        elif self.status == 100:
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
