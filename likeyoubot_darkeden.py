@@ -16,6 +16,7 @@ class LYBDarkEden(lybgame.LYBGame):
         '자동 사냥',
         '메인 퀘스트',
         '일일 퀘스트',
+        '지역 퀘스트',
         '종족임무',
         '결투장',
         '토벌대',
@@ -58,6 +59,7 @@ class LYBDarkEden(lybgame.LYBGame):
             '드로베타 NE',
             '드로베타 NW',
             '아이센 던전 B1',
+            '라옴 던전 B1',
         ],
         [
             '브랑코 MID',
@@ -107,6 +109,9 @@ class LYBDarkEden(lybgame.LYBGame):
         sub_area_list[2][4] : [
             '선택안함',  
         ],
+        sub_area_list[2][5] : [
+            '선택안함',  
+        ],
         sub_area_list[3][0] : [
             '선택안함',
             '디케이리서치',            
@@ -135,6 +140,10 @@ class LYBDarkEden(lybgame.LYBGame):
         sub_area_list[2][4] : [
             '선택안함',    
             '아이센 던전 B2',  
+        ],
+        sub_area_list[2][5] : [
+            '선택안함',    
+            '라옴 던전 B2',  
         ],
         sub_area_list[3][0] : [
             '선택안함',         
@@ -189,6 +198,10 @@ class LYBDarkEden(lybgame.LYBGame):
         '아이센 던전 B2',
         '아이센 던전 B3',
         '아이센 던전 B4',
+        '라옴 던전 B2',
+        '라옴 던전 B3',
+        '라옴 던전 B4',
+        '라옴 던전 B5',
     ]
 
     dungeon_floor_monster_list = [
@@ -206,6 +219,18 @@ class LYBDarkEden(lybgame.LYBGame):
             '선택안함',
             '다크헤이즈',
             '인세이나',
+        ],
+        [
+            '선택안함',
+        ],
+        [
+            '선택안함',
+        ],
+        [
+            '선택안함',
+        ],
+        [
+            '선택안함',
         ],
     ]
 
@@ -225,6 +250,21 @@ class LYBDarkEden(lybgame.LYBGame):
             '선택안함',
             '아이센 던전 B3',
         ],
+        [
+            '선택안함',
+            '라옴 던전 B3',
+        ],
+        [
+            '선택안함',
+            '라옴 던전 B4',
+        ],
+        [
+            '선택안함',
+            '라옴 던전 B5',
+        ],
+        [
+            '선택안함',
+        ],
     ]
 
     dungeon_floor_monster_dic = {
@@ -232,6 +272,10 @@ class LYBDarkEden(lybgame.LYBGame):
         dungeon_floor_list[1]: dungeon_floor_monster_list[1],
         dungeon_floor_list[2]: dungeon_floor_monster_list[2],
         dungeon_floor_list[3]: dungeon_floor_monster_list[3],
+        dungeon_floor_list[4]: dungeon_floor_monster_list[4],
+        dungeon_floor_list[5]: dungeon_floor_monster_list[5],
+        dungeon_floor_list[6]: dungeon_floor_monster_list[6],
+        dungeon_floor_list[7]: dungeon_floor_monster_list[7],
     }
 
     dungeon_floor_npc_dic = {
@@ -239,6 +283,10 @@ class LYBDarkEden(lybgame.LYBGame):
         dungeon_floor_list[1]: dungeon_floor_npc_list[1],
         dungeon_floor_list[2]: dungeon_floor_npc_list[2],
         dungeon_floor_list[3]: dungeon_floor_npc_list[3],
+        dungeon_floor_list[4]: dungeon_floor_npc_list[4],
+        dungeon_floor_list[5]: dungeon_floor_npc_list[5],
+        dungeon_floor_list[6]: dungeon_floor_npc_list[6],
+        dungeon_floor_list[7]: dungeon_floor_npc_list[7],
     }
 
     def __init__(self, game_name, game_data_name, window):

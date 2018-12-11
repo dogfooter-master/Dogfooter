@@ -727,9 +727,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         resource_name,
                         custom_threshold=0.7,
                         custom_flag=1,
-                        custom_rect=(570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60),
+                        custom_rect=(570, 180 + (i*40) - 45, 720, 180 + (i*40) + 45),
                         debug=True)
-                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60)))
+                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 45, 720, 180 + (i*40) + 45)))
                     if loc_x != -1:
                         if cfg_order > 1:
                             loc_count = self.get_option('loc_count')
@@ -1464,7 +1464,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                         self.window_image,
                         resource_name,
-                        custom_threshold=0.7,
+                        custom_threshold=0.8,
                         custom_flag=1,
                         custom_rect=(5, 150 + (quest_index * 25), 35, 180 + (quest_index * 30)),
                         debug=True)
