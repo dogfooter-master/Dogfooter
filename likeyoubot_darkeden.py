@@ -184,6 +184,63 @@ class LYBDarkEden(lybgame.LYBGame):
 
     ]
 
+    dungeon_floor_list = [
+        '선택안함',
+        '아이센 던전 B2',
+        '아이센 던전 B3',
+        '아이센 던전 B4',
+    ]
+
+    dungeon_floor_monster_list = [
+        [
+            '선택안함',
+        ],
+        [
+            '선택안함',
+            '상급 페스트네일',
+        ],
+        [
+            '선택안함',
+        ],
+        [
+            '선택안함',
+            '다크헤이즈',
+            '인세이나',
+        ],
+    ]
+
+    dungeon_floor_npc_list = [
+        [
+            '선택안함',
+        ],
+        [
+            '선택안함',
+            '아이센 던전 B3',
+        ],
+        [
+            '선택안함',
+            '아이센 던전 B4',
+        ],
+        [
+            '선택안함',
+            '아이센 던전 B3',
+        ],
+    ]
+
+    dungeon_floor_monster_dic = {
+        dungeon_floor_list[0]: dungeon_floor_monster_list[0],
+        dungeon_floor_list[1]: dungeon_floor_monster_list[1],
+        dungeon_floor_list[2]: dungeon_floor_monster_list[2],
+        dungeon_floor_list[3]: dungeon_floor_monster_list[3],
+    }
+
+    dungeon_floor_npc_dic = {
+        dungeon_floor_list[0]: dungeon_floor_npc_list[0],
+        dungeon_floor_list[1]: dungeon_floor_npc_list[1],
+        dungeon_floor_list[2]: dungeon_floor_npc_list[2],
+        dungeon_floor_list[3]: dungeon_floor_npc_list[3],
+    }
+
     def __init__(self, game_name, game_data_name, window):
         lybgame.LYBGame.__init__(self, lybconstant.LYB_GAME_DARKEDEN, lybconstant.LYB_GAME_DATA_DARKEDEN, window)
 
@@ -517,10 +574,218 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
 
         # 일반 탭 좌측
         frame_l = ttk.Frame(self.inner_frame_dic['common_tab_frame'])
+        frame_label = ttk.LabelFrame(frame_l, text='전투')
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('자동 전환 감지 횟수(회)', width=27)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'].trace(
+            'w', lambda *args: self.auto_limit_count(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count')
+            )
+        combobox_list = []
+        for i in range(1, 11):
+            combobox_list.append(str(i))
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'] = 5
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 7,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
         frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 일반 탭 중간
         frame_m = ttk.Frame(self.inner_frame_dic['common_tab_frame'])
+        frame_label = ttk.LabelFrame(frame_m, text='던전 이동 세부 설정')
+
+        self.dungeon_floor_monster_combobox = []
+        self.dungeon_floor_npc_combobox = []
+
+        for i in range(5):
+            frame = ttk.Frame(frame_label)
+            self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)] = tkinter.StringVar(frame)            
+            self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)] = tkinter.StringVar(frame)  
+            self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)] = tkinter.StringVar(frame)
+            self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)] = tkinter.StringVar(frame)
+
+            combobox_list = LYBDarkEden.dungeon_floor_list
+
+            if not lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i) in self.configure.common_config[self.game_name]:
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)] = combobox_list[0]
+
+            combobox = ttk.Combobox(
+                master              = frame,
+                values              = combobox_list, 
+                textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)], 
+                state               = "readonly",
+                height              = 10,
+                width               = 15,
+                font                = lybconstant.LYB_FONT 
+                )
+            combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)])
+            combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        
+            label = ttk.Label(
+                master              = frame, 
+                text                = '>>'
+                )
+            label.pack(side=tkinter.LEFT)
+
+            try:
+                area_index = LYBDarkEden.dungeon_floor_list.index(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)])
+                combobox_list = LYBDarkEden.dungeon_floor_monster_list[area_index]
+
+                if not lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i) in self.configure.common_config[self.game_name]:                    
+                    self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)] = combobox_list[0]
+            except ValueError:
+                area_index = 0
+                combobox_list = LYBDarkEden.dungeon_floor_monster_list[area_index]
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)] = combobox_list[0]
+
+            self.dungeon_floor_monster_combobox.append(
+                ttk.Combobox(
+                    master              = frame,
+                    values              = combobox_list, 
+                    textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)], 
+                    state               = "readonly",
+                    height              = 10,
+                    width               = 15,
+                    font                = lybconstant.LYB_FONT 
+                    )
+                )
+            self.dungeon_floor_monster_combobox[i].set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)])
+            self.dungeon_floor_monster_combobox[i].pack(anchor=tkinter.W, side=tkinter.LEFT)
+
+
+            try:
+                area_index = LYBDarkEden.dungeon_floor_list.index(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)])
+                combobox_list = LYBDarkEden.dungeon_floor_npc_list[area_index]
+
+                if not lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i) in self.configure.common_config[self.game_name]:                    
+                    self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)] = combobox_list[0]
+            except ValueError:
+                area_index = 0
+                combobox_list = LYBDarkEden.dungeon_floor_npc_list[area_index]
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)] = combobox_list[0]
+
+            self.dungeon_floor_npc_combobox.append(
+                ttk.Combobox(
+                    master              = frame,
+                    values              = combobox_list, 
+                    textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)], 
+                    state               = "readonly",
+                    height              = 10,
+                    width               = 15,
+                    font                = lybconstant.LYB_FONT 
+                    )
+                )
+            self.dungeon_floor_npc_combobox[i].set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)])
+            self.dungeon_floor_npc_combobox[i].pack(anchor=tkinter.W, side=tkinter.LEFT)
+
+            combobox_list = []
+            for j in range(1, 5):
+                combobox_list.append(str(j))
+
+            if not lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i) in self.configure.common_config[self.game_name]:
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)] = 1
+
+            combobox = ttk.Combobox(
+                master              = frame,
+                values              = combobox_list, 
+                textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)], 
+                state               = "readonly",
+                height              = 10,
+                width               = 7,
+                font                = lybconstant.LYB_FONT 
+                )
+            combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)])
+            combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+
+            if i == 0:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(0)].trace(
+                    'w', lambda *args: self.dungeon_floor_0(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(0))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(0)].trace(
+                    'w', lambda *args: self.dungeon_floor_monster_0(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(0))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(0)].trace(
+                    'w', lambda *args: self.dungeon_floor_npc_0(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(0))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(0)].trace(
+                    'w', lambda *args: self.dungeon_floor_order_0(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(0))
+                    )
+            elif i == 1:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(1)].trace(
+                    'w', lambda *args: self.dungeon_floor_1(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(1))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(1)].trace(
+                    'w', lambda *args: self.dungeon_floor_monster_1(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(1))
+                    )  
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(1)].trace(
+                    'w', lambda *args: self.dungeon_floor_npc_1(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(1))
+                    ) 
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(1)].trace(
+                    'w', lambda *args: self.dungeon_floor_order_1(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(1))
+                    ) 
+            elif i == 2:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(2)].trace(
+                    'w', lambda *args: self.dungeon_floor_2(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(2))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(2)].trace(
+                    'w', lambda *args: self.dungeon_floor_monster_2(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(2))
+                    )  
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(2)].trace(
+                    'w', lambda *args: self.dungeon_floor_npc_2(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(2))
+                    ) 
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(2)].trace(
+                    'w', lambda *args: self.dungeon_floor_order_2(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(2))
+                    ) 
+            elif i == 3:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(3)].trace(
+                    'w', lambda *args: self.dungeon_floor_3(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(3))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(3)].trace(
+                    'w', lambda *args: self.dungeon_floor_monster_3(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(3))
+                    )  
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(3)].trace(
+                    'w', lambda *args: self.dungeon_floor_npc_3(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(3))
+                    ) 
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(3)].trace(
+                    'w', lambda *args: self.dungeon_floor_order_3(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(3))
+                    ) 
+            elif i == 4:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(4)].trace(
+                    'w', lambda *args: self.dungeon_floor_4(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(4))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(4)].trace(
+                    'w', lambda *args: self.dungeon_floor_monster_4(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(4))
+                    )  
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(4)].trace(
+                    'w', lambda *args: self.dungeon_floor_npc_4(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(4))
+                    ) 
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(4)].trace(
+                    'w', lambda *args: self.dungeon_floor_order_4(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(4))
+                    ) 
+
+            frame.pack(anchor=tkinter.W)        
+
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
         frame_m.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 일반 탭 우측
@@ -589,25 +854,36 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         frame.pack(anchor=tkinter.W)
         
         frame = ttk.Frame(frame_label)
-
-        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'] = tkinter.BooleanVar(frame)
-        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'].trace(
-            'w', lambda *args: self.auto_second_monster(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster')
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('클릭할 인식 순서(번째)', width=27)
             )
-        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster' in self.configure.common_config[self.game_name]:
-            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'] = False
+        label.pack(side=tkinter.LEFT)
 
-        check_box = ttk.Checkbutton(
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'].trace(
+            'w', lambda *args: self.auto_order(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order')
+            )
+        combobox_list = []
+        for i in range(1, 5):
+            combobox_list.append(str(i))
 
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'] = 1
+
+        combobox = ttk.Combobox(
             master              = frame,
-            text                = '두번째 몬스터(NPC) 선택', 
-            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'],
-            onvalue             = True, 
-            offvalue            = False
-        )
-        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
-
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 7,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
+
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
             master              = frame, 
@@ -1192,8 +1468,11 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         new_list = LYBDarkEden.sub_area_dic[self.option_dic[option_name].get()]
 
         self.auto_sub_area_combobox['values'] = new_list
-        if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_sub_area') in new_list:
-            self.auto_sub_area_combobox.set(new_list[0])
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_sub_area') in new_list:
+                self.auto_sub_area_combobox.set(new_list[0])
+        except KeyError:
+            pass
 
     def auto_sub_area(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
@@ -1206,8 +1485,11 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         new_list = LYBDarkEden.sub_area_npc_dic[self.option_dic[option_name].get()]
         self.auto_npc_combobox['values'] = new_list
         # self.logger.warn("DEBUG1: " + self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'elite_quest_go'))
-        if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc') in new_list:
-            self.auto_npc_combobox.set(new_list[0])
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc') in new_list:
+                self.auto_npc_combobox.set(new_list[0])
+        except KeyError:
+            pass
         # if not self.elite_quest_go_combobox.get() in new_list:
         #   self.elite_quest_go_combobox.set(new_list[0])
 
@@ -1218,6 +1500,210 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         #         self.elite_quest_accept_combobox[i].set(new_list[0])
         #     # if not self.elite_quest_accept_combobox[i].get() in new_list:
         #     #   self.elite_quest_accept_combobox[i].set( new_list[0])
+
+    def dungeon_floor_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        new_list = LYBDarkEden.dungeon_floor_monster_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_monster_combobox[0]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(0)) in new_list:
+                self.dungeon_floor_monster_combobox[0].set(new_list[0])
+        except KeyError:
+            pass
+
+        new_list = LYBDarkEden.dungeon_floor_npc_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_npc_combobox[0]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(0)) in new_list:
+                self.dungeon_floor_npc_combobox[0].set(new_list[0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_monster_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_npc_combobox[0].set(self.dungeon_floor_npc_combobox[0]['values'][0])
+        except KeyError:
+            pass
+
+
+    def dungeon_floor_npc_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_monster_combobox[0].set(self.dungeon_floor_monster_combobox[0]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_order_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def dungeon_floor_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+        new_list = LYBDarkEden.dungeon_floor_monster_dic[self.option_dic[option_name].get()]
+
+        self.dungeon_floor_monster_combobox[1]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(1)) in new_list:
+                self.dungeon_floor_monster_combobox[1].set(new_list[0])
+        except KeyError:
+            pass
+
+        new_list = LYBDarkEden.dungeon_floor_npc_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_npc_combobox[1]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(1)) in new_list:
+                self.dungeon_floor_npc_combobox[1].set(new_list[0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_monster_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_npc_combobox[1].set(self.dungeon_floor_npc_combobox[1]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_npc_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_monster_combobox[1].set(self.dungeon_floor_monster_combobox[1]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_order_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def dungeon_floor_2(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+        new_list = LYBDarkEden.dungeon_floor_monster_dic[self.option_dic[option_name].get()]
+
+        self.dungeon_floor_monster_combobox[2]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(2)) in new_list:
+                self.dungeon_floor_monster_combobox[2].set(new_list[0])
+        except KeyError:
+            pass
+
+        new_list = LYBDarkEden.dungeon_floor_npc_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_npc_combobox[2]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(2)) in new_list:
+                self.dungeon_floor_npc_combobox[2].set(new_list[0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_monster_2(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_npc_combobox[2].set(self.dungeon_floor_npc_combobox[2]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_npc_2(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_monster_combobox[2].set(self.dungeon_floor_monster_combobox[2]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_order_2(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def dungeon_floor_3(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+        new_list = LYBDarkEden.dungeon_floor_monster_dic[self.option_dic[option_name].get()]
+
+        self.dungeon_floor_monster_combobox[3]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(3)) in new_list:
+                self.dungeon_floor_monster_combobox[3].set(new_list[0])
+        except KeyError:
+            pass
+
+        new_list = LYBDarkEden.dungeon_floor_npc_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_npc_combobox[3]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(3)) in new_list:
+                self.dungeon_floor_npc_combobox[3].set(new_list[0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_monster_3(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_npc_combobox[3].set(self.dungeon_floor_npc_combobox[3]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_npc_3(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_monster_combobox[3].set(self.dungeon_floor_monster_combobox[3]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_order_3(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def dungeon_floor_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+        new_list = LYBDarkEden.dungeon_floor_monster_dic[self.option_dic[option_name].get()]
+
+        self.dungeon_floor_monster_combobox[4]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(4)) in new_list:
+                self.dungeon_floor_monster_combobox[4].set(new_list[0])
+        except KeyError:
+            pass
+
+        new_list = LYBDarkEden.dungeon_floor_npc_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_npc_combobox[4]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(4)) in new_list:
+                self.dungeon_floor_npc_combobox[4].set(new_list[0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_monster_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_npc_combobox[4].set(self.dungeon_floor_npc_combobox[4]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_npc_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_monster_combobox[4].set(self.dungeon_floor_monster_combobox[4]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_order_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def auto_limit_count(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def auto_monster(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
@@ -1240,7 +1726,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
     def auto_jongjok(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
-    def auto_second_monster(self, args, option_name):
+    def auto_order(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def sell_item_0(self, args, option_name):

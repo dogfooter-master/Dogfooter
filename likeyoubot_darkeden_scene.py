@@ -645,6 +645,23 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.logger.info('scene: ' + self.scene_name)
             self.set_option('click_npc_tab', False)
             self.set_option('loc_first_monster', (-1, -1))
+            self.set_option('loc_count', 1)
+            self.set_option('cfg_monster', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_monster'))
+            self.set_option('cfg_npc', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'))
+            self.set_option('cfg_order', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'))
+
+            for i in range(5):
+                cfg_dungeon_floor = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i))
+                if cfg_dungeon_floor != '선택안함':
+                    resource_name = 'jido_scene_dungeon_floor_' + cfg_dungeon_floor + '_loc'
+                    if self.click_resource(resource_name, custom_threshold=0.9) is True:
+                        self.logger.info('던전 이동: ' + str(cfg_dungeon_floor))
+                        self.set_option('cfg_monster', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)))
+                        self.set_option('cfg_npc', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)))
+                        self.set_option('cfg_order', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)))
+                        self.status = 2
+                        return self.status
+
             self.status += 1
         elif self.status == 1:
             self.lyb_mouse_click('jido_scene_tab_0', custom_threshold=0)
@@ -653,8 +670,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status += 1
             cfg_area = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_area')
             cfg_sub_area = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_sub_area')
-            cfg_monster = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_monster')
-            cfg_npc = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc')
+            cfg_monster = self.get_option('cfg_monster')
+            cfg_npc = self.get_option('cfg_npc')
+            cfg_order = int(self.get_option('cfg_order'))
 
             if cfg_monster == '선택안함' and cfg_npc == '선택안함':
                 self.status = 99999
@@ -713,13 +731,18 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         debug=True)
                     self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60)))
                     if loc_x != -1:
-                        if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster') is True:
+                        if cfg_order > 1:
+                            loc_count = self.get_option('loc_count')
                             last_loc_x, last_loc_y = self.get_option('loc_first_monster')
-                            if last_loc_x != -1 and (last_loc_x != loc_x or last_loc_y != loc_y):
-                                self.lyb_mouse_click_location(loc_x, loc_y)
-                                self.status = 10
-                                return self.status
-                            else:
+                            self.logger.info('loc_count: ' + str(loc_count) + ' ' + str(cfg_order))
+                            if last_loc_x != loc_x or last_loc_y != loc_y:
+                                if loc_count >= cfg_order:
+                                    self.lyb_mouse_click_location(loc_x, loc_y)
+                                    self.status = 10
+                                    return self.status
+                                else:
+                                    self.set_option('loc_count', loc_count + 1)                                    
+                                    
                                 self.set_option('loc_first_monster', (loc_x, loc_y))
                         else:
                             self.lyb_mouse_click_location(loc_x, loc_y)
@@ -746,7 +769,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 return self.status
 
             self.lyb_mouse_drag('jido_scene_monster_drag_bot', 'jido_scene_monster_drag_top')
-            self.set_option('loc_first_monster', (-1, -1))
+            # self.set_option('loc_first_monster', (-1, -1))
+            # self.set_option('loc_count', 1)
             self.game_object.interval = self.period_bot(2)
         elif 10 <= self.status < 20:
             self.status += 1
@@ -909,11 +933,11 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status += 1
         elif 1 <= self.status < 6000:
             self.status += 1
-            if self.isAutoCombat(limit_count=3) is False:
+            if self.isAutoCombat() is False:
                 self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                 return self.status
 
-            if self.isCenterAutoCombat(limit_count=3) is False:
+            if self.isCenterAutoCombat() is False:
                 self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                 return self.status
 
@@ -1082,7 +1106,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
     def combat_scene(self):
 
-        if self.isAutoCombat(limit_count=3) is False:
+        if self.isAutoCombat() is False:
             self.lyb_mouse_click('combat_scene_auto_0', custom_threshold=0)
             return self.status
 
@@ -1408,11 +1432,11 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     self.set_option(self.current_work + '_inner_status', 0)
                     return self.status
 
-                if self.isAutoCombat(limit_count=5) is False:
+                if self.isAutoCombat() is False:
                     self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                     return self.status
 
-                if self.isCenterAutoCombat(limit_count=5) is False:
+                if self.isCenterAutoCombat() is False:
                     self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                     return self.status
             elif 1000 <= inner_status < 1010:
@@ -1813,6 +1837,14 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
                     return True
 
+        resource_name = 'main_scene_portal_loc'
+        elapsed_time = time.time() - self.get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(20):
+            if self.click_resource(resource_name) is True:
+                self.set_checkpoint(resource_name)
+                self.logger.info('포탈 이동 클릭')
+                return True
+
         # pb_name = 'main_scene_gasang_sooryeonjang_loc'
         # elapsed_time = time.time() - self.get_checkpoint(pb_name)
         # if elapsed_time > self.period_bot(30):
@@ -2036,6 +2068,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
 
     def isAutoCombat(self, limit_count=-1):
+
+        if limit_count == -1:
+            limit_count = int(self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'))
+
         return self.isStatusByResource(
             '[우측 자동전투 인식 실패 횟수]',
             'main_scene_auto_loc',
@@ -2056,6 +2092,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         )
 
     def isCenterAutoCombat(self, limit_count=-1):
+        if limit_count == -1:
+            limit_count = int(self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'auto_limit_count'))
+
         return self.isStatusByResource(
             '[중앙 자동전투 인식 실패 횟수]',
             'main_scene_center_auto_loc',
@@ -2166,11 +2205,11 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         return hp_percent
 
-    def click_resource(self, resource_name):        
+    def click_resource(self, resource_name, custom_threshold=0.7):        
         (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
             self.window_image,
             resource_name,
-            custom_threshold=0.7,
+            custom_threshold=custom_threshold,
             custom_flag=1)
         self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
         if loc_x != -1:
