@@ -742,7 +742,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                                     return self.status
                                 else:
                                     self.set_option('loc_count', loc_count + 1)                                    
-                                    
+
                                 self.set_option('loc_first_monster', (loc_x, loc_y))
                         else:
                             self.lyb_mouse_click_location(loc_x, loc_y)
@@ -1840,10 +1840,28 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         resource_name = 'main_scene_portal_loc'
         elapsed_time = time.time() - self.get_checkpoint(resource_name)
         if elapsed_time > self.period_bot(20):
-            if self.click_resource(resource_name) is True:
-                self.set_checkpoint(resource_name)
-                self.logger.info('포탈 이동 클릭')
-                return True
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1,
+                custom_rect=(540, 445, 580, 475))
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                limit_count = self.get_option(resource_name + '_limit')
+                if limit_count == None:
+                    limit_count = 0
+
+                if limit_count > 2:
+                    self.set_option(resource_name + '_limit', 0)
+                    self.set_checkpoint(resource_name)
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                    self.logger.info('포탈 이동 클릭')
+                    return True            
+                else:
+                    self.set_option(resource_name +'_limit', limit_count + 1)
+            else:
+                self.set_option(resource_name +'_limit', 0)
 
         # pb_name = 'main_scene_gasang_sooryeonjang_loc'
         # elapsed_time = time.time() - self.get_checkpoint(pb_name)
