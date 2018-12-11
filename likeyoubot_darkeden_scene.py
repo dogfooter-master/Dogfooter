@@ -115,6 +115,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
+            self.set_option('guild_immu_drag_count', 0)
             self.status += 1
         elif self.status == 1:
             self.click_resource('guild_scene_tab_길드 정보_loc')
@@ -126,8 +127,43 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.status = 100
             else:
                 self.status += 1
-        elif self.status == 100:
+        elif 100 <= self.status < 105:
             self.status += 1
+            immu_list = lybgamedarkeden.LYBDarkEden.guild_immu_list
+            for each_list in immu_list:
+                resource_name = 'guild_scene_immu_' + each_list + '_loc'
+                for i in range(6):
+                    (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                        self.window_image,
+                        resource_name,
+                        custom_threshold=0.7,
+                        custom_flag=1,
+                        custom_rect=(170, 130 + (i * 50) - 40, 420, 130 + (i * 50) + 30),
+                        debug=True)
+                    if loc_x != -1:
+                        surak_resource_name = 'guild_scene_immu_surak_loc'
+                        adj_x, adj_y = self.game_object.get_player_adjust()
+                        (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                            self.window_image,
+                            surak_resource_name,
+                            custom_threshold=0.7,
+                            custom_flag=1,
+                            custom_rect=(680, loc_y - 40 - adj_y, 780, loc_y + 30 - adj_y),
+                            debug=True)
+                        if loc_x != -1:
+                            self.lyb_mouse_click_location(loc_x, loc_y)
+                            return self.status
+        elif self.status == 105:
+            count = self.get_option('guild_immu_drag_count')
+            if count is None:
+                count = 0
+
+            if count > 3:
+                self.status = 99999
+            else:
+                self.set_option('guild_immu_drag_count', count + 1)
+                self.lyb_mouse_drag('guild_scene_immu_drag_bot', 'guild_scene_immu_drag_top')
+                self.status = 100
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1580,6 +1616,27 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             if match_rate > 0.9:
                 self.lyb_mouse_click('main_scene_menu_gejo', custom_threshold=0)
                 self.game_object.get_scene('gejo_scene').status = 0
+            else:
+                self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+
+        elif self.status == self.get_work_status('길드'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+
+            pb_name = 'main_scene_menu_open'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.lyb_mouse_click('main_scene_menu_guild', custom_threshold=0)
+                self.game_object.get_scene('guild_scene').status = 0
             else:
                 self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
 

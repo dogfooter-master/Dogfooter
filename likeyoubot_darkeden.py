@@ -57,6 +57,7 @@ class LYBDarkEden(lybgame.LYBGame):
             '드로베타 SW',
             '드로베타 NE',
             '드로베타 NW',
+            '아이센 던전 B1',
         ],
         [
             '브랑코 MID',
@@ -103,6 +104,9 @@ class LYBDarkEden(lybgame.LYBGame):
             '솔져',
             '인페스트 레이디',
         ],
+        sub_area_list[2][4] : [
+            '선택안함',  
+        ],
         sub_area_list[3][0] : [
             '선택안함',
             '디케이리서치',            
@@ -127,6 +131,10 @@ class LYBDarkEden(lybgame.LYBGame):
         sub_area_list[2][3] : [
             '선택안함',    
             '애슬라니안 SW',  
+        ],
+        sub_area_list[2][4] : [
+            '선택안함',    
+            '아이센 던전 B2',  
         ],
         sub_area_list[3][0] : [
             '선택안함',         
@@ -163,6 +171,17 @@ class LYBDarkEden(lybgame.LYBGame):
     option_list = [
         '강화 아이템 포함',
         '거래가능 아이템 포함',
+    ]
+
+    guild_immu_list = [
+        '길드 레벨업',
+        '부수고 또 부수고',
+        '골드 사용',
+        '포션 사용',
+        '종족임무 수행',
+        '일일퀘스트 수행',
+        '지역퀘스트 완료',
+
     ]
 
     def __init__(self, game_name, game_data_name, window):
@@ -1126,6 +1145,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         )
         check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)   
         frame_m.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 작업 탭 우측
