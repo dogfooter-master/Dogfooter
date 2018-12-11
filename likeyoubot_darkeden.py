@@ -600,7 +600,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         check_box = ttk.Checkbutton(
 
             master              = frame,
-            text                = '두번째 몬스터', 
+            text                = '두번째 몬스터(NPC) 선택', 
             variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster'],
             onvalue             = True, 
             offvalue            = False

@@ -713,7 +713,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         debug=True)
                     self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 60, 720, 180 + (i*40) + 60)))
                     if loc_x != -1:
-                        if cfg_monster != '선택안함' and self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster') is True:
+                        if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_second_monster') is True:
                             last_loc_x, last_loc_y = self.get_option('loc_first_monster')
                             if last_loc_x != -1 and (last_loc_x != loc_x or last_loc_y != loc_y):
                                 self.lyb_mouse_click_location(loc_x, loc_y)
