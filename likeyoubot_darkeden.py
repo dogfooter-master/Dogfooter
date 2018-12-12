@@ -289,6 +289,26 @@ class LYBDarkEden(lybgame.LYBGame):
         dungeon_floor_list[7]: dungeon_floor_npc_list[7],
     }
 
+    quest_scene_jiyeok_list = [
+        '드로베타',
+        '브랑코',
+    ]
+
+    quest_scene_jiyeok_quest_list = [
+        [
+            '드로베타 정화8',
+        ],
+        [
+            '브랑코 정화1',
+        ]
+
+    ]
+
+    quest_scene_jiyeok_quest_dic = {
+        quest_scene_jiyeok_list[0] : quest_scene_jiyeok_quest_list[0],
+        quest_scene_jiyeok_list[1] : quest_scene_jiyeok_quest_list[1],
+    }
+
     def __init__(self, game_name, game_data_name, window):
         lybgame.LYBGame.__init__(self, lybconstant.LYB_GAME_DARKEDEN, lybconstant.LYB_GAME_DATA_DARKEDEN, window)
 
@@ -1474,6 +1494,74 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
 
         # 작업 탭 우측
         frame_r = ttk.Frame(self.inner_frame_dic['work_tab_frame'])
+        frame_label = ttk.LabelFrame(frame_r, text='지역 퀘스트')
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('지역(대분류)', width=19)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area'].trace(
+            'w', lambda *args: self.jiyeok_quest_area(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area')
+            )
+        combobox_list = LYBDarkEden.quest_scene_jiyeok_list
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area'] = combobox_list[0]
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 15,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)        
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
+            text                = self.get_option_text('퀘스트(중분류)', width=19)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select'].trace(
+            'w', lambda *args: self.jiyeok_quest_select(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select')
+            )
+
+        try:
+            area_index = LYBDarkEden.quest_scene_jiyeok_list.index(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_area'])
+            combobox_list = LYBDarkEden.quest_scene_jiyeok_quest_list[area_index]
+            if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select' in self.configure.common_config[self.game_name]:
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select'] = combobox_list[0]
+        except ValueError:
+            area_index = 0
+            combobox_list = LYBDarkEden.quest_scene_jiyeok_quest_list[area_index]
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select'] = combobox_list[0]
+
+
+        self.jiyeok_quest_select_combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 15,
+            font                = lybconstant.LYB_FONT 
+            )
+        self.jiyeok_quest_select_combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select'])
+        self.jiyeok_quest_select_combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)   
+
         frame_r.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 알림 탭 좌
@@ -1828,3 +1916,17 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
     def guild_immu(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
+
+    def jiyeok_quest_area(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+        new_list = LYBDarkEden.quest_scene_jiyeok_quest_dic[self.option_dic[option_name].get()]
+
+        self.jiyeok_quest_select_combobox['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'jiyeok_quest_select') in new_list:
+                self.jiyeok_quest_select_combobox.set(new_list[0])
+        except KeyError:
+            pass
+
+    def jiyeok_quest_select(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
