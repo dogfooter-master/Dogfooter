@@ -122,7 +122,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status += 1
         elif self.status == 2:
             self.click_resource('guild_scene_chulseok_loc')            
-            if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu') == True:
+            if self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'guild_immu') is True:
                 self.click_resource('guild_scene_tab_길드 임무_loc')
                 self.status = 100
             else:
@@ -786,6 +786,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
+                self.set_option('click_jido', True)
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1922,7 +1923,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         resource_name = 'main_scene_portal_loc'
         elapsed_time = time.time() - self.get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(20):
+        if elapsed_time > self.period_bot(10) and self.game_object.get_scene('jido_scene').get_option('click_jido') is True:
             (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
@@ -1935,10 +1936,11 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 if limit_count == None:
                     limit_count = 0
 
-                if limit_count > 2:
+                if limit_count > 1:
                     self.set_option(resource_name + '_limit', 0)
                     self.set_checkpoint(resource_name)
                     self.lyb_mouse_click_location(loc_x, loc_y)
+                    self.game_object.get_scene('jido_scene').set_option('click_jido', False)
                     self.logger.info('포탈 이동 클릭')
                     return True            
                 else:
