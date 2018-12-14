@@ -26,6 +26,7 @@ class LYBDarkEden(lybgame.LYBGame):
         '특수던전',
         '보상',
         '길드',
+        '뽑기',
 
         '알림',
         '[반복 시작]',

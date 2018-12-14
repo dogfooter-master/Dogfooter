@@ -850,6 +850,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             else:
                 self.lyb_mouse_click('buy_confirm_scene_cancel', custom_threshold=0)
                 self.status = 0
+        elif self.status == 100:
+            self.click_resource('buy_confirm_scene_gume')
+            self.status = 99999
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -886,6 +889,35 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.lyb_mouse_click(pb_name, custom_threshold=0)
             self.game_object.get_scene('buy_confirm_scene').status = 0
             self.status += 1
+        elif self.status == self.get_work_status('뽑기'):
+            self.status = 100
+        elif self.status == 100:
+            self.click_resource('sangjeom_scene_tab_pet_loc')
+            self.status += 1
+        elif 101 <= self.status < 105:
+            self.status += 1
+
+            pb_name = 'sangjeom_scene_byeonsin_limit'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate < 0.9:
+                if self.click_resource('sangjeom_scene_byeonsin_pick_loc') == True:
+                    self.game_object.get_scene('buy_confirm_scene').status = 100
+                    return self.status
+
+            pb_name = 'sangjeom_scene_pet_limit'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.status = 99999
+                return self.status
+
+            if self.click_resource('sangjeom_scene_pet_pick_loc') == True:
+                self.game_object.get_scene('buy_confirm_scene').status = 100
+                return self.status
+
+            self.lyb_mouse_drag('sangjeom_scene_drag_right', 'sangjeom_scene_drag_left')
+
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1058,6 +1090,13 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click('quest_scene_tab_3', custom_threshold=0)
         elif 10 <= self.status < 20:
             self.status += 1
+
+            pb_name = 'quest_scene_ilil_limit'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.9:
+                self.status = 99999
+                return self.status
 
             for i in range(4):
                 resource_name = 'quest_scene_bosang_loc'
@@ -1440,11 +1479,19 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 return self.status
 
             elapsed_time = time.time() - self.get_checkpoint('auto_ilil_quest_period')
-            if cfg_check_ilil_quest != 0 and elapsed_time > cfg_check_sell:
-                self.set_checkpoint('auto_ilil_quest_period')
-                self.lyb_mouse_click('main_scene_menu_quest', custom_threshold=0)
-                self.game_object.get_scene('quest_scene').status = 0
-                self.set_option(self.current_work + '_inner_status', 0)
+            if cfg_check_ilil_quest != 0 and elapsed_time > cfg_check_ilil_quest:
+
+                pb_name = 'main_scene_menu_open'
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+                if match_rate > 0.9:
+                    self.set_checkpoint('auto_ilil_quest_period')
+                    self.lyb_mouse_click('main_scene_menu_quest', custom_threshold=0)
+                    self.game_object.get_scene('quest_scene').status = 0
+                    self.set_option(self.current_work + '_inner_status', 0)
+                else:
+                    self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+                
                 return self.status
 
             elapsed_time = time.time() - self.get_checkpoint('auto_move_check_period')
@@ -1528,11 +1575,11 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                         self.window_image,
                         resource_name,
-                        custom_threshold=0.8,
+                        custom_threshold=0.7,
                         custom_flag=1,
-                        custom_rect=(5, 150 + (quest_index * 25), 35, 180 + (quest_index * 30)),
+                        custom_rect=(5, 160 + (quest_index * 35) - 40, 35, 160 + (quest_index * 35) + 40),
                         debug=True)
-                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                    self.logger.debug('DEBUG:' + resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                     if loc_x != -1:
                         self.lyb_mouse_click_location(loc_x, loc_y)
                         self.set_option(self.current_work + '_inner_status', 1010)
@@ -1651,6 +1698,19 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             else:
                 self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
 
+        elif self.status == self.get_work_status('뽑기'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.game_object.get_scene('sangjeom_scene').status = self.status
+            self.lyb_mouse_click('main_scene_sangjeom', custom_threshold=0)
 
         elif self.status == self.get_work_status('토벌대'):
 
@@ -2092,8 +2152,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.game_object.get_scene('quest_scene').status = self.get_work_status('지역 퀘스트')
                 return True
 
-        if self.click_resource('main_scene_tobeol_ipjang_loc') is True:
-            return True
+        resource_name = 'main_scene_tobeol_ipjang_loc'
+        elapsed_time = time.time() - self.get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(60):
+            if self.click_resource(resource_name) is True:
+                self.set_checkpoint(resource_name)
+                return True
 
         return False
 
@@ -2101,6 +2165,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         complete_list = [
             'main_scene_quest_complete',
             'main_scene_quest_kill_loc',
+            'main_scene_quest_jongjok_complete_loc',
         ]
 
         for pb_name in complete_list:
@@ -2108,15 +2173,20 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                     self.window_image,
                     pb_name,
-                    custom_threshold=0.6,
+                    custom_threshold=0.5,
                     custom_flag=1,
-                    custom_rect=(5, 150, 170, 350))
+                    custom_top_level=(10, 255, 50),
+                    custom_below_level=(0, 135, 0),
+                    custom_rect=(5, 150, 170, 350),
+                    debug=True)
             else:
                 (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                     self.window_image,
                     self.game_object.resource_manager.pixel_box_dic[pb_name],
-                    custom_threshold=0.6,
+                    custom_threshold=0.5,
                     custom_flag=1,
+                    custom_top_level=(10, 255, 50),
+                    custom_below_level=(0, 135, 0),
                     custom_rect=(5, 150, 170, 350))
 
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
