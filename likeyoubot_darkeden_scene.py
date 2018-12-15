@@ -1564,10 +1564,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     return self.status
 
                 if self.isAutoCombat() is False:
+                    self.game_object.get_scene('jido_scene').set_option('click_jido', False)
                     self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                     return self.status
 
                 if self.isCenterAutoCombat() is False:
+                    self.game_object.get_scene('jido_scene').set_option('click_jido', False)
                     self.lyb_mouse_click('main_scene_auto_0', custom_threshold=0)
                     return self.status
             elif 1000 <= inner_status < 1010:
@@ -2139,7 +2141,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             custom_flag=1,
             custom_rect=(180, 450, 230, 480))
         self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
-        if loc_x == -1:           
+        if loc_x == -1 and self.game_object.get_scene('jido_scene').get_option('click_jido') is False:           
             # 깜빡일 때 클릭            
             elapsed_time = time.time() - self.get_checkpoint(pb_name)
             if elapsed_time > self.period_bot(10):
