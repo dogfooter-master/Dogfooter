@@ -1008,7 +1008,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.status = 0
                 return self.status
             
-            if self.status % 5 == 0:
+            if self.status % 60 == 0:
                 self.lyb_mouse_drag('pad_direction_center', 'pad_direction_1', stop_delay=2)
                 return self.status
         else:
@@ -1062,7 +1062,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status += 1
         elif 2 <= self.status < 10:
             self.status += 1
-            self.game_object.get_scene('tobeolde_combat_scene').status = 0
+            self.game_object.get_scene('tobeolde_main_scene').status = 0
             self.lyb_mouse_click('tobeolde_scene_enter', custom_threshold=0)
         elif 10 <= self.status < 20:
             bottom_bosang_index = self.get_option('bottom_bosang_index')
@@ -2156,6 +2156,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 self.logger.info('줍기 클릭')
                 return True
+            else:
+                self.set_option(pb_name + '_limit', limit_count + 1)
 
         resource_name = 'main_scene_receive_jiyeok_loc'
         elapsed_time = time.time() - self.get_checkpoint(resource_name)
