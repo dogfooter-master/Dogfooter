@@ -65,6 +65,7 @@ class LYBDarkEden(lybgame.LYBGame):
         ],
         [
             '브랑코 MID',
+            '브랑코 NW',
         ]
     ]
 
@@ -118,6 +119,11 @@ class LYBDarkEden(lybgame.LYBGame):
             '선택안함',
             '디케이리서치',            
         ],
+        sub_area_list[3][1] : [
+            '선택안함',
+            'B-봇',   
+            '세크워치봇',         
+        ],
     }
     sub_area_npc_dic = {
         sub_area_list[0][0] : [
@@ -149,6 +155,9 @@ class LYBDarkEden(lybgame.LYBGame):
         ],
         sub_area_list[3][0] : [
             '선택안함',         
+        ],
+        sub_area_list[3][1] : [
+            '선택안함',    
         ],
     }
     item_list = [
@@ -678,6 +687,29 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         frame.pack(anchor=tkinter.W)
 
         frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
+        frame_label = ttk.LabelFrame(frame_l, text='이동')
+        frame = ttk.Frame(frame_label)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'quick_move_gold'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'quick_move_gold'].trace(
+            'w', lambda *args: self.quick_move_gold(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'quick_move_gold')
+            )
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'quick_move_gold' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'quick_move_gold'] = False
+
+        check_box = ttk.Checkbutton(
+
+            master              = frame,
+            text                = '골드 사용 즉시 이동', 
+            variable            = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'quick_move_gold'],
+            onvalue             = True, 
+            offvalue            = False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
         frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 일반 탭 중간
@@ -1874,6 +1906,9 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
             pass
 
     def dungeon_floor_order_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def quick_move_gold(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def main_quest_duration(self, args, option_name):
