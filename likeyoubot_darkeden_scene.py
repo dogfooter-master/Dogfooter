@@ -466,7 +466,14 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
-        elif 1 <= self.status < 10:
+        elif self.status == 1:
+            self.lyb_mouse_click('event_scene_tab_0', custom_threshold=0)
+            self.status += 1
+        elif 2 <= self.status < 10:
+            self.status += 1
+            if self.status % 5 == 0:
+                self.lyb_mouse_drag('event_scene_drag_right', 'event_scene_drag_left')
+                return self.status
             resource_name = 'event_scene_click_loc'
             resource = self.game_object.resource_manager.resource_dic[resource_name]
 
@@ -482,7 +489,13 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.logger.debug(pb_name)
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 self.game_object.interval = 0.01
+        elif self.status == 10:
+            self.lyb_mouse_click('event_scene_tab_3', custom_threshold=0)
             self.status += 1
+        elif 11 <= self.status < 15:
+            self.status += 1
+            if self.click_resource('event_scene_dungeon_enter_loc') is False:
+                self.lyb_mouse_click('event_scene_dungeon_go', custom_threshold=0)
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1809,6 +1822,20 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             self.lyb_mouse_click('main_scene_gabang', custom_threshold=0)
             self.game_object.get_scene('gabang_scene').status = 0
+
+        elif self.status == self.get_work_status('이벤트'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            if self.click_resource('main_scene_event_loc') is True:
+                self.game_object.get_scene('event_scene').status = 0
 
         elif self.status == self.get_work_status('분해'):
 

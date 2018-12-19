@@ -26,6 +26,7 @@ class LYBDarkEden(lybgame.LYBGame):
         '가상수련장',
         '특수던전',
         '보상',
+        '이벤트',
         '길드',
         '뽑기',
 
