@@ -687,7 +687,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.set_option('cfg_npc', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'))
             self.set_option('cfg_order', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'))
 
-            for i in range(5):
+            for i in range(6):
                 cfg_dungeon_floor = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i))
                 if cfg_dungeon_floor != '선택안함':
                     resource_name = 'jido_scene_dungeon_floor_' + cfg_dungeon_floor + '_loc'
@@ -825,6 +825,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
+                self.game_object.interval = self.period_bot(3)
                 self.status = 0
                 self.set_option('click_jido', True)
         else:
@@ -2055,7 +2056,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 if limit_count == None:
                     limit_count = 0
 
-                if limit_count > 1:
+                if limit_count >= 0:
                     self.set_option(resource_name + '_limit', 0)
                     self.set_checkpoint(resource_name)
                     self.lyb_mouse_click_location(loc_x, loc_y)

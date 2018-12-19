@@ -719,7 +719,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         self.dungeon_floor_monster_combobox = []
         self.dungeon_floor_npc_combobox = []
 
-        for i in range(5):
+        for i in range(6):
             frame = ttk.Frame(frame_label)
             self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i)] = tkinter.StringVar(frame)            
             self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)] = tkinter.StringVar(frame)  
@@ -883,6 +883,19 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
                     ) 
                 self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(4)].trace(
                     'w', lambda *args: self.dungeon_floor_order_4(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(4))
+                    ) 
+            elif i == 5:
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(5)].trace(
+                    'w', lambda *args: self.dungeon_floor_5(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(5))
+                    )
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(5)].trace(
+                    'w', lambda *args: self.dungeon_floor_monster_5(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(5))
+                    )  
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(5)].trace(
+                    'w', lambda *args: self.dungeon_floor_npc_5(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(5))
+                    ) 
+                self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(5)].trace(
+                    'w', lambda *args: self.dungeon_floor_order_5(args, lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(5))
                     ) 
 
             frame.pack(anchor=tkinter.W)        
@@ -1906,6 +1919,47 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
             pass
 
     def dungeon_floor_order_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+
+    def dungeon_floor_5(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+        new_list = LYBDarkEden.dungeon_floor_monster_dic[self.option_dic[option_name].get()]
+
+        self.dungeon_floor_monster_combobox[5]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(5)) in new_list:
+                self.dungeon_floor_monster_combobox[5].set(new_list[0])
+        except KeyError:
+            pass
+
+        new_list = LYBDarkEden.dungeon_floor_npc_dic[self.option_dic[option_name].get()]
+        self.dungeon_floor_npc_combobox[5]['values'] = new_list
+        try:
+            if not self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(5)) in new_list:
+                self.dungeon_floor_npc_combobox[5].set(new_list[0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_monster_5(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_npc_combobox[5].set(self.dungeon_floor_npc_combobox[5]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_npc_5(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+        try:
+            if self.option_dic[option_name].get() != '선택안함':
+                self.dungeon_floor_monster_combobox[5].set(self.dungeon_floor_monster_combobox[5]['values'][0])
+        except KeyError:
+            pass
+
+    def dungeon_floor_order_5(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def quick_move_gold(self, args, option_name):
