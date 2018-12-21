@@ -537,7 +537,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 self.game_object.interval = 0.01
         elif self.status == 10:
-            self.lyb_mouse_click('event_scene_tab_3', custom_threshold=0)
+            self.lyb_mouse_click('event_scene_tab_4', custom_threshold=0)
             self.status += 1
         elif 11 <= self.status < 15:
             self.status += 1
@@ -2124,13 +2124,6 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click_location(loc_x, loc_y)
                 return self.status
 
-        resource_name = 'main_scene_target_loc'
-        elapsed_time = time.time() - self.get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(5) and self.game_object.get_scene('jido_scene').get_option('click_jido') is False:
-            if self.click_resource(resource_name) == True:
-                self.set_checkpoint(resource_name)
-                return self.status
-
         pb_name = 'main_scene_mana_potion_empty'        
         elapsed_time = time.time() - self.get_checkpoint(pb_name)
         if elapsed_time > self.period_bot(600):
@@ -2334,6 +2327,13 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.set_checkpoint(resource_name)
                 self.game_object.get_scene('quest_scene').status = self.get_work_status('지역 퀘스트')
                 return True
+
+        resource_name = 'main_scene_target_loc'
+        elapsed_time = time.time() - self.get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(5) and self.game_object.get_scene('jido_scene').get_option('click_jido') is False:
+            if self.click_resource(resource_name) == True:
+                self.set_checkpoint(resource_name)
+                return self.status
 
         resource_name = 'main_scene_tobeol_ipjang_loc'
         elapsed_time = time.time() - self.get_checkpoint(resource_name)
