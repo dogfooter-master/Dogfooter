@@ -29,6 +29,7 @@ class LYBDarkEden(lybgame.LYBGame):
         '이벤트',
         '길드',
         '뽑기',
+        '도감',
 
         '알림',
         '[반복 시작]',
@@ -1127,6 +1128,37 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
             master              = frame, 
+            text                = self.get_option_text('도감 체크 주기(초)', width=27)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period'].trace(
+            'w', lambda *args: self.auto_dogam_period(args, lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period')
+            )
+        combobox_list = []
+        for i in range(0, 3601):
+            combobox_list.append(str(i))
+
+        if not lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period'] = 1200
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list, 
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period'], 
+            state               = "readonly",
+            height              = 10,
+            width               = 7,
+            font                = lybconstant.LYB_FONT 
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_dogam_period'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame, 
             text                = self.get_option_text('종족 퀘스트 수행 횟수(회)', width=27)
             )
         label.pack(side=tkinter.LEFT)
@@ -1677,6 +1709,9 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
     def auto_ilil_quest_period(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())   
 
+    def auto_dogam_period(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())  
+        
     def auto_jongjok_quest_count(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())       
 
