@@ -878,7 +878,7 @@ class LYBGame():
 
         near_rect = (left, top, right, bottom) 
 
-        self.logger.warn(near_rect)
+        # self.logger.warn(near_rect)
 
         return self.locationResourceOnWindowPart(parent, child_resource,
             custom_threshold=custom_threshold,

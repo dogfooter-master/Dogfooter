@@ -1916,7 +1916,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         elif self.status == self.get_work_status('이벤트'):
 
             elapsed_time = self.get_elapsed_time()
-            if elapsed_time > self.period_bot(5):
+            if elapsed_time > self.period_bot(10):
                 self.set_option(self.current_work + '_end_flag', True)
 
             if self.get_option(self.current_work + '_end_flag'):
