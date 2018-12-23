@@ -313,6 +313,7 @@ class LYBDarkEden(lybgame.LYBGame):
         ],
         [
             '브랑코 정화1',
+            '브랑코 정화2',
         ]
 
     ]
@@ -1711,7 +1712,7 @@ class LYBDarkEdenTab(lybgame.LYBGameTab):
 
     def auto_dogam_period(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())  
-        
+
     def auto_jongjok_quest_count(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())       
 
