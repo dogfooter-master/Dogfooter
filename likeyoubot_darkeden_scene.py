@@ -536,10 +536,23 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.logger.debug(pb_name)
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 self.game_object.interval = 0.01
-        elif self.status == 10:
-            self.lyb_mouse_click('event_scene_tab_4', custom_threshold=0)
+        elif 10 <= self.status < 15:
             self.status += 1
-        elif 11 <= self.status < 15:
+            resource_name = 'event_scene_201812_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.8,
+                custom_flag=1,
+                custom_rect=(60, 120, 170, 360),
+                average=False,
+                debug=True)
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)            
+                self.status = 20
+
+        elif 20 <= self.status < 25:
             self.status += 1
             if self.click_resource('event_scene_dungeon_enter_loc') is False:
                 self.lyb_mouse_click('event_scene_dungeon_go', custom_threshold=0)
