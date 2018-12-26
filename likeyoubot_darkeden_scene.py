@@ -1629,16 +1629,27 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             elapsed_time = time.time() - self.get_checkpoint('auto_move_check_period')
             if cfg_check_worldmap != 0 and elapsed_time > cfg_check_worldmap:
-                pb_name = 'main_scene_menu_open'
-                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-                self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9:
-                    self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+                pb_name = 'main_scene_out'
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(610, 80, 670, 130))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.set_checkpoint('auto_move_check_period')
                 else:
-                    self.game_object.get_scene('jido_scene').status = 0
-                    self.lyb_mouse_click('main_scene_map', custom_threshold=0)
-                    # self.set_option(self.current_work + '_inner_status', 0)
-                return self.status   
+                    pb_name = 'main_scene_menu_open'
+                    match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+                    self.logger.debug(pb_name + ' ' + str(match_rate))
+                    if match_rate > 0.9:
+                        self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+                    else:
+                        self.game_object.get_scene('jido_scene').status = 0
+                        self.lyb_mouse_click('main_scene_map', custom_threshold=0)
+                        # self.set_option(self.current_work + '_inner_status', 0)
+                    return self.status   
 
             inner_status = self.get_option(self.current_work + '_inner_status')
             if inner_status is None:
