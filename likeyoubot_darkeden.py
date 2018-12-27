@@ -64,6 +64,7 @@ class LYBDarkEden(lybgame.LYBGame):
             '드로베타 NW',
             '아이센 던전 B1',
             '라옴 던전 B1',
+            '드로베타 SE',
         ],
         [
             '브랑코 MID',
@@ -116,6 +117,10 @@ class LYBDarkEden(lybgame.LYBGame):
         ],
         sub_area_list[2][5] : [
             '선택안함',  
+        ],
+        sub_area_list[2][6] : [
+            '선택안함',  
+            '앵글러',
         ],
         sub_area_list[3][0] : [
             '선택안함',
