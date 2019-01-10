@@ -359,7 +359,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         elif self.status == 100:
             self.lyb_mouse_click('upjeok_scene_tab_2', custom_threshold=0)
             self.status += 1
-        elif 101 <= self.status < 107:
+        elif 101 <= self.status < 105:
             pb_name = 'upjeok_scene_jongjok_quest_list_' + str(self.status - 101)
             self.lyb_mouse_click(pb_name, custom_threshold=0)
             self.set_option('last_status', self.status + 1)
