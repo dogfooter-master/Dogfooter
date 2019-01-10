@@ -1732,7 +1732,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     # self.logger.debug('DEBUG:' + resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                     if loc_x != -1:
                         self.lyb_mouse_click_location(loc_x, loc_y)
-                        self.game_object.get_scene('jido_scene').set_option('click_jido', True)
+                        self.game_object.get_scene('main_scene').set_option('click_quest', True)
                         self.set_option(self.current_work + '_inner_status', 3000)
                         break
             elif 3000 <= inner_status < 3100:
@@ -1752,7 +1752,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)  
             elif inner_status == 3100:
-                self.game_object.get_scene('jido_scene').set_option('click_jido', False)
+                self.game_object.get_scene('main_scene').set_option('click_quest', False)
                 self.set_option(self.current_work + '_inner_status', 1010)                            
             else:
                 self.set_option(self.current_work + '_inner_status', 0)
@@ -2104,6 +2104,9 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
     def pre_process_main_scene(self):
 
+        if self.game_object.get_scene('main_scene').get_option('click_quest') == True:
+            return False
+
         elapsed_time = time.time() - self.get_checkpoint('hp_check')
         if elapsed_time > self.period_bot(5):
             hp = self.player_hp()        
@@ -2157,7 +2160,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             if loc_x != -1:
                 self.set_checkpoint(resource_name)
                 self.lyb_mouse_click_location(loc_x, loc_y)
-                return self.status
+                return True
 
         resource_name = 'skill_silver_loc'
         elapsed_time = time.time() - self.get_checkpoint(resource_name)
@@ -2172,7 +2175,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             if loc_x != -1:
                 self.set_checkpoint(resource_name)
                 self.lyb_mouse_click_location(loc_x, loc_y)
-                return self.status
+                return True
 
         pb_name = 'main_scene_mana_potion_empty'        
         elapsed_time = time.time() - self.get_checkpoint(pb_name)
