@@ -1732,6 +1732,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     # self.logger.debug('DEBUG:' + resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                     if loc_x != -1:
                         self.lyb_mouse_click_location(loc_x, loc_y)
+                        self.game_object.get_scene('jido_scene').set_option('click_jido', True)
                         self.set_option(self.current_work + '_inner_status', 3000)
                         break
             elif 3000 <= inner_status < 3100:
@@ -1751,6 +1752,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)  
             elif inner_status == 3100:
+                self.game_object.get_scene('jido_scene').set_option('click_jido', False)
                 self.set_option(self.current_work + '_inner_status', 1010)                            
             else:
                 self.set_option(self.current_work + '_inner_status', 0)
