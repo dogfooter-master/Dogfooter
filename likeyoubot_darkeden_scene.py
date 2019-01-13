@@ -2397,7 +2397,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         return False
 
-    def is_complete_quest(self, limit=1):
+    def is_complete_quest(self, limit=3):
         complete_list = [
             'main_scene_quest_complete',
             'main_scene_quest_kill_loc',
