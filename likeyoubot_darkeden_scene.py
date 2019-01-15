@@ -896,7 +896,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 custom_threshold=0.8,
                 custom_flag=1,
                 custom_rect=(700, 150, 780, 470))
-            # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
                 self.game_object.interval = self.period_bot(3)
@@ -1737,6 +1737,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         break
             elif 3000 <= inner_status < 3100:
                 if self.is_complete_quest():
+                    self.game_object.get_scene('main_scene').set_option('click_quest', False)
                     self.set_option(self.current_work + '_inner_status', 0)
                     return self.status
 

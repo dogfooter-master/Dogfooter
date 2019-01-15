@@ -249,6 +249,8 @@ class LYBDarkEden(lybgame.LYBGame):
         ],
         [
             '선택안함',
+            '블런트크래그',
+            '허밋',
         ],
     ]
 
