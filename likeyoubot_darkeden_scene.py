@@ -148,7 +148,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status = 0
 
         return self.status
-        
+
     def dogam_scene(self):
 
         if self.status == 0:
@@ -1181,30 +1181,19 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         elif self.status == 100:
             self.click_resource('sangjeom_scene_tab_pet_loc')
             self.status += 1
-        elif 101 <= self.status < 105:
+        elif self.status == 101:
+            self.lyb_mouse_drag('sangjeom_scene_drag_right', 'sangjeom_scene_drag_left')
             self.status += 1
-
-            pb_name = 'sangjeom_scene_byeonsin_limit'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate < 0.7:
-                if self.click_resource('sangjeom_scene_byeonsin_pick_loc') == True:
-                    self.game_object.get_scene('buy_confirm_scene').status = 100
-                    return self.status
-
-            pb_name = 'sangjeom_scene_pet_limit'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.7:
-                self.status = 99999
+        elif self.status == 102:
+            self.status += 1
+            if self.click_resource('sangjeom_scene_byeonsin_pick_loc') == True:
+                self.game_object.get_scene('buy_confirm_scene').status = 100
                 return self.status
-
+        elif self.status == 103:
+            self.status += 1
             if self.click_resource('sangjeom_scene_pet_pick_loc') == True:
                 self.game_object.get_scene('buy_confirm_scene').status = 100
                 return self.status
-
-            self.lyb_mouse_drag('sangjeom_scene_drag_right', 'sangjeom_scene_drag_left')
-
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)

@@ -853,8 +853,17 @@ class LYBGame():
         right = -1
         bottom = -1
 
+        pb_width = 0
+        pb_height = 0
+
         resource = self.resource_manager.resource_dic[child_resource]
         for each_pixel_box_name in resource:
+            pixel_box = self.resource_manager.pixel_box_dic[each_pixel_box_name]
+            if pb_width < pixel_box.width:
+                pb_width = pixel_box.width
+            if pb_height < pixel_box.height:
+                pb_height = pixel_box.height
+                
             (loc_x, loc_y) = self.get_location(each_pixel_box_name)
             if loc_x < left:
                 left = loc_x
@@ -868,15 +877,16 @@ class LYBGame():
 
         adj_x, adj_y = self.get_player_adjust()
 
-        left = left - near + adj_x
-        top = top - near + adj_y
-        right = right + near - adj_x
-        bottom = bottom + near - adj_y
+
+        left = left - pb_width - near + adj_x
+        top = top - pb_height - near + adj_y
+        right = right + pb_width + near - adj_x
+        bottom = bottom + pb_height + near - adj_y
 
         if left < 0:
             left = 0
-        if top < 40:
-            top = 40
+        if top < 1:
+            top = 1
         if right > likeyoubot_win.LYBWin.WIDTH - adj_x:
             right = likeyoubot_win.LYBWin.WIDTH - adj_x
         if bottom > likeyoubot_win.LYBWin.HEIGHT - adj_y:
@@ -884,7 +894,7 @@ class LYBGame():
 
         near_rect = (left, top, right, bottom) 
 
-        # self.logger.warn(near_rect)
+        self.logger.warn(near_rect)
 
         return self.locationResourceOnWindowPart(parent, child_resource,
             custom_threshold=custom_threshold,

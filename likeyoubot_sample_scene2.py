@@ -67,7 +67,7 @@ class LYBMu2Scene(likeyoubot_scene.LYBScene):
 								self.game_object.resource_manager.pixel_box_dic[each_icon],
 								custom_threshold=0.8,
 								custom_flag=1,
-								custom_rect=(80, 110, 570, 300)
+			                    custom_rect=(80, 110, 700, 370)
 								)
 				# self.logger.debug(match_rate)
 				if loc_x != -1:
@@ -80,7 +80,7 @@ class LYBMu2Scene(likeyoubot_scene.LYBScene):
 								self.game_object.resource_manager.pixel_box_dic[each_icon],
 								custom_threshold=0.8,
 								custom_flag=1,
-								custom_rect=(30, 10, 610, 300)
+								custom_rect=(30, 10, 740, 370)
 								)
 				# self.logger.debug(match_rate)
 				if loc_x != -1:

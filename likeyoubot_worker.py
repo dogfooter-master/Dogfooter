@@ -8,7 +8,11 @@ from PIL import ImageGrab
 import cv2
 import numpy as np
 from likeyoubot_configure import LYBConstant as lybconstant
+
 import likeyoubot_darkeden
+import likeyoubot_hundredsoul
+
+
 import likeyoubot_logger
 import traceback
 import pyautogui
@@ -332,6 +336,11 @@ class LYBWorker(threading.Thread):
 
 						if self.game_name == lybconstant.LYB_GAME_DARKEDEN:
 							self.game = likeyoubot_darkeden.LYBDarkEden(None, None, self.win)
+						elif self.game_name == lybconstant.LYB_GAME_HUNDREDSOUL:
+							self.game = likeyoubot_hundredsoul.LYBHundredSoul(None, None, self.win)
+
+
+							
 						# elif self.game_name == lybconstant.LYB_GAME_BLACKDESERT:
 						# 	self.game = likeyoubot_blackdesert.LYBBlackDesert(None, None, self.win)
 						# elif self.game_name == lybconstant.LYB_GAME_BLADE2:

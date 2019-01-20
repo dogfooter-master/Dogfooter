@@ -498,3 +498,4 @@ class LYBScene():
     def period_bot(self, weight):
         # print(self.get_window_config('wakeup_period_entry'))
         return self.game_object.period_bot(weight)
+

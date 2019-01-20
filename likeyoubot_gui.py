@@ -10,7 +10,10 @@ import pickle
 import sys
 import os
 import likeyoubot_message
+
 import likeyoubot_darkeden as LYBDARKEDEN
+import likeyoubot_hundredsoul as LYBHUNDREDSOUL
+
 from likeyoubot_configure import LYBConstant as lybconstant
 import datetime
 import copy
@@ -390,6 +393,16 @@ class LYBGUI:
             # lybconstant.LYB_GAME_CLANS,
             # lybconstant.LYB_GAME_YEOLHYUL
         ]
+        # 헌드레드 소울
+        lybhttp = self.login_gnu_board()
+        base_point = lybhttp.get_elem('hundredsoul_point')
+        if base_point == None:
+            base_point = 0
+        else:
+            base_point = int(base_point)
+        
+        if int(self.get_mb_point()) >= base_point:
+            self.games.append(lybconstant.LYB_GAME_HUNDREDSOUL)
 
         # # 검은사막
         # lybhttp = self.login_gnu_board()
@@ -2245,6 +2258,26 @@ class LYBGUI:
             self.height
         )
         self.game_tab_dic[lybconstant.LYB_GAME_DARKEDEN] = lyb_game_tab
+
+        # 헌드레드 소울
+        lybhttp = self.login_gnu_board()
+        base_point = lybhttp.get_elem('hundredsoul_point')
+        if base_point == None:
+            base_point = 0
+        else:
+            base_point = int(base_point)
+
+        if int(self.get_mb_point()) >= base_point:
+            game_index += 1
+            lyb_game_tab = LYBHUNDREDSOUL.LYBHundredSoulTab(
+                self.tab_frame[game_index + 1],
+                self.configure,
+                self.game_options[self.games[game_index]],
+                self.game_frame[self.games[game_index]],
+                self.width,
+                self.height
+            )
+            self.game_tab_dic[lybconstant.LYB_GAME_HUNDREDSOUL] = lyb_game_tab
 
         # # 테라M
         #

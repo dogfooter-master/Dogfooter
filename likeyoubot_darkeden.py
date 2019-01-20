@@ -358,13 +358,37 @@ class LYBDarkEden(lybgame.LYBGame):
                 self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                 return 'skip'
 
+        resource_name = 'open_all_loc'
+        (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+            self.window_image,
+            resource_name,
+            custom_threshold=0.7,
+            custom_flag=1,
+            custom_rect=(680, 430, 760, 470)
+        )
+        if loc_x != -1:
+            self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+            return 'skip'
+
+        resource_name = 'open_ok_loc'
+        (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+            self.window_image,
+            resource_name,
+            custom_threshold=0.7,
+            custom_flag=1,
+            custom_rect=(40, 430, 110, 470)
+        )
+        if loc_x != -1:
+            self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+            return 'skip'
+
         resource_name = 'skip_npc_loc'
         elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
         if elapsed_time > self.period_bot(5):
             (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.8,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(710, 400, 790, 450)
             )
@@ -424,10 +448,6 @@ class LYBDarkEden(lybgame.LYBGame):
         if len(scene_name) > 0:
             return scene_name
 
-        scene_name = self.death_scene(window_image)
-        if len(scene_name) > 0:
-            return scene_name
-
         scene_name = self.gabang_scene(window_image)
         if len(scene_name) > 0:
           return scene_name
@@ -437,14 +457,6 @@ class LYBDarkEden(lybgame.LYBGame):
           return scene_name
 
         scene_name = self.jido_scene(window_image)
-        if len(scene_name) > 0:
-          return scene_name
-
-        scene_name = self.quest_scene(window_image)
-        if len(scene_name) > 0:
-          return scene_name
-
-        scene_name = self.dogam_scene(window_image)
         if len(scene_name) > 0:
           return scene_name
 
@@ -467,6 +479,9 @@ class LYBDarkEden(lybgame.LYBGame):
             'quick_move_gold_scene',
             'buy_confirm_scene',
             'bosang_scene',
+            'death_scene',
+            'quest_scene',
+            'dogam_scene',
         ]
 
         max_match_rate_scene = ''
@@ -540,18 +555,6 @@ class LYBDarkEden(lybgame.LYBGame):
 
       return ''
 
-    def death_scene(self, window_image):
-      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
-                          self.window_image,
-                          'death_scene_loc',
-                          custom_threshold=0.7,
-                          custom_flag=1,
-                          average=True)
-      if loc_x != -1:
-          return 'death_scene'
-
-      return ''
-
     def jido_scene(self, window_image):
       (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
                           self.window_image,
@@ -573,30 +576,6 @@ class LYBDarkEden(lybgame.LYBGame):
                           average=True)
       if loc_x != -1:
         return 'gabang_scene'
-
-      return ''
-
-    def quest_scene(self, window_image):
-      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
-                          self.window_image,
-                          'quest_scene_loc',
-                          custom_flag=1,
-                          custom_threshold=0.7,
-                          average=True)
-      if loc_x != -1:
-        return 'quest_scene'
-
-      return ''
-
-    def dogam_scene(self, window_image):
-      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
-                          self.window_image,
-                          'dogam_scene_loc',
-                          custom_flag=1,
-                          custom_threshold=0.7,
-                          average=True)
-      if loc_x != -1:
-        return 'dogam_scene'
 
       return ''
 
