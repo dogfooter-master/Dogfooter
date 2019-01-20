@@ -29,6 +29,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             rc = self.main_scene()
         elif self.scene_name == 'connect_account_scene':
             rc = self.connect_account_scene()
+        elif self.scene_name == 'google_play_store_scene':
+            rc = self.google_play_store_scene()
         elif self.scene_name == 'google_account_scene':
             rc = self.google_account_scene()
         elif self.scene_name == 'login_scene':
@@ -116,6 +118,37 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         return self.status
 
 
+    def google_play_store_scene(self):
+
+        elapsed_time = time.time() - self.get_checkpoint('start')
+        if elapsed_time > 120 and elapsed_time < 180:
+            self.set_checkpoint('start')
+            self.game_object.terminate_application()
+            self.status = 0
+            return self.status
+
+        if self.status == 0:
+            self.set_checkpoint('start')
+            self.status += 1
+        elif self.status == 1:
+            pb_name = self.scene_name + '_open'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.9:
+                self.lyb_mouse_click(pb_name)
+            else:
+                self.status += 1
+        elif self.status == 2:
+            pb_name = self.scene_name + '_update'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.9:
+                self.lyb_mouse_click(pb_name)
+            else:
+                self.status = 1
+        else:
+            self.status = 0
+
+        return self.status
+        
     def dogam_scene(self):
 
         if self.status == 0:
@@ -267,9 +300,14 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.status += 1
 
             pb_name = 'bosang_scene_chulseok'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.8:
+            (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                self.window_image,
+                self.game_object.resource_manager.pixel_box_dic[pb_name],
+                custom_threshold=0.7,
+                custom_flag=1,
+                custom_rect=(580, 90, 760, 120))
+            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
                 extra_x = 0
                 for j in range(4):
                     for i in range(7):
@@ -294,9 +332,13 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                             return self.status
 
             pb_name = 'bosang_scene_jeopsok'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.8:
+            (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                self.window_image,
+                self.game_object.resource_manager.pixel_box_dic[pb_name],
+                custom_threshold=0.7,
+                custom_flag=1,
+                custom_rect=(190, 90, 280, 140))
+            if loc_x != -1:
                 for i in range(5):
                     custom_rect = (240 + (120*i) - 30, 250, 240 + (120*i) + 30, 310)
                     pb_name = 'bosang_scene_jeopsok_check'

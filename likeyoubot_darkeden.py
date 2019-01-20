@@ -378,7 +378,8 @@ class LYBDarkEden(lybgame.LYBGame):
             'confirm_20181129_loc',
             'confirm_20181129_1_loc',
             'confirm_20190119_loc',
-            'confirm_20190120_loc'
+            'confirm_20190120_loc',
+            'download_20190120_loc'
         ]
         for resource_name in confirm_list:
             elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
@@ -388,7 +389,7 @@ class LYBDarkEden(lybgame.LYBGame):
                     resource_name,
                     custom_threshold=0.8,
                     custom_flag=1,
-                    custom_rect=(360, 300, 450, 450)
+                    custom_rect=(300, 200, 510, 450)
                 )
                 # self.logger.warn(resource_name + ' ' + str(match_rate))
                 if loc_x != -1:
@@ -465,6 +466,7 @@ class LYBDarkEden(lybgame.LYBGame):
             'character_scene',
             'quick_move_gold_scene',
             'buy_confirm_scene',
+            'bosang_scene',
         ]
 
         max_match_rate_scene = ''
@@ -492,7 +494,7 @@ class LYBDarkEden(lybgame.LYBGame):
                 custom_flag=1,
                 near=64,
                 average=True)
-            self.logger.warn(each_scene + ' ' + str(match_rate))
+            # self.logger.warn(each_scene + ' ' + str(match_rate))
             if loc_x != -1:
                 if max_match_rate < match_rate:
                     max_match_rate_scene = each_scene
