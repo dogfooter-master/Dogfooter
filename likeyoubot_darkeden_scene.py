@@ -149,8 +149,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 # self.logger.debug(pb_name + ' ' + str(match_rate))
                 if match_rate < 0.8:
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
-                    return self.status
-
+                    time.sleep(0.1)
+        elif self.status == 15:
             self.status = self.get_option('last_status')
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -400,6 +400,14 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
     def gejo_scene(self):
 
+        quality_list = [
+            [(140, 140, 140), (255, 255, 255)],
+            [(25, 85, 0), (45, 180, 30)],
+            [(35, 65, 100), (85, 135, 230)],
+            [(70, 0, 110), (180, 30, 255)],
+            [(100, 85, 0), (255, 160, 25)],
+        ]
+
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
@@ -412,26 +420,66 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             for i in range(len(lybgamedarkeden.LYBDarkEden.option_list)):
                 cfg_item = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i))
                 pb_name = 'gejo_scene_bunhe_option_' + str(i)
-                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
-                # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9 and cfg_item is False:
+                resource_name = 'gejo_scene_bunhe_option_' + str(i) + '_loc'
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                    self.window_image,
+                    resource_name,
+                    near=8,
+                    custom_threshold=0.8,
+                    custom_flag=1)
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1 and cfg_item is False:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
-                elif match_rate < 0.9 and cfg_item is True:
+                elif loc_x == -1 and cfg_item is True:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
 
             for i in range(len(lybgamedarkeden.LYBDarkEden.item_quality_list)):
                 cfg_item_quality = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i))
                 pb_name = 'gejo_scene_item_quality_' + str(i)
-                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
-                # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9 and cfg_item_quality is False:
+                resource_name = 'gejo_scene_item_quality_' + str(i) + '_loc'
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                    self.window_image,
+                    resource_name,
+                    near=16,
+                    custom_threshold=0.5,
+                    custom_below_level=quality_list[i][0],
+                    custom_top_level=quality_list[i][1],
+                    custom_flag=1,
+                    debug=True)
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1 and cfg_item_quality is False:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
-                elif match_rate < 0.9 and cfg_item_quality is True:
+                elif loc_x == -1 and cfg_item_quality is True:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+            # is_clicked = False
+            # for i in range(len(lybgamedarkeden.LYBDarkEden.option_list)):
+            #     cfg_item = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_option_' + str(i))
+            #     pb_name = 'gejo_scene_bunhe_option_' + str(i)
+            #     match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+            #     # self.logger.debug(pb_name + ' ' + str(match_rate))
+            #     if match_rate > 0.7 and cfg_item is False:
+            #         is_clicked = True
+            #         self.lyb_mouse_click(pb_name, custom_threshold=0)
+            #     elif match_rate < 0.7 and cfg_item is True:
+            #         is_clicked = True
+            #         self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+            # for i in range(len(lybgamedarkeden.LYBDarkEden.item_quality_list)):
+            #     cfg_item_quality = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'bunhe_item_quality_' + str(i))
+            #     pb_name = 'gejo_scene_item_quality_' + str(i)
+            #     match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+            #     # self.logger.debug(pb_name + ' ' + str(match_rate))
+            #     if match_rate > 0.7 and cfg_item_quality is False:
+            #         is_clicked = True
+            #         self.lyb_mouse_click(pb_name, custom_threshold=0)
+            #     elif match_rate < 0.7 and cfg_item_quality is True:
+            #         is_clicked = True
+            #         self.lyb_mouse_click(pb_name, custom_threshold=0)
 
             if is_clicked == False:
                 self.status = 10
@@ -481,6 +529,16 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         return self.status
 
     def special_dungeon_scene(self):
+
+        resource_name = 'special_dungeon_create_scene_create_loc'
+        (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+            self.window_image,
+            resource_name,
+            custom_threshold=0.7,
+            custom_flag=1)
+        self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        if loc_x != -1:
+            return self.game_object.get_scene('special_dungeon_create_scene').process(self.window_image, self.window_pixels)
 
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
@@ -535,7 +593,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.set_option('tutorial_iterator', tutorial_iterator + 1)
                 # self.logger.debug(pb_name)
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
-                self.game_object.interval = 0.01
+                self.game_object.interval = 1.0
         elif 10 <= self.status < 15:
             self.status += 1
             resource_name = 'event_scene_201812_loc'
@@ -579,7 +637,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 pb_name = 'connect_account_scene_check_' + str(i)
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                 # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9:
+                if match_rate > 0.7:
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
                     return self.status
 
@@ -623,7 +681,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'party_chode_scene_check_all'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate < 0.9:
+            if match_rate < 0.7:
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 return self.status
 
@@ -647,7 +705,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             resource_name = 'gasang_sooryeonjang_scene_limit_loc'
             match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.status = 10
                 return self.status
 
@@ -670,37 +728,89 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
     def gabang_sell_scene(self):
 
+        quality_list = [
+            [(140, 140, 140), (255, 255, 255)],
+            [(25, 85, 0), (45, 180, 30)],
+            [(35, 65, 100), (85, 135, 230)],
+            [(70, 0, 110), (180, 30, 255)],
+            [(100, 85, 0), (255, 160, 25)],
+        ]
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
         elif 1 <= self.status < 10:
+            self.status += 1
             is_clicked = False
             for i in range(len(lybgamedarkeden.LYBDarkEden.item_list)):
                 cfg_item = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'sell_item_' + str(i))
                 pb_name = 'gabang_sell_scene_item_' + str(i)
-                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
-                # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9 and cfg_item is False:
+                resource_name = 'gabang_sell_scene_item_' + str(i) + '_loc'
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                    self.window_image,
+                    resource_name,
+                    near=8,
+                    custom_threshold=0.8,
+                    custom_flag=1)
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1 and cfg_item is False:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
-                elif match_rate < 0.9 and cfg_item is True:
+                elif loc_x == -1 and cfg_item is True:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
 
             for i in range(len(lybgamedarkeden.LYBDarkEden.item_quality_list)):
                 cfg_item_quality = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'sell_item_quality_' + str(i))
                 pb_name = 'gabang_sell_scene_item_quality_' + str(i)
-                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
-                # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9 and cfg_item_quality is False:
+                resource_name = 'gabang_sell_scene_item_quality_' + str(i) + '_loc'
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+                    self.window_image,
+                    resource_name,
+                    near=16,
+                    custom_threshold=0.4,
+                    custom_below_level=quality_list[i][0],
+                    custom_top_level=quality_list[i][1],
+                    custom_flag=1,
+                    debug=True)
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1 and cfg_item_quality is False:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
-                elif match_rate < 0.9 and cfg_item_quality is True:
+                elif loc_x == -1 and cfg_item_quality is True:
                     is_clicked = True
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
 
             if is_clicked == False:
                 self.status = 10
+
+        # elif 1 <= self.status < 10:
+        #     is_clicked = False
+        #     for i in range(len(lybgamedarkeden.LYBDarkEden.item_list)):
+        #         cfg_item = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'sell_item_' + str(i))
+        #         pb_name = 'gabang_sell_scene_item_' + str(i)
+        #         match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+        #         # self.logger.debug(pb_name + ' ' + str(match_rate))
+        #         if match_rate > 0.7 and cfg_item is False:
+        #             is_clicked = True
+        #             self.lyb_mouse_click(pb_name, custom_threshold=0)
+        #         elif match_rate < 0.7 and cfg_item is True:
+        #             is_clicked = True
+        #             self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+        #     for i in range(len(lybgamedarkeden.LYBDarkEden.item_quality_list)):
+        #         cfg_item_quality = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'sell_item_quality_' + str(i))
+        #         pb_name = 'gabang_sell_scene_item_quality_' + str(i)
+        #         match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name, custom_tolerance=10)
+        #         # self.logger.debug(pb_name + ' ' + str(match_rate))
+        #         if match_rate > 0.7 and cfg_item_quality is False:
+        #             is_clicked = True
+        #             self.lyb_mouse_click(pb_name, custom_threshold=0)
+        #         elif match_rate < 0.7 and cfg_item_quality is True:
+        #             is_clicked = True
+        #             self.lyb_mouse_click(pb_name, custom_threshold=0)
+
+        #     if is_clicked == False:
+        #         self.status = 10
         elif self.status == 10:
             self.click_resource('gabang_sell_scene_sell_loc')
             self.status += 1
@@ -757,22 +867,33 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             self.game_object.get_scene('main_scene').set_checkpoint('auto_move_check_period')
             self.set_option('click_npc_tab', False)
             self.set_option('loc_first_monster', (-1, -1))
-            self.set_option('loc_count', 1)
+            # self.set_option('loc_count', 1)
             self.set_option('cfg_monster', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_monster'))
             self.set_option('cfg_npc', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_npc'))
             self.set_option('cfg_order', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_WORK + 'auto_order'))
 
+            p = None
             for i in range(6):
                 cfg_dungeon_floor = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i))
                 if cfg_dungeon_floor != '선택안함':
                     resource_name = 'jido_scene_dungeon_floor_' + cfg_dungeon_floor + '_loc'
-                    if self.click_resource(resource_name, custom_threshold=0.9) is True:
-                        self.logger.info('던전 이동: ' + str(cfg_dungeon_floor))
-                        self.set_option('cfg_monster', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)))
-                        self.set_option('cfg_npc', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)))
-                        self.set_option('cfg_order', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)))
-                        self.status = 2
-                        return self.status
+                    isMatched, match_rate = self.click_resource2(resource_name, custom_threshold=0.7) 
+                    if isMatched is True:
+                        e = {}
+                        e['index'] = i
+                        e['rate'] = match_rate
+                        if p is None or match_rate < e['rate']:
+                            p = e
+            if p is not None:
+                i = p['index']
+                cfg_dungeon_floor = self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor' + str(i))
+                self.logger.info('던전 이동: ' + str(cfg_dungeon_floor))
+                self.set_option('cfg_monster', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_monster' + str(i)))
+                self.set_option('cfg_npc', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_npc' + str(i)))
+                self.set_option('cfg_order', self.get_game_config(lybconstant.LYB_DO_STRING_DARKEDEN_ETC + 'dungeon_floor_order' + str(i)))
+                self.status = 2
+                return self.status
+
             for i in range(4):
                 pb_name = 'jido_scene_monster_last_' + str(i)
                 (loc_x, loc_y) = self.get_location(pb_name)
@@ -796,8 +917,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             pb_name = 'jido_scene_tab_pb_0'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.8:
                 resource_name = 'jido_scene_area_' + cfg_area + '_loc'
                 (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
                     self.window_image,
@@ -812,8 +933,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             pb_name = 'jido_scene_tab_pb_1'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.8:
                 resource_name = 'jido_scene_sub_area_' + cfg_sub_area + '_loc'
                 (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
                     self.window_image,
@@ -827,8 +948,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             pb_name = 'jido_scene_tab_pb_2'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.8:
                 resource_name = 'jido_scene_monster_' + cfg_monster + '_loc'
                 if cfg_monster == '선택안함':
                     if self.get_option('click_npc_tab') is False:
@@ -837,33 +958,31 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                         return self.status
                     resource_name = 'jido_scene_npc_' + cfg_npc + '_loc'
 
+                pDic = {}
                 for i in range(6):                    
                     (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                         self.window_image,
                         resource_name,
-                        custom_threshold=0.85,
+                        custom_threshold=0.7,
                         custom_flag=1,
-                        custom_rect=(570, 180 + (i*40) - 45, 720, 180 + (i*40) + 45),
+                        custom_rect=(570, 180 + (i*40) - 25, 720, 180 + (i*40) + 55),
+                        debug=True
                         )
-                    # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 45, 720, 180 + (i*40) + 45)))
+                    self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate) + str((570, 180 + (i*40) - 25, 720, 180 + (i*40) + 55)))
                     if loc_x != -1:
-                        if cfg_order > 1:
-                            loc_count = self.get_option('loc_count')
-                            last_loc_x, last_loc_y = self.get_option('loc_first_monster')
-                            self.logger.info('loc_count: ' + str(loc_count) + ' ' + str(cfg_order))
-                            if last_loc_x != loc_x or last_loc_y != loc_y:
-                                if loc_count >= cfg_order:
-                                    self.lyb_mouse_click_location(loc_x, loc_y)
-                                    self.status = 10
-                                    return self.status
-                                else:
-                                    self.set_option('loc_count', loc_count + 1)                                    
+                        # p['rate'] = match_rate
+                        # p['loc'] = (loc_x, loc_y)
+                        pDic[(loc_x, loc_y)] = match_rate
 
-                                self.set_option('loc_first_monster', (loc_x, loc_y))
-                        else:
-                            self.lyb_mouse_click_location(loc_x, loc_y)
-                            self.status = 10
-                            return self.status
+
+                sorted_list = sorted(pDic.items(), key=operator.itemgetter(1), reverse=True)
+
+                self.logger.warn(sorted_list)
+                if len(sorted_list) > cfg_order - 1:
+                    loc_x, loc_y = sorted_list[cfg_order - 1][0]
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                    self.status = 10
+                    return self.status
 
             is_end = True
             for i in range(4):
@@ -873,11 +992,12 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 if last_pixel == None:
                     is_end = False
                 else:
-                    # self.logger.debug(str((loc_x, loc_y)) + ' ' + str(last_pixel) + ' ' + str(self.game_object.window_pixels[loc_x, loc_y]))
+                    self.logger.debug(str((loc_x, loc_y)) + ' ' + str(last_pixel) + ' ' + str(self.game_object.window_pixels[loc_x, loc_y]))
                     if last_pixel != self.game_object.window_pixels[loc_x, loc_y]:
                         is_end = False
 
                 self.set_option('last_pixel_' + pb_name, self.game_object.window_pixels[loc_x, loc_y])
+
             if is_end == True:
                 self.logger.warn('몬스터 탐색 실패: ' + str(cfg_monster))
                 self.status = 10
@@ -893,7 +1013,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.8,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(700, 150, 780, 470))
             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -922,7 +1042,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         resource_name = self.scene_name
         match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
-        if match_rate < 0.9:
+        if match_rate < 0.7:
             self.game_object.click_all_tutorial_point()
             return self.status
 
@@ -955,7 +1075,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(430, 210, 500, 260))
             # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -966,7 +1086,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click('buy_confirm_scene_cancel', custom_threshold=0)
                 self.status = 0
         elif self.status == 100:
-            self.click_resource('buy_confirm_scene_gume')
+            self.click_resource('buy_confirm_scene_gume_loc')
             self.status = 99999
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -978,6 +1098,16 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
     def sangjeom_scene(self):
 
+        resource_name = 'buy_confirm_scene_gume_loc'
+        (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
+            self.window_image,
+            resource_name,
+            custom_threshold=0.7,
+            custom_flag=1)
+        self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        if loc_x != -1:
+            return self.game_object.get_scene('buy_confirm_scene').process(self.window_image, self.window_pixels)
+
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
@@ -987,10 +1117,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.8,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(160, 70, 790, 120))
-            # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
                 self.status = 10
@@ -1015,7 +1145,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'sangjeom_scene_byeonsin_limit'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate < 0.9:
+            if match_rate < 0.7:
                 if self.click_resource('sangjeom_scene_byeonsin_pick_loc') == True:
                     self.game_object.get_scene('buy_confirm_scene').status = 100
                     return self.status
@@ -1023,7 +1153,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'sangjeom_scene_pet_limit'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.status = 99999
                 return self.status
 
@@ -1049,21 +1179,19 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.set_checkpoint('last_death')
+            self.set_option('click_help', False)
+            self.set_option('click_help_guild', False)
             self.status += 1
         elif 1 <= self.status < 10:
             self.status += 1
-            pb_name = 'death_scene_help'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
-                self.lyb_mouse_click(pb_name, custom_threshold=0)
+            resource_name = 'death_scene_help_loc'
+            if self.click_resource(resource_name) is True and self.get_option('click_help') is False:
+                self.set_option('click_help', True)
                 return self.status
 
-            pb_name = 'death_scene_help_guild'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
-                self.lyb_mouse_click(pb_name, custom_threshold=0)
+            resource_name = 'death_scene_help_guild_loc'
+            if self.click_resource(resource_name) is True and self.get_option('click_help_guild') is False:
+                self.set_option('click_help_guild', True)
                 return self.status
 
             self.end_work()
@@ -1103,7 +1231,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 self.status = 0
                 return self.status
             
-            if self.status % 60 == 0:
+            if self.status % 10 == 0:
                 self.lyb_mouse_drag('pad_direction_center', 'pad_direction_1', stop_delay=2)
                 return self.status
         else:
@@ -1195,10 +1323,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.8,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(30, 330, 130, 380))
-            # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.status = 10
             else:
@@ -1208,8 +1336,8 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             pb_name = 'quest_scene_ilil_limit'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-            # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            self.logger.debug(pb_name + ' ' + str(match_rate))
+            if match_rate > 0.7:
                 self.status = 99999
                 return self.status
 
@@ -1218,10 +1346,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                     self.window_image,
                     resource_name,
-                    custom_threshold=0.8,
+                    custom_threshold=0.7,
                     custom_flag=1,
                     custom_rect=(125 + (180*i) - 100, 290, 125 + (180*i) + 100, 340))
-                # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                 if loc_x != -1:
                     self.lyb_mouse_click_location(loc_x, loc_y)
                     return self.status
@@ -1231,10 +1359,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                     self.window_image,
                     resource_name,
-                    custom_threshold=0.8,
+                    custom_threshold=0.7,
                     custom_flag=1,
                     custom_rect=(125 + (180*i) - 100, 290, 125 + (180*i) + 100, 340))
-                # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                 if loc_x != -1:
                     self.lyb_mouse_click_location(loc_x, loc_y)
                     return self.status
@@ -1262,10 +1390,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.8,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(170, 430, 300, 460))
-            # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.status = 110
             else:
@@ -1340,26 +1468,26 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
             resource_name = 'gyeoltoojang_scene_bosang_loc'
             match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
-            # self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
-            if match_rate > 0.9:
+            self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+            if match_rate > 0.7:
                 self.click_resource(resource_name)
                 return True
 
-            pb_name = 'gyeoltoojang_scene_limit'
-            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            # pb_name = 'gyeoltoojang_scene_limit'
+            # match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.95:
-                self.status = 10
-                return self.status
+            # if match_rate > 0.75:
+            #     self.status = 10
+            #     return self.status
 
             pb_name = 'gyeoltoojang_scene_match'
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(650, 380, 700, 430))
-            # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y)
         else:
@@ -1601,7 +1729,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 pb_name = 'main_scene_menu_open'
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                 # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9:
+                if match_rate > 0.7:
                     self.set_checkpoint('auto_ilil_quest_period')
                     self.lyb_mouse_click('main_scene_menu_quest', custom_threshold=0)
                     self.game_object.get_scene('quest_scene').status = 0
@@ -1616,7 +1744,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 pb_name = 'main_scene_menu_open'
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                 # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9:
+                if match_rate > 0.7:
                     self.set_checkpoint('auto_dogam_period')
                     self.lyb_mouse_click('main_scene_menu_dogam', custom_threshold=0)
                     self.game_object.get_scene('dogam_scene').status = 0
@@ -1642,7 +1770,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     pb_name = 'main_scene_menu_open'
                     match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                     # self.logger.debug(pb_name + ' ' + str(match_rate))
-                    if match_rate > 0.9:
+                    if match_rate > 0.7:
                         self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
                     else:
                         self.game_object.get_scene('jido_scene').status = 0
@@ -1726,10 +1854,10 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                     (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                         self.window_image,
                         resource_name,
-                        custom_threshold=0.7,
+                        custom_threshold=0.9,
                         custom_flag=1,
                         custom_rect=(5, 160 + (quest_index * 35) - 40, 35, 160 + (quest_index * 35) + 40))
-                    # self.logger.debug('DEBUG:' + resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                    self.logger.debug('DEBUG:' + resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                     if loc_x != -1:
                         self.lyb_mouse_click_location(loc_x, loc_y)
                         self.game_object.get_scene('main_scene').set_option('click_quest', True)
@@ -1779,7 +1907,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
                 pb_name = 'main_scene_menu_open'
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                 # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9:
+                if match_rate > 0.7:
                     self.lyb_mouse_click('main_scene_menu_dejeon', custom_threshold=0)
                     self.game_object.get_scene('dejeon_scene').status = 0
                     self.set_option(self.current_work + '_inner_status', 10)
@@ -1803,7 +1931,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_quest', custom_threshold=0)
                 self.game_object.get_scene('quest_scene').status = 0
             else:
@@ -1823,7 +1951,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_quest', custom_threshold=0)
                 self.game_object.get_scene('quest_scene').status = self.status
             else:
@@ -1844,7 +1972,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_upjeok', custom_threshold=0)
                 self.game_object.get_scene('upjeok_scene').status = self.status
             else:
@@ -1864,7 +1992,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_dungeon', custom_threshold=0)
                 self.game_object.get_scene('dungeon_scene').status = self.status
             else:
@@ -1898,7 +2026,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_dungeon', custom_threshold=0)
                 self.game_object.get_scene('dungeon_scene').status = self.status
             else:
@@ -1918,7 +2046,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_dungeon', custom_threshold=0)
                 self.game_object.get_scene('dungeon_scene').status = self.status
             else:
@@ -1967,7 +2095,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_gejo', custom_threshold=0)
                 self.game_object.get_scene('gejo_scene').status = 0
             else:
@@ -1988,7 +2116,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_guild', custom_threshold=0)
                 self.game_object.get_scene('guild_scene').status = 0
             else:
@@ -2008,7 +2136,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_dogam', custom_threshold=0)
                 self.game_object.get_scene('dogam_scene').status = 0
             else:
@@ -2028,7 +2156,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             pb_name = 'main_scene_menu_open'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.lyb_mouse_click('main_scene_menu_bosang', custom_threshold=0)
                 self.game_object.get_scene('bosang_scene').status = 0
             else:
@@ -2183,7 +2311,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         if elapsed_time > self.period_bot(600):
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             # self.logger.debug(pb_name + ' ' + str(match_rate))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 self.set_checkpoint(pb_name)
                 self.game_object.get_scene('sangjeom_scene').status = 0
                 self.game_object.get_scene('sangjeom_scene').set_option('potion_pb_name', 'sangjeom_scene_mp_potion')
@@ -2199,7 +2327,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             if elapsed_time > self.period_bot(600):
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
                 # self.logger.debug(pb_name + ' ' + str(match_rate))
-                if match_rate > 0.9:
+                if match_rate > 0.7:
                     self.set_checkpoint(pb_name)
                     self.game_object.get_scene('sangjeom_scene').status = 0
                     self.game_object.get_scene('sangjeom_scene').set_option('potion_pb_name', 'sangjeom_scene_hp_potion')
@@ -2242,7 +2370,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         #     (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
         #         self.window_image,
         #         self.game_object.resource_manager.pixel_box_dic[pb_name],
-        #         custom_threshold=0.9,
+        #         custom_threshold=0.7,
         #         custom_flag=1,
         #         custom_rect=(710, 260, 760, 300))
         #     self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -2258,7 +2386,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(480, 330, 520, 370))
             # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -2275,7 +2403,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(280, 330, 350, 360))
             # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -2292,7 +2420,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(460, 330, 500, 360))
             # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -2309,7 +2437,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(710, 260, 760, 300))
             # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -2326,7 +2454,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         for resource_name in resource_name_list:
             match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
             # self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
-            if match_rate > 0.9:
+            if match_rate > 0.7:
                 pb_name = resource_name.replace('_loc', '', 1) + '_close_icon'
                 self.lyb_mouse_click(pb_name, custom_threshold=0)
                 return True
@@ -2340,7 +2468,7 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
         (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
             self.window_image,
             self.game_object.resource_manager.pixel_box_dic[pb_name],
-            custom_threshold=0.9,
+            custom_threshold=0.7,
             custom_top_level=(255, 255, 255),
             custom_below_level=(100, 100, 100),
             custom_flag=1,
@@ -2631,14 +2759,20 @@ class LYBDarkEdenScene(likeyoubot_scene.LYBScene):
 
         return hp_percent
 
-    def click_resource(self, resource_name, custom_threshold=0.7):        
+    def click_resource(self, resource_name, custom_threshold=0.7, near=32): 
+        isMatched, rate = self.click_resource2(resource_name, custom_threshold=custom_threshold, near=near)
+
+        return isMatched
+
+    def click_resource2(self, resource_name, custom_threshold=0.7, near=32):        
         (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart2(
             self.window_image,
             resource_name,
             custom_threshold=custom_threshold,
+            near=near,
             custom_flag=1)
-        # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        # self.logger.warn(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
         if loc_x != -1:
             self.lyb_mouse_click_location(loc_x, loc_y)
-            return True
-        return False
+            return True, match_rate
+        return False, match_rate

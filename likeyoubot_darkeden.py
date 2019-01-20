@@ -374,41 +374,32 @@ class LYBDarkEden(lybgame.LYBGame):
                 self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                 return 'skip'
 
-        resource_name = 'confirm_20181129_loc'
-        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(3):
-            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
-                self.window_image,
-                resource_name,
-                custom_threshold=0.8,
-                custom_flag=1,
-                custom_rect=(360, 300, 450, 450)
-            )
-            if loc_x != -1:
-                self.get_scene('main_scene').set_checkpoint(resource_name)
-                self.logger.info('확인: ' + str(match_rate))
-                self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
-                return 'skip'
+        confirm_list = [
+            'confirm_20181129_loc',
+            'confirm_20181129_1_loc',
+            'confirm_20190119_loc',
+            'confirm_20190120_loc'
+        ]
+        for resource_name in confirm_list:
+            elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
+            if elapsed_time > self.period_bot(3):
+                (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+                    self.window_image,
+                    resource_name,
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(360, 300, 450, 450)
+                )
+                # self.logger.warn(resource_name + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.get_scene('quest_scene').status = 20
+                    self.get_scene('main_scene').set_checkpoint(resource_name)
+                    self.logger.info('확인: ' + str(match_rate))
+                    self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+                    return 'skip'
 
-        resource_name = 'confirm_20181129_1_loc'
-        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(3):
-            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
-                self.window_image,
-                resource_name,
-                custom_threshold=0.8,
-                custom_flag=1,
-                custom_rect=(360, 300, 450, 450)
-            )
-            if loc_x != -1:
-                self.get_scene('main_scene').set_checkpoint(resource_name)
-                self.logger.info('확인: ' + str(match_rate))
-                self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
-                return 'skip'
-
-        if True:
+        if self.get_scene('main_scene').current_work == '메인 퀘스트':
             self.process_tutorial()
-
 
         # 패배!
         # (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
@@ -432,6 +423,85 @@ class LYBDarkEden(lybgame.LYBGame):
         if len(scene_name) > 0:
             return scene_name
 
+        scene_name = self.death_scene(window_image)
+        if len(scene_name) > 0:
+            return scene_name
+
+        scene_name = self.gabang_scene(window_image)
+        if len(scene_name) > 0:
+          return scene_name
+
+        scene_name = self.gabang_sell_scene(window_image)
+        if len(scene_name) > 0:
+          return scene_name
+
+        scene_name = self.jido_scene(window_image)
+        if len(scene_name) > 0:
+          return scene_name
+
+        scene_name = self.quest_scene(window_image)
+        if len(scene_name) > 0:
+          return scene_name
+
+        scene_name = self.dogam_scene(window_image)
+        if len(scene_name) > 0:
+          return scene_name
+
+        scene_name = self.upjeok_scene(window_image)
+        if len(scene_name) > 0:
+          return scene_name
+
+        scene_list = [
+            'sangjeom_scene',
+            'dungeon_scene',
+            'dejeon_scene',
+            'gyeoltoojang_scene',
+            'tobeolde_scene',
+            'special_dungeon_scene',
+            'gasang_sooryeonjang_scene',
+            'gejo_scene',
+            'special_dungeon_create_scene',
+            'event_scene',
+            'character_scene',
+            'quick_move_gold_scene',
+            'buy_confirm_scene',
+        ]
+
+        max_match_rate_scene = ''
+        max_match_rate = 0
+
+        # for each_scene, value in self.resource_manager.resource_dic.items():
+        #     if 'scene' in value.resource_type:
+        #         (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+        #             self.window_image,
+        #             each_scene,
+        #             custom_threshold=0.7,
+        #             custom_flag=1,
+        #             average=True)
+        #         # self.logger.warn(each_scene + ' ' + str(match_rate))
+        #         if loc_x != -1:
+        #             if max_match_rate < match_rate:
+        #                 max_match_rate_scene = each_scene
+        #                 max_match_rate = match_rate
+
+        for each_scene in scene_list:
+            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                self.window_image,
+                each_scene,
+                custom_threshold=0.7,
+                custom_flag=1,
+                near=64,
+                average=True)
+            self.logger.warn(each_scene + ' ' + str(match_rate))
+            if loc_x != -1:
+                if max_match_rate < match_rate:
+                    max_match_rate_scene = each_scene
+                    max_match_rate = match_rate
+
+        if len(max_match_rate_scene) > 0:
+            return max_match_rate_scene
+
+
         # scene_name = self.jeontoo_scene(window_image)
         # if len(scene_name) > 0:
         # 	return scene_name
@@ -440,9 +510,95 @@ class LYBDarkEden(lybgame.LYBGame):
         # if len(scene_name) > 0:
         # 	return scene_name
 
-        self.click_all_tutorial_point()
+        if self.get_scene('main_scene').current_work == '메인 퀘스트':
+            self.click_all_tutorial_point()
 
         return ''
+
+    def upjeok_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'upjeok_scene_loc',
+                          custom_threshold=0.7,
+                          custom_flag=1,
+                          average=True)
+      if loc_x != -1:
+          return 'upjeok_scene'
+
+      return ''
+
+    def gabang_sell_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'gabang_sell_scene_loc',
+                          custom_threshold=0.7,
+                          custom_flag=1)
+      if loc_x != -1:
+          return 'gabang_sell_scene'
+
+      return ''
+
+    def death_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'death_scene_loc',
+                          custom_threshold=0.7,
+                          custom_flag=1,
+                          average=True)
+      if loc_x != -1:
+          return 'death_scene'
+
+      return ''
+
+    def jido_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'jido_scene_loc',
+                          custom_threshold=0.7,
+                          custom_flag=1,
+                          average=True)
+      if loc_x != -1:
+          return 'jido_scene'
+
+      return ''
+
+    def gabang_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'gabang_scene_loc',
+                          custom_flag=1,
+                          custom_threshold=0.7,
+                          average=True)
+      if loc_x != -1:
+        return 'gabang_scene'
+
+      return ''
+
+    def quest_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'quest_scene_loc',
+                          custom_flag=1,
+                          custom_threshold=0.7,
+                          average=True)
+      if loc_x != -1:
+        return 'quest_scene'
+
+      return ''
+
+    def dogam_scene(self, window_image):
+      (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart2(
+                          self.window_image,
+                          'dogam_scene_loc',
+                          custom_flag=1,
+                          custom_threshold=0.7,
+                          average=True)
+      if loc_x != -1:
+        return 'dogam_scene'
+
+      return ''
+
+
 
     def click_all_tutorial_point(self):
 
