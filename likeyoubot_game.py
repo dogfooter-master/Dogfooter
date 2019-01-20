@@ -173,12 +173,17 @@ class LYBGame():
                     len(self.current_matched_scene['name']) > 0 and
                     self.current_matched_scene['rate'] >= float(
                     self.get_window_config('threshold_entry')) * self.weight_threshold
-            ):
+            ):           
+
             match_rate = self.rateMatchedResource(window_pixels, self.current_matched_scene['name'],
                                                   weight_tolerance=self.weight_tolerance)
+
+
             # self.logger.info(match_rate)
             # self.logger.info(self.current_matched_scene['name'])
             # self.logger.info(self.current_matched_scene['rate'])
+            
+
             if match_rate > 0.9 and abs(int(match_rate * 100) - self.current_matched_scene['rate']) < 10:
                 scene_name = self.current_matched_scene['name']
             else:
@@ -836,6 +841,7 @@ class LYBGame():
                                      source_custom_below_level=-1,
                                      source_custom_top_level=-1,
                                      custom_flag=-1,
+                                     near=32,
                                      average=False,
                                      debug=False
                                      ):
@@ -862,10 +868,10 @@ class LYBGame():
 
         adj_x, adj_y = self.get_player_adjust()
 
-        left = left - 32 + adj_x
-        top = top - 32 + adj_y
-        right = right + 32 - adj_x
-        bottom = bottom + 32 - adj_y
+        left = left - near + adj_x
+        top = top - near + adj_y
+        right = right + near - adj_x
+        bottom = bottom + near - adj_y
 
         if left < 0:
             left = 0
