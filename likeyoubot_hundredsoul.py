@@ -48,10 +48,27 @@ class LYBHundredSoul(lybgame.LYBGame):
                 custom_flag=1,
                 custom_rect=(720, 410, 760, 450)
             )
-            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
             if loc_x != -1:
                 self.get_scene('main_scene').set_checkpoint(resource_name)
                 self.logger.info('대화 스킵: ' + str(match_rate))
+                self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+                return 'skip'
+
+        resource_name = 'center_bosang_loc'
+        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(30):
+            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.7,
+                custom_flag=1,
+                custom_rect=(300, 90, 600, 300)
+            )
+            # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.get_scene('main_scene').set_checkpoint(resource_name)
+                self.logger.info('보상: ' + str(match_rate))
                 self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                 return 'skip'
 
