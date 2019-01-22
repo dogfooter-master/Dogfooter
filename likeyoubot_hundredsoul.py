@@ -14,7 +14,9 @@ class LYBHundredSoul(lybgame.LYBGame):
         '게임 시작',
         '로그인',
         '메인 퀘스트',
+        '우편',
         '기사단',
+        '노바스톤',
         
         '알림',
         '[반복 시작]',

@@ -52,6 +52,13 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             rc = self.gisadan_scene()
         elif self.scene_name == 'seong_scene':
             rc = self.seong_scene()
+        elif self.scene_name == 'mail_scene':
+            rc = self.mail_scene()
+        elif self.scene_name == 'cash_sangjeom_scene':
+            rc = self.cash_sangjeom_scene()
+        elif self.scene_name == 'nova_stone_free_scene':
+            rc = self.nova_stone_free_scene()
+
 
 
 
@@ -70,6 +77,73 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
             self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+                
+            self.status = 0
+
+        return self.status
+
+    def nova_stone_free_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            self.click_resource('nova_stone_free_scene_free_loc')
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+                
+            self.status = 0
+
+        return self.status
+
+    def cash_sangjeom_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            if self.click_resource('cash_sangjeom_scene_nova_stone_new_loc') is False:
+                self.status = 99999
+                return self.status
+            else:
+                self.status += 1
+
+            pb_name = 'cash_sangjeom_scene_nova_stone'        	
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.9:
+                self.status = 10
+
+       	elif self.status == 10:
+            pb_name = 'cash_sangjeom_scene_nova_stone'  
+       	    self.lyb_mouse_click(pb_name, custom_threshold=0)
+       	    self.game_object.get_scene('nova_stone_free_scene').status = 0
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+                
+            self.status = 0
+
+        return self.status
+
+    def mail_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            pb_name = 'mail_scene_receive'        	
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate < 0.9:
+                self.status = 99999
+            else:
+                self.click_resource('mail_scene_receive_all_loc')
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -624,6 +698,38 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
             self.click_resource('main_scene_gisadan_loc')
             self.game_object.get_scene('gisadan_scene').status = 0
+
+
+        elif self.status == self.get_work_status('우편'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag') == True:
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.click_resource('main_scene_mail_loc')
+            self.game_object.get_scene('mail_scene').status = 0
+
+        elif self.status == self.get_work_status('노바스톤'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag') == True:
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            if self.click_resource('main_scene_cash_sangjeom_new_loc') is False:
+                self.set_option(self.current_work + '_end_flag', True)
+                return self.status
+
+            self.game_object.get_scene('cash_sangjeom_scene').status = 0
 
         elif self.status == self.get_work_status('알림'):
 
