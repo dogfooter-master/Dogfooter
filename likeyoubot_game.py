@@ -592,6 +592,20 @@ class LYBGame():
 
         return False
 
+    def click_back(self):
+        if self.player_type == 'nox':
+            if self.terminate_status == 0:
+                if self.side_hwnd == None:
+                    self.logger.warn('녹스 사이드바 검색 실패로 종료 기능 사용 불가')
+                    self.request_terminate = False
+                    return
+                self.window.mouse_click(self.side_hwnd, 16, likeyoubot_win.LYBWin.HEIGHT - 115)
+        elif self.player_type == 'momo':
+            if self.terminate_status == 0:
+                self.window.mouse_click(self.parent_hwnd,
+                                        likeyoubot_win.LYBWin.WIDTH + 20,
+                                        likeyoubot_win.LYBWin.HEIGHT - 80)
+
     def process_terminate_applications(self):
 
         max_app_close_count = self.common_config[lybconstant.LYB_DO_STRING_CLOSE_APP_COUNT]

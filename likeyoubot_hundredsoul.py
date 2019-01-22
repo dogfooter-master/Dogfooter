@@ -93,6 +93,13 @@ class LYBHundredSoul(lybgame.LYBGame):
                     self.logger.info('확인: ' + str(match_rate))
                     self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                     return 'skip'
+
+        resource_name = 'temporary_notice_20190122_loc'
+        match_rate = self.rateMatchedResource(self.window_pixels, resource_name)
+        if match_rate > 0.8:
+            self.click_back()
+            return 'skip'
+
         # 패배!
         # (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
         # 					self.window_image,
