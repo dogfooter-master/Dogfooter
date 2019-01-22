@@ -14,6 +14,7 @@ class LYBHundredSoul(lybgame.LYBGame):
         '게임 시작',
         '로그인',
         '메인 퀘스트',
+        '기사단',
         
         '알림',
         '[반복 시작]',
@@ -57,7 +58,7 @@ class LYBHundredSoul(lybgame.LYBGame):
 
         resource_name = 'center_bosang_loc'
         elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(30):
+        if elapsed_time > self.period_bot(5):
             (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
@@ -72,6 +73,26 @@ class LYBHundredSoul(lybgame.LYBGame):
                 self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                 return 'skip'
 
+        confirm_list = [
+            'confirm_loc',
+        ]
+        for resource_name in confirm_list:
+            elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
+            if elapsed_time > self.period_bot(3):
+                (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+                    self.window_image,
+                    resource_name,
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(200, 200, 600, 450)
+                )
+                # self.logger.warn(resource_name + ' ' + str(match_rate))
+                if loc_x != -1:
+                    # self.get_scene('quest_scene').status = 20
+                    self.get_scene('main_scene').set_checkpoint(resource_name)
+                    self.logger.info('확인: ' + str(match_rate))
+                    self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+                    return 'skip'
         # 패배!
         # (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
         # 					self.window_image,

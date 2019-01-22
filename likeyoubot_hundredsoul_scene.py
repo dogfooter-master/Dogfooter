@@ -48,6 +48,10 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             rc = self.google_play_account_select_1_scene()
         elif self.scene_name == 'google_play_account_select_2_scene':
             rc = self.google_play_account_select_2_scene()
+        elif self.scene_name == 'gisadan_scene':
+            rc = self.gisadan_scene()
+        elif self.scene_name == 'seong_scene':
+            rc = self.seong_scene()
 
 
 
@@ -74,6 +78,50 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         return self.status
 
+    def seong_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            resource_name = 'seong_scene_give_' + 'emerald' + '_loc'
+            match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+            self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+            if match_rate > 0.9:
+            	self.click_resource(resource_name)
+            else:
+            	self.status = 10
+        elif self.status == 10:
+        	self.lyb_mouse_click('back', custom_threshold=0)
+        	self.status = 0
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+                
+            self.status = 0
+
+        return self.status
+
+    def gisadan_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+        	self.lyb_mouse_click('gisadan_scene_chulseok_bosang', custom_threshold=0)
+        	self.status += 1
+        elif self.status == 2:
+        	if self.click_resource('gisadan_scene_give_new_loc') is True:
+        		self.game_object.get_scene('seong_scene').status = 0
+        	self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+                
+            self.status = 0
+
+        return self.status
 
     def login_scene(self):
         self.game_object.current_matched_scene['name'] = ''
@@ -562,6 +610,20 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                 return self.status
 
             self.process_main_quest()
+
+        elif self.status == self.get_work_status('기사단'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag') == True:
+                self.set_option(self.current_work + '_end_flag', False)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.click_resource('main_scene_gisadan_loc')
+            self.game_object.get_scene('gisadan_scene').status = 0
 
         elif self.status == self.get_work_status('알림'):
 
