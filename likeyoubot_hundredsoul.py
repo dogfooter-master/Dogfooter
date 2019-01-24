@@ -47,7 +47,7 @@ class LYBHundredSoul(lybgame.LYBGame):
             (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
-                custom_threshold=0.9,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_rect=(720, 410, 760, 450)
             )
@@ -77,31 +77,55 @@ class LYBHundredSoul(lybgame.LYBGame):
 
         confirm_list = [
             'confirm_loc',
+            'gotcha_loc',
+            'open_new_boss_loc',
+            'gotcha_20190123_loc',
+            'bosang_20190124_loc',
+            'close_20190124_loc',
         ]
+
         for resource_name in confirm_list:
             elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-            if elapsed_time > self.period_bot(3):
+            if elapsed_time > self.period_bot(5):
                 (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                     self.window_image,
                     resource_name,
                     custom_threshold=0.8,
                     custom_flag=1,
-                    custom_rect=(200, 200, 600, 450)
+                    custom_rect=(200, 100, 600, 450),
                 )
                 # self.logger.warn(resource_name + ' ' + str(match_rate))
                 if loc_x != -1:
                     # self.get_scene('quest_scene').status = 20
                     self.get_scene('main_scene').set_checkpoint(resource_name)
-                    self.logger.info('확인: ' + str(match_rate))
+                    self.logger.info(resource_name + ':' + str(match_rate))
                     self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
                     return 'skip'
 
-        resource_name = 'temporary_notice_20190122_loc'
+        resource_name = 'notice_20190124_loc'
         match_rate = self.rateMatchedResource(self.window_pixels, resource_name)
         if match_rate > 0.8:
             self.click_back()
             return 'skip'
 
+
+        resource_name = 'close_popup_20190124_loc'
+        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
+        if elapsed_time > self.period_bot(5):
+            (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.8,
+                custom_flag=1,
+                custom_rect=(660, 380, 730, 430),
+                )
+            if loc_x != -1:
+                # self.get_scene('quest_scene').status = 20
+                self.get_scene('main_scene').set_checkpoint(resource_name)
+                self.logger.info(resource_name + ':' + str(match_rate))
+                self.get_scene('main_scene').lyb_mouse_click_location(loc_x, loc_y)
+                return 'skip'
+            
         # 패배!
         # (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
         # 					self.window_image,
@@ -132,6 +156,8 @@ class LYBHundredSoul(lybgame.LYBGame):
         # if len(scene_name) > 0:
         # 	return scene_name
         
+        self.return_to_back()
+
         return ''
     
     # def jeontoo_scene(self, window_image):
@@ -148,6 +174,25 @@ class LYBHundredSoul(lybgame.LYBGame):
     # 		return 'jeontoo_scene'
     
     # 	return ''
+
+    def return_to_back(self):
+
+        return_to_back_threshold = self.get_option('return_to_back_threshold')
+        if return_to_back_threshold == None:
+            return_to_back_threshold = 0
+
+        elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint('return_to_back_last_check_time')
+
+        if elapsed_time > self.period_bot(3):
+            return_to_back_threshold = 0
+
+        self.get_scene('main_scene').set_checkpoint('return_to_back_last_check_time')
+
+        if return_to_back_threshold > 30:
+                self.mouse_click('back')
+        else:
+            self.set_option('return_to_back_threshold', return_to_back_threshold + 1)
+            # self.logger.debug('return to back after ' + str(return_to_back_threshold) + '/30')
     
     def scene_init_screen(self, window_image):
         
