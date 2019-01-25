@@ -1,17 +1,9 @@
-import likeyoubot_resource as lybrsc
-import likeyoubot_message
-import cv2
-import sys
-import numpy as np
-from matplotlib import pyplot as plt
-import pyautogui
 import operator
-import random
-import likeyoubot_game as lybgame
 import likeyoubot_hundredsoul as lybgamehundredsoul
 from likeyoubot_configure import LYBConstant as lybconstant
 import likeyoubot_scene
 import time
+
 
 class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
     def __init__(self, scene_name):
@@ -21,7 +13,6 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         super(LYBHundredSoulScene, self).process(window_image, window_pixels)
 
-        rc = 0
         if self.scene_name == 'init_screen_scene':
             rc = self.init_screen_scene()
         elif self.scene_name == 'main_scene':
@@ -72,13 +63,18 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             rc = self.combat_main_scene()
         elif self.scene_name == 'event_immu_scene':
             rc = self.event_immu_scene()
+        elif self.scene_name == 'jeontoo_victory_scene':
+            rc = self.jeontoo_victory_scene()
+        elif self.scene_name == 'jeontoo_fail_scene':
+            rc = self.jeontoo_fail_scene()
 
 
 
 
 
 
-            
+
+
 
 
 
@@ -95,17 +91,16 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
-
 
     def event_immu_scene(self):
 
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
-            self.status += 1            
+            self.status += 1
         elif 1 <= self.status < 9:
             self.status += 1
             resource_name = 'immu_scene_new_loc'
@@ -140,7 +135,44 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
+            self.status = 0
+
+        return self.status
+
+    def jeontoo_victory_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 0 <= self.status < 10:
+            self.click_resource('jeontoo_victory_scene_nagagi_loc')
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def jeontoo_fail_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            elapsed_time = time.time() - self.get_checkpoint(self.scene_name)
+            if elapsed_time > 60:
+                message = '창 이름 [' + str(self.game_object.window_title) + ']에서 전투 실패 감지'
+                self.game_object.telegram_send(message)
+                png_name = self.game_object.save_image('전투 실패')
+                self.game_object.telegram_send('', image=png_name)
+                self.set_checkpoint(self.scene_name)
+
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
             self.status = 0
 
         return self.status
@@ -149,6 +181,9 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
+            self.game_object.get_scene('jeontoo_victory_scene').status = 0
+            self.game_object.get_scene('jeontoo_fail_scene').status = 0
+
             resource_name = 'skill_loc'
             resource = self.game_object.resource_manager.resource_dic[resource_name]
             for pb_name in resource:
@@ -202,7 +237,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                     custom_below_level=(20, 180, 200),
                     custom_flag=1,
                     custom_rect=self.get_option(pb_name + 'custom_rect'),
-                    )
+                )
                 # self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                 if loc_x != -1:
                     self.set_option(pb_name, time.time() + 2)
@@ -218,7 +253,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -239,7 +274,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -251,15 +286,14 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.status += 1
         elif 1 <= self.status < 10:
             self.lyb_mouse_click('tobeol_scene_tamheom', custom_threshold=0)
-            self.status += 1            
+            self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
-
 
     # 탐험 맵
 
@@ -270,14 +304,14 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             locations = []
             self.set_option('locations', locations)
             self.status += 1
-        elif 1 <= self.status < 10:
+        elif 1 <= self.status < 20:
             self.status += 1
             locations = self.get_option('locations')
             pb_name = 'tamheom_scene_current'
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.5,
+                custom_threshold=0.7,
                 custom_flag=1,
                 custom_top_level=(255, 255, 255),
                 custom_below_level=(254, 254, 254),
@@ -289,7 +323,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                     self.set_option('locations', locations)
                     self.status = 100
                     return self.status
-        elif 10 <= self.status < 20:
+        elif 20 <= self.status < 40:
             self.status += 1
             pb_name = 'tamheom_scene_boss'
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
@@ -302,8 +336,10 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             if loc_x != -1:
                 self.lyb_mouse_click_location(loc_x, loc_y + 50)
                 self.game_object.get_scene('jeontoo_junbi_scene').status = 0
-                self.status = 20                
-        elif self.status == 20:
+                self.status = 40
+        elif 40 <= self.status < 45:
+            self.status += 1
+        elif self.status == 45:
             self.lyb_mouse_click('main_scene_config', custom_threshold=0)
             self.game_object.get_scene('config_scene').status = 200
             self.status += 1
@@ -327,11 +363,11 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.lyb_mouse_click_location(loc_x_list[1] - 20, loc_y_list[1])
             self.lyb_mouse_click_location(loc_x_list[1] + 20, loc_y_list[1])
             self.game_object.get_scene('jeontoo_junbi_scene').status = 0
-            self.status = 20
+            self.status = 40
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -347,7 +383,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -364,20 +400,20 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             else:
                 self.status += 1
 
-            pb_name = 'cash_sangjeom_scene_nova_stone'        	
+            pb_name = 'cash_sangjeom_scene_nova_stone'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate > 0.9:
                 self.status = 10
 
-       	elif self.status == 10:
-            pb_name = 'cash_sangjeom_scene_nova_stone'  
-       	    self.lyb_mouse_click(pb_name, custom_threshold=0)
-       	    self.game_object.get_scene('nova_stone_free_scene').status = 0
+        elif self.status == 10:
+            pb_name = 'cash_sangjeom_scene_nova_stone'
+            self.lyb_mouse_click(pb_name, custom_threshold=0)
+            self.game_object.get_scene('nova_stone_free_scene').status = 0
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -389,7 +425,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.status += 1
         elif 1 <= self.status < 10:
             self.status += 1
-            pb_name = 'mail_scene_receive'        	
+            pb_name = 'mail_scene_receive'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate < 0.9:
                 self.status = 99999
@@ -398,7 +434,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -421,7 +457,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -434,14 +470,14 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         elif 1 <= self.status < 5:
             self.status += 1
 
-            pb_name = 'build_up_scene_speed_up'          
+            pb_name = 'build_up_scene_speed_up'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate > 0.9:
                 self.lyb_mouse_click(pb_name)
                 self.status = 99999
                 return self.status
 
-            pb_name = 'build_up_scene_empty'          
+            pb_name = 'build_up_scene_empty'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate > 0.9:
                 self.lyb_mouse_click('back', custom_threshold=0)
@@ -451,7 +487,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -467,16 +503,16 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
             self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
             if match_rate > 0.9:
-            	self.click_resource(resource_name)
+                self.click_resource(resource_name)
             else:
-            	self.status = 10
+                self.status = 10
         elif self.status == 10:
-        	self.lyb_mouse_click('back', custom_threshold=0)
-        	self.status = 0
+            self.lyb_mouse_click('back', custom_threshold=0)
+            self.status = 0
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -487,12 +523,12 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
         elif self.status == 1:
-        	self.lyb_mouse_click('gisadan_scene_chulseok_bosang', custom_threshold=0)
-        	self.status += 1
+            self.lyb_mouse_click('gisadan_scene_chulseok_bosang', custom_threshold=0)
+            self.status += 1
         elif self.status == 2:
-        	if self.click_resource('gisadan_scene_give_new_loc') is True:
-        		self.game_object.get_scene('seong_scene').status = 0
-        	self.status += 1
+            if self.click_resource('gisadan_scene_give_new_loc') is True:
+                self.game_object.get_scene('seong_scene').status = 0
+            self.status += 1
         elif self.status == 3:
             if self.click_resource('gisadan_scene_build_up_aura_loc') is True:
                 self.game_object.get_scene('build_up_scene').status = 0
@@ -507,7 +543,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -550,10 +586,12 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         return self.status
 
     def google_play_account_select_1_scene(self):
-        return self.game_object.get_scene('google_play_account_select_scene').process(self.window_image, self.window_pixels)
+        return self.game_object.get_scene('google_play_account_select_scene').process(self.window_image,
+                                                                                      self.window_pixels)
 
     def google_play_account_select_2_scene(self):
-        return self.game_object.get_scene('google_play_account_select_scene').process(self.window_image, self.window_pixels)
+        return self.game_object.get_scene('google_play_account_select_scene').process(self.window_image,
+                                                                                      self.window_pixels)
 
     def google_play_account_select_scene(self):
 
@@ -581,7 +619,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                 if account_index > 1:
                     self.set_option('account_index', 0)
                     account_index = 0
-               
+
                 self.set_option('click_index', 20 + account_index)
                 self.status = 200
                 return self.status
@@ -593,7 +631,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                 if account_index > 2:
                     self.set_option('account_index', 0)
                     account_index = 0
-               
+
                 self.set_option('click_index', account_index)
                 self.status = 200
                 return self.status
@@ -622,7 +660,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                         self.set_option('last_status', self.status)
                         self.set_option('click_index', click_index - 1)
                         self.status = 100
-                else:             
+                else:
                     self.status = 200
         elif self.status == 100:
             self.lyb_mouse_drag('google_play_account_drag_bot', 'google_play_account_drag_top', delay=2)
@@ -638,7 +676,8 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.lyb_mouse_click(pb_name, custom_threshold=0)
             self.status = 99999
         elif 1000 <= self.status < 1005:
-            self.lyb_mouse_drag('google_play_account_select_scene_drag_top', 'google_play_account_select_scene_drag_bot')
+            self.lyb_mouse_drag('google_play_account_select_scene_drag_top',
+                                'google_play_account_select_scene_drag_bot')
             self.status += 1
         elif self.status == 1005:
             self.set_option('account_index', 0)
@@ -646,7 +685,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -673,7 +712,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -687,7 +726,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.game_object.get_scene('terms_scene').status = 0
             self.game_object.get_scene('google_play_account_select_scene').status = 0
             self.lyb_mouse_click(self.scene_name + '_google', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -705,7 +744,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -735,7 +774,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -777,7 +816,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -802,7 +841,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
@@ -824,7 +863,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                     custom_threshold=0.7,
                     custom_flag=1,
                     custom_rect=(120, 130 + (i * 60) - 30, 200, 130 + (i * 60) + 30),
-                    )
+                )
                 if loc_x != -1:
                     pDic[(loc_x, loc_y)] = match_rate
 
@@ -839,135 +878,48 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                
+
             self.status = 0
 
         return self.status
 
     def init_screen_scene(self):
-        
+
         self.schedule_list = self.get_game_config('schedule_list')
         if not '게임 시작' in self.schedule_list:
             return 0
 
-
         loc_x = -1
         loc_y = -1
 
-
         if self.game_object.player_type == 'nox':
             for each_icon in lybgamehundredsoul.LYBHundredSoul.hundredsoul_icon_list:
-                (loc_x, loc_y),  match_rate = self.game_object.locationOnWindowPart(
-                                self.window_image,
-                                self.game_object.resource_manager.pixel_box_dic[each_icon],
-                                custom_threshold=0.8,
-                                custom_flag=1,
-                                custom_rect=(80, 110, 700, 370)
-                                )
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[each_icon],
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(80, 110, 700, 370)
+                )
                 # self.logger.debug(match_rate)
                 if loc_x != -1:
                     self.lyb_mouse_click_location(loc_x, loc_y)
                     break
         else:
             for each_icon in lybgamehundredsoul.LYBHundredSoul.hundredsoul_icon_list:
-                (loc_x, loc_y),  match_rate = self.game_object.locationOnWindowPart(
-                                self.window_image,
-                                self.game_object.resource_manager.pixel_box_dic[each_icon],
-                                custom_threshold=0.8,
-                                custom_flag=1,
-                                custom_rect=(30, 10, 740, 370)
-                                )
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[each_icon],
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(30, 10, 740, 370)
+                )
                 # self.logger.debug(match_rate)
                 if loc_x != -1:
                     self.lyb_mouse_click_location(loc_x, loc_y)
                     break
 
         return 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     #################################
     #                               #
@@ -976,7 +928,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
     #                               #
     #                               #
     #################################
-    
+
     def main_scene(self):
 
         if self.game_object.current_schedule_work != self.current_work:
@@ -1001,8 +953,10 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         elif self.status == self.get_work_status('메인 퀘스트'):
 
+            cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'main_quest_duration'))
             elapsed_time = self.get_elapsed_time()
-            if elapsed_time > self.period_bot(120):
+
+            if elapsed_time > self.period_bot(cfg_duration):
                 self.set_option(self.current_work + '_end_flag', True)
 
             if self.get_option(self.current_work + '_end_flag') == True:
@@ -1107,7 +1061,8 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                 loop_count = 1
 
             self.logger.debug('[반복 종료] ' + str(loop_count) + ' 회 수행 완료, ' +
-             str(int(self.get_game_config(lybconstant.LYB_DO_STRING_COUNT_LOOP)) - loop_count) + ' 회 남음')
+                              str(int(
+                                  self.get_game_config(lybconstant.LYB_DO_STRING_COUNT_LOOP)) - loop_count) + ' 회 남음')
             if loop_count >= int(self.get_game_config(lybconstant.LYB_DO_STRING_COUNT_LOOP)):
                 self.status = self.last_status[self.current_work] + 1
                 self.set_option('loop_count', 1)
@@ -1125,92 +1080,11 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         else:
             self.status = self.last_status[self.current_work] + 1
 
-
         return self.status
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def callback_logoff(self):
-    	self.lyb_mouse_click('main_scene_config', custom_threshold=0)
-    	self.game_object.get_scene('config_scene').status = 100
+        self.lyb_mouse_click('main_scene_config', custom_threshold=0)
+        self.game_object.get_scene('config_scene').status = 100
 
     def pre_process_main_scene(self):
 
@@ -1247,14 +1121,13 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             inner_status = 0
 
         if 0 <= inner_status < 1000:
-            self.lyb_mouse_click('main_scene_alarm', custom_threshold=0)  
-            self.game_object.get_scene('notification_scene').status = 0     
+            self.lyb_mouse_click('main_scene_alarm', custom_threshold=0)
+            self.game_object.get_scene('notification_scene').status = 0
             self.game_object.get_scene('dashboard_scene').status = 0
             self.set_option(cs, inner_status + 1)
         else:
             self.set_option(cs, 0)
             return False
-
 
         return True
 
@@ -1299,7 +1172,8 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             limit_count=limit_count,
         )
 
-    def isStatusByResource(self, log_message, resource_name, custom_threshold, custom_top_level, custom_below_level, custom_rect, limit_count=-1, reverse=False):
+    def isStatusByResource(self, log_message, resource_name, custom_threshold, custom_top_level, custom_below_level,
+                           custom_rect, limit_count=-1, reverse=False):
         # if limit_count == -1:
         #     limit_count = int(self.get_game_config(lybconstant.LYB_DO_STRING_L2R_ETC + 'auto_limit'))
 
@@ -1313,7 +1187,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             custom_rect=custom_rect,
             average=True
         )
-        self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))        
+        self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
         if loc_x != -1 and reverse == False:
             self.set_option(resource_name + 'check_count', 0)
             return True
