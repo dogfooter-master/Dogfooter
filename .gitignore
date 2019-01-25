@@ -2,3 +2,5 @@ test_*.py
 screenshot
 log
 account*.dat
+__pycache__/*
+*.pyc
