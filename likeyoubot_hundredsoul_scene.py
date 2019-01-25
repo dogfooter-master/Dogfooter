@@ -311,7 +311,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                 self.window_image,
                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-                custom_threshold=0.7,
+                custom_threshold=0.6,
                 custom_flag=1,
                 custom_top_level=(255, 255, 255),
                 custom_below_level=(254, 254, 254),
