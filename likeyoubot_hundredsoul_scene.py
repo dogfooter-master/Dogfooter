@@ -67,6 +67,9 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             rc = self.jeontoo_victory_scene()
         elif self.scene_name == 'jeontoo_fail_scene':
             rc = self.jeontoo_fail_scene()
+        elif self.scene_name == 'aura_daeryuk_scene':
+            rc = self.aura_daeryuk_scene()
+
 
 
 
@@ -87,6 +90,22 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def aura_daeryuk_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            self.click_resource('aura_daeryuk_scene_yuhwang_loc')
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -850,12 +869,14 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
+            self.set_option('resource_name', 'dashboard_scene_jeontoo_loc')
+            self.game_object.get_scene('tamheom_scene').status = 0
             self.status += 1
         elif 1 <= self.status < 10:
             self.status += 1
             button_loc_x, button_loc_y = self.get_location('dashboard_scene_button')
             pDic = {}
-            resource_name = 'dashboard_scene_jeontoo_loc'
+            resource_name = self.get_option('resource_name')
             for i in range(5):
                 (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
                     self.window_image,
@@ -872,9 +893,12 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             if len(sorted_list) > 0:
                 loc_x, loc_y = sorted_list[0][0]
                 self.lyb_mouse_click_location(button_loc_x + 50, loc_y + 10)
-                self.game_object.get_scene('tamheom_scene').status = 0
             else:
                 self.status = 99999
+        elif self.status == self.get_work_status('광산'):
+            self.set_option('resource_name', 'dashboard_scene_gwangsan_loc')
+            self.game_object.get_scene('aura_daeryuk_scene').status = 0
+            self.status = 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1012,6 +1036,22 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                 return self.status
 
             self.game_object.get_scene('cash_sangjeom_scene').status = 0
+
+        elif self.status == self.get_work_status('광산'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.set_option(self.current_work + '_inner_status', None)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.lyb_mouse_click('main_scene_alarm', custom_threshold=0)
+            self.game_object.get_scene('notification_scene').status = 0
+            self.game_object.get_scene('dashboard_scene').status = self.status
 
         elif self.status == self.get_work_status('알림'):
 

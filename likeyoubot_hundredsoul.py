@@ -17,6 +17,7 @@ class LYBHundredSoul(lybgame.LYBGame):
         '우편',
         '기사단',
         '노바스톤',
+        '광산',
 
         '알림',
         '[반복 시작]',
