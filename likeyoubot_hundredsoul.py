@@ -18,6 +18,9 @@ class LYBHundredSoul(lybgame.LYBGame):
         '기사단',
         '노바스톤',
         '광산',
+        '환영의 전당',
+        '이벤트전',
+        '소환의탑',
 
         '알림',
         '[반복 시작]',
@@ -29,6 +32,14 @@ class LYBHundredSoul(lybgame.LYBGame):
     hundredsoul_icon_list = [
         'hundredsoul_icon',
         'hundredsoul_icon_1'
+    ]
+
+    bugwan_list = [
+        '나즈리엘',
+        '기간틱',
+        '라리엘',
+        '루신다',
+        '카렌',
     ]
 
     def __init__(self, game_name, game_data_name, window):
@@ -379,6 +390,62 @@ class LYBHundredSoulTab(lybgame.LYBGameTab):
         frame.pack(anchor=tkinter.W)
 
         frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
+        frame_label = ttk.LabelFrame(frame_l, text='환영의 전당')
+
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master              = frame,
+            text                = self.get_option_text('부관 선택', width=19)
+            )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan'].trace(
+            'w', lambda *args: self.hwanyoung_bugwan(args, lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan')
+            )
+        combobox_list = LYBHundredSoul.bugwan_list
+
+        if not lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan'] = combobox_list[0]
+
+        combobox = ttk.Combobox(
+            master              = frame,
+            values              = combobox_list,
+            textvariable        = self.option_dic[lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan'],
+            state               = "readonly",
+            height              = 10,
+            width               = 15,
+            font                = lybconstant.LYB_FONT
+            )
+        combobox.set(self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'hwanyoung_bugwan'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
+        frame_label = ttk.LabelFrame(frame_l, text='이벤트전')
+
+        frame = ttk.Frame(frame_label)
+        self.option_dic[lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point'] = tkinter.BooleanVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point'].trace(
+            'w', lambda *args: self.event_skill_point(args, lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point')
+        )
+        if not lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point' in self.configure.common_config[self.game_name]:
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point'] = False
+
+        check_box = ttk.Checkbutton(
+            master=frame,
+            text=self.get_option_text('스킬 포인트', width=35),
+            variable=self.option_dic[lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point'],
+            onvalue=True,
+            offvalue=False
+        )
+        check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
         frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 작업 탭 중간
@@ -435,3 +502,11 @@ class LYBHundredSoulTab(lybgame.LYBGameTab):
 
     def notify_jeontoo_defeat(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
+        
+    def hwanyoung_bugwan(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def event_skill_point(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+
