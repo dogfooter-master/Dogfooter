@@ -1150,7 +1150,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                     self.game_object.resource_manager.pixel_box_dic[pb_name],
                     custom_threshold=0.7,
                     custom_flag=1,
-                    custom_rect=(200, 80, 700, 130))
+                    custom_rect=(200, 80, 700, 200))
                 self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                 if loc_x != -1:
                     self.lyb_mouse_click_location(loc_x, loc_y)
