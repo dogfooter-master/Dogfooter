@@ -21,6 +21,8 @@ class LYBHundredSoul(lybgame.LYBGame):
         '환영의 전당',
         '이벤트전',
         '소환의탑',
+        '결투장',
+        '협동전',
 
         '알림',
         '[반복 시작]',

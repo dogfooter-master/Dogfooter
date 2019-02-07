@@ -1,4 +1,6 @@
 import operator
+import traceback
+
 import likeyoubot_hundredsoul as lybgamehundredsoul
 from likeyoubot_configure import LYBConstant as lybconstant
 import likeyoubot_scene
@@ -61,6 +63,10 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             rc = self.jeontoo_junbi_scene()
         elif self.scene_name == 'combat_main_scene':
             rc = self.combat_main_scene()
+        elif self.scene_name == 'pvp_combat_main_scene':
+            rc = self.combat_main_scene()
+        elif self.scene_name == 'hyeopdongjeon_combat_main_scene':
+            rc = self.combat_main_scene()
         elif self.scene_name == 'event_immu_scene':
             rc = self.event_immu_scene()
         elif self.scene_name == 'jeontoo_victory_scene':
@@ -91,9 +97,18 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             rc = self.sohwantap_jeontoo_sijak_scene()
         elif self.scene_name == 'boss_sohwan_scene':
             rc = self.boss_sohwan_scene()
-
-
-
+        elif self.scene_name == 'gyeoltoojang_scene':
+            rc = self.gyeoltoojang_scene()
+        elif self.scene_name == 'team_lobby_scene':
+            rc = self.team_lobby_scene()
+        elif self.scene_name == 'jeontoo_daesang_scene':
+            rc = self.jeontoo_daesang_scene()
+        elif self.scene_name == 'pvp_jeontoo_sijak_scene':
+            rc = self.pvp_jeontoo_sijak_scene()
+        elif self.scene_name == 'hyeopdongjeon_scene':
+            rc = self.hyeopdongjeon_scene()
+        elif self.scene_name == 'hyeopdongjeon_sijak_scene':
+            rc = self.hyeopdongjeon_sijak_scene()
 
 
         else:
@@ -105,6 +120,126 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def hyeopdongjeon_sijak_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.game_object.get_scene('hyeopdongjeon_scene').status = 0
+            self.status += 1
+        elif 1 <= self.status < 59:
+            self.status += 1
+            self.game_object.get_scene('hyeopdongjeon_combat_main_scene').status = 0
+            if self.click_resource('hyeopdongjeon_sijak_scene_start_loc') is True:
+                self.status = 60
+                return self.status
+
+            if self.click_resource('hyeopdongjeon_junbi_scene_ready_loc') is True:
+                self.status = 60
+                return self.status
+        elif 60 <= self.status < 90:
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def hyeopdongjeon_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            if self.click_resource('hyeopdongjeon_scene_level_combobox_0_노멀_loc') is True:
+                self.status = 10
+            else:
+                self.lyb_mouse_click('hyeopdongjeon_scene_level_combobox_0', custom_threshold=0)
+        elif 10 <= self.status < 15:
+            self.game_object.get_scene('hyeopdongjeon_sijak_scene').status = 0
+            self.click_resource('hyeopdongjeon_scene_join_loc')
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def pvp_jeontoo_sijak_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            self.click_resource('pvp_jeontoo_sijak_scene_start_loc')
+            self.game_object.get_scene('pvp_combat_main_scene').status = 0
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def jeontoo_daesang_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            if self.status % 2 == 1:
+                self.lyb_mouse_click('jeontoo_daesang_scene_last', custom_threshold=0)
+            else:
+                self.game_object.get_scene('pvp_jeontoo_sijak_scene').status = 0
+                self.click_resource('jeontoo_daesang_scene_ready_loc')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def team_lobby_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            self.game_object.get_scene('jeontoo_daesang_scene').status = 0
+            self.click_resource('team_lobby_scene_gyeoltoo_loc')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+
+            self.status = 0
+
+        return self.status
+
+    def gyeoltoojang_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            self.game_object.get_scene('team_lobby_scene').status = 0
+            self.lyb_mouse_click('gyeoltoojang_scene_team', custom_threshold=0)
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -199,6 +334,12 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click('back', custom_threshold=0)
                 return self.status
 
+            pb_name = 'event_scene_event_limit'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.95:
+                self.lyb_mouse_click('back', custom_threshold=0)
+                return self.status
+
             if self.click_resource('event_scene_jeontoo_sijak_loc') is True:
                 self.game_object.get_scene('combat_main_scene').status = 0
                 self.game_object.get_scene('jeontoo_fail_scene').set_option('from_event', True)
@@ -206,16 +347,27 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
             if self.get_option('accessory') is False:
                 if self.get_game_config(lybconstant.LYB_DO_STRING_HUNDREDSOUL_WORK + 'event_skill_point') is True:
-                    is_clicked = self.click_resource('event_scene_skill_point_loc')
+                    resource_name = 'event_scene_skill_point_loc'
                 else:
-                    is_clicked = self.click_resource('event_scene_accessory_loc')
+                    resource_name = 'event_scene_accessory_loc'
+                #     is_clicked = self.click_resource('event_scene_skill_point_loc')
+                # else:
+                #     is_clicked = self.click_resource('event_scene_accessory_loc')
 
-                if is_clicked is True:
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                    self.window_image,
+                    resource_name,
+                    custom_threshold=0.7,
+                    custom_flag=1,
+                    custom_rect=(40, 330, 410, 370),
+                )
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
                     self.set_option('accessory', True)
                     return self.status
 
             # self.click_resource('event_scene_event_loc')
-            self.status = 99999
+            self.click_resource('event_scene_event_loc')
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -551,9 +703,11 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         elif 1 <= self.status < 600:
             self.game_object.interval = self.period_bot(0.5)
             self.status += 1
-            if self.isEasyPlayOn(limit_count=3) is False:
-                if self.click_resource('combat_main_scene_easy_play_button_loc') is True:
-                    return self.status
+
+            if self.scene_name != 'hyeopdongjeon_combat_main_scene':
+                if self.isEasyPlayOn(limit_count=3) is False:
+                    if self.click_resource('combat_main_scene_easy_play_button_loc') is True:
+                        return self.status
 
             if 0 <= self.status % 10 < 9:
                 resource_name = 'combo_loc'
@@ -605,6 +759,9 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
                     self.lyb_mouse_click(pb_name, custom_threshold=0)
                     self.set_option(pb_name, time.time() + 99)
                     return self.status
+
+            if self.scene_name == 'hyeopdongjeon_combat_main_scene':
+                self.lyb_mouse_click('attack', custom_threshold=0)
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -1404,6 +1561,36 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
             self.game_object.get_scene('bugwan_scene').status = 0
             self.click_resource('main_scene_bugwan_loc')
+
+        elif self.status == self.get_work_status('결투장'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.set_option(self.current_work + '_inner_status', None)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.game_object.get_scene('gyeoltoojang_scene').status = 0
+            self.click_resource('main_scene_gyeoltoojang_loc')
+
+        elif self.status == self.get_work_status('협동전'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(5):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.set_option(self.current_work + '_inner_status', None)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.game_object.get_scene('hyeopdongjeon_scene').status = 0
+            self.click_resource('main_scene_hyeopdongjeon_loc')
 
         elif (self.status == self.get_work_status('소환의탑') or
                 self.status == self.get_work_status('이벤트전')):
