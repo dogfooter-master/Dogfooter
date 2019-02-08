@@ -989,20 +989,19 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             pb_name = 'build_up_scene_speed_up'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate > 0.9:
-                self.lyb_mouse_click('back', custom_threshold=0)
+                self.lyb_mouse_click(pb_name)
+                self.status = 99999
                 return self.status
 
             pb_name = 'build_up_scene_empty'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate > 0.9:
-                self.lyb_mouse_click('back', custom_threshold=0)
+                self.status = 99999
                 self.game_object.get_scene('gisadan_scene').status = 100
                 self.game_object.get_scene('gisadan_sangjeom_scene').status = 100
                 return self.status
         else:
-            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
-                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-
+            self.lyb_mouse_click('back', custom_threshold=0)
             self.status = 0
 
         return self.status
@@ -1066,7 +1065,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             self.status = 0
 
         self.game_object.interval = self.period_bot(2)
-        
+
         return self.status
 
     def login_scene(self):
