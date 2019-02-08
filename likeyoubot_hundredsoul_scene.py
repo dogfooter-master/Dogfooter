@@ -1065,6 +1065,8 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
 
             self.status = 0
 
+        self.game_object.interval = self.period_bot(2)
+        
         return self.status
 
     def login_scene(self):
