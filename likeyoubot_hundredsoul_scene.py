@@ -963,7 +963,16 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         elif self.status == 120:
             self.lyb_mouse_click('gisadan_sangjeom_scene_buy')
             self.status += 1
-        elif 121 <= self.status < 130:
+        elif 121 <= self.status < 125:
+            self.status += 1
+        elif 125 <= self.status < 130:
+            self.status += 1
+            if self.click_resource('gisadan_sangjeom_scene_item_arcane_loc') is True:
+                self.status = 130
+        elif self.status == 130:
+            self.lyb_mouse_click('gisadan_sangjeom_scene_buy')
+            self.status += 1
+        elif 131 <= self.status < 140:
             self.status += 1
             self.lyb_mouse_click('back', custom_threshold=0)
         else:
