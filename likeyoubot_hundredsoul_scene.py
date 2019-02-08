@@ -956,6 +956,10 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            if self.click_resource('gisadan_sangjeom_scene_item_arcane_loc') is True:
+                self.status = 120
         elif 100 <= self.status < 110:
             self.status += 1
             if self.click_resource('gisadan_sangjeom_scene_item_speed_up_loc') is True:
@@ -963,16 +967,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         elif self.status == 120:
             self.lyb_mouse_click('gisadan_sangjeom_scene_buy')
             self.status += 1
-        elif 121 <= self.status < 125:
-            self.status += 1
-        elif 125 <= self.status < 130:
-            self.status += 1
-            if self.click_resource('gisadan_sangjeom_scene_item_arcane_loc') is True:
-                self.status = 130
-        elif self.status == 130:
-            self.lyb_mouse_click('gisadan_sangjeom_scene_buy')
-            self.status += 1
-        elif 131 <= self.status < 140:
+        elif 121 <= self.status < 130:
             self.status += 1
             self.lyb_mouse_click('back', custom_threshold=0)
         else:
@@ -994,8 +989,7 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
             pb_name = 'build_up_scene_speed_up'
             match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
             if match_rate > 0.9:
-                self.lyb_mouse_click(pb_name)
-                self.status = 99999
+                self.lyb_mouse_click('back', custom_threshold=0)
                 return self.status
 
             pb_name = 'build_up_scene_empty'
@@ -1057,6 +1051,10 @@ class LYBHundredSoulScene(likeyoubot_scene.LYBScene):
         elif self.status == 4:
             if self.click_resource('gisadan_scene_build_up_castle_loc') is True:
                 self.game_object.get_scene('build_up_scene').status = 0
+            self.status += 1
+        elif self.status == 5:
+            self.lyb_mouse_click('gisadan_scene_sangjeom', custom_threshold=0)
+            self.game_object.get_scene('gisadan_scene_sangjeom').status = 0
             self.status += 1
         elif self.status == 100:
             self.lyb_mouse_click('gisadan_scene_sangjeom', custom_threshold=0)
