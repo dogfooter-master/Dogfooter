@@ -51,8 +51,8 @@ class LYBWorker(threading.Thread):
 		# logger.debug('['+self.name+']'+' start:'+str(threading.currentThread()))
 		while True:
 			try:
-				if self.pause_flag == True:
-					if self.game != None:
+				if self.pause_flag:
+					if self.game is not None:
 						self.game.interval = 9999999
 					recv_msg = self.command_queue.get()
 				else:
@@ -88,7 +88,6 @@ class LYBWorker(threading.Thread):
 
 					self.response_queue.put_nowait(likeyoubot_message.LYBMessage('end_start_app_player', str(self.window_title)))
 					self.response_queue.join()
-
 					break
 				elif recv_msg.type =='GetWindowLocation':
 					self.ui = recv_msg.message
@@ -106,8 +105,8 @@ class LYBWorker(threading.Thread):
 							self.ui.gui_config_dic[lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'y'].set(anchor_y)
 
 						self.ui.configure.window_config[window_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'x']	= anchor_x
-						self.ui.configure.window_config[window_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'y']	= anchor_y				
-					
+						self.ui.configure.window_config[window_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'y']	= anchor_y
+
 					# self.response_queue.put_nowait(likeyoubot_message.LYBMessage('search_hwnd_return', rhwnds_dic))
 					# self.response_queue.put_nowait(likeyoubot_message.LYBMessage('search_side_hwnd_return', side_handle_dic))
 					# self.response_queue.put_nowait(likeyoubot_message.LYBMessage('search_parent_hwnd_return', parent_handle_dic))
@@ -118,7 +117,7 @@ class LYBWorker(threading.Thread):
 					break
 
 				elif recv_msg.type =='search':
-					window_config = recv_msg.message					
+					window_config = recv_msg.message
 					(handle_list, side_handle_dic, parent_handle_dic, multi_handle_dic) = self.findWindows()
 
 					window_list, rhwnds_dic = self.set_location(window_config, handle_list, side_handle_dic, parent_handle_dic)
@@ -152,11 +151,11 @@ class LYBWorker(threading.Thread):
 				# 	side_handle_dic = self.ui.side_hwnds
 
 				# 	window_list, rhwnds_dic = self.set_location(
-				# 								self.ui.configure.window_config, 
-				# 								handle_list, 
-				# 								side_handle_dic, 
-				# 								parent_handle_dic, 
-				# 								custom_loc_x=self.ui.master.winfo_screenwidth(), 
+				# 								self.ui.configure.window_config,
+				# 								handle_list,
+				# 								side_handle_dic,
+				# 								parent_handle_dic,
+				# 								custom_loc_x=self.ui.master.winfo_screenwidth(),
 				# 								custom_loc_y=self.ui.master.winfo_screenheight() )
 
 				# 	for key, each_hwnd in hwnds.items():
@@ -164,11 +163,7 @@ class LYBWorker(threading.Thread):
 
 				# 	self.response_queue.join()
 				# 	break
-				elif (	recv_msg.type =='watchout' or
-						recv_msg.type == 'watchout2'
-						) :
-
-
+				elif recv_msg.type == 'watchout' or recv_msg.type == 'watchout2':
 					if recv_msg.type == 'watchout':
 						self.ui = recv_msg.message[0]
 						configure = self.ui.configure
@@ -191,27 +186,26 @@ class LYBWorker(threading.Thread):
 
 					self.win = likeyoubot_win.LYBWin(configure.window_title, configure)
 
-
 					if cmd == 'show':
 						self.logger.warn('창 보이기')
-						custom_loc_x=0
-						custom_loc_y=0
+						custom_loc_x = 0
+						custom_loc_y = 0
 					else:
 						self.logger.warn('창 숨기기')
-						custom_loc_x=resolution_w
-						custom_loc_y=resolution_h
+						custom_loc_x = resolution_w
+						custom_loc_y = resolution_h
 
 					if window_name == None:
 						# if len(self.ui.parent_hwnds) > 0:
 						# 	hwnds = self.ui.parent_hwnds
 						# else:
 						# 	hwnds = self.ui.hwnds
-							
+
 						# self.ui.searchWindow(None)
 						handle_list = []
 						for key, each_handle in hwnds.items():
 							handle_list.append(each_handle)
-							
+
 						parent_handle_dic = parent_hwnds
 						side_handle_dic = side_hwnds
 					else:
@@ -231,9 +225,9 @@ class LYBWorker(threading.Thread):
 							pass
 
 					window_list, rhwnds_dic = self.set_location(
-												configure.window_config, 
-												handle_list, 
-												side_handle_dic, 
+												configure.window_config,
+												handle_list,
+												side_handle_dic,
 												parent_handle_dic,
 												custom_loc_x=custom_loc_x,
 												custom_loc_y=custom_loc_y )
@@ -340,7 +334,7 @@ class LYBWorker(threading.Thread):
 							self.game = likeyoubot_hundredsoul.LYBHundredSoul(None, None, self.win)
 
 
-							
+
 						# elif self.game_name == lybconstant.LYB_GAME_BLACKDESERT:
 						# 	self.game = likeyoubot_blackdesert.LYBBlackDesert(None, None, self.win)
 						# elif self.game_name == lybconstant.LYB_GAME_BLADE2:
@@ -357,7 +351,7 @@ class LYBWorker(threading.Thread):
 						self.game.setWindowConfig(self.window_config)
 						self.game.setWindowHandle(self.hwnd, self.side_hwnd, self.parent_hwnd, self.multi_handle_dic)
 						self.game.setStartFlag(self.start_flag)
-						
+
 					except:
 						self.logger.error(traceback.format_exc())
 						# self.response_queue.put_nowait(likeyoubot_message.LYBMessage('log', 'Thread Game Init Exception:' +  str(sys.exc_info()[0]) + '(' +str(sys.exc_info()[1]) + ')'))
@@ -367,7 +361,7 @@ class LYBWorker(threading.Thread):
 
 					self.logger.info('[' + self.window_title + '] 창, [' + self.game_name + '] 게임 작업 시작')
 					# self.response_queue.put_nowait(
-					# 	likeyoubot_message.LYBMessage('log', 
+					# 	likeyoubot_message.LYBMessage('log',
 					# 		'[' + self.window_title + '] 창에서 [' + self.game_name + '] 게임에 대해 작업을 시작합니다')
 					# 	)
 
@@ -375,10 +369,10 @@ class LYBWorker(threading.Thread):
 					win_width, win_height = self.win.get_player_size(self.hwnd)
 
 					# print(win_width, win_height)
-					if (	self.app_player_type == 'momo' or 
-							self.app_player_type == 'memu' 
+					if (	self.app_player_type == 'momo' or
+							self.app_player_type == 'memu'
 							):
-						
+
 						self.response_queue.put_nowait(
 							likeyoubot_message.LYBMessage('log',
 								'[' + self.window_title + '] 창 크기: ' + str((win_width, win_height)) +', 플레이어 종류: '+'모모/미뮤')
@@ -398,7 +392,7 @@ class LYBWorker(threading.Thread):
 							# cv2.imshow("test", frame)
 							# cv2.waitKey(0)
 							# cv2.destroyAllWindows()
-	
+
 
 							# (anchor_x, anchor_y, end_x, end_y) = self.win.get_window_location(self.hwnd)
 							# adj_x, adj_y = self.win.get_player_adjust(self.hwnd)
@@ -419,7 +413,7 @@ class LYBWorker(threading.Thread):
 							# self.logger.warn('CP2')
 
 					elif self.app_player_type == 'nox':
-						
+
 						self.response_queue.put_nowait(
 							likeyoubot_message.LYBMessage('log',
 								'[' + self.window_title + '] 창 크기: ' + str((win_width, win_height)) +', 플레이어 종류: '+'녹스')
@@ -457,7 +451,7 @@ class LYBWorker(threading.Thread):
 			try:
 				if self.start_action:
 					s = time.time()
-					rc = self.letsgetit()				
+					rc = self.letsgetit()
 					if rc < 0:
 						self.response_queue.put_nowait(likeyoubot_message.LYBMessage('end_return', self.window_title + ' 비정상'))
 						break
@@ -591,18 +585,18 @@ class LYBWorker(threading.Thread):
 			# # elif f2 != 0:
 			# elif self.ui.hide_window == True:
 			# 	self.logger.warn('창 숨기기')
-						
+
 			# 	(handle_list, side_handle_dic, parent_handle_dic, multi_handle_dic) = self.findWindows()
 			# 	window_list, rhwnds_dic = self.set_location(
-			# 								self.ui.configure.window_config, 
-			# 								handle_list, 
-			# 								side_handle_dic, 
-			# 								parent_handle_dic, 
-			# 								custom_loc_x=self.ui.master.winfo_screenwidth(), 
+			# 								self.ui.configure.window_config,
+			# 								handle_list,
+			# 								side_handle_dic,
+			# 								parent_handle_dic,
+			# 								custom_loc_x=self.ui.master.winfo_screenwidth(),
 			# 								custom_loc_y=self.ui.master.winfo_screenheight() )
 			# 	for key, each_hwnd in hwnds.items():
 			# 		self.win.setInvisible(int(each_hwnd))
-			
+
 			# 	self.ui.hide_window = False
 		except:
 			# self.ui.show_window = False
@@ -617,10 +611,10 @@ class LYBWorker(threading.Thread):
 		window_list = []
 
 		iterator = 0
-		# self.logger.warn(str((custom_loc_x, custom_loc_y)))
 		for h in handle_list:
 			if h in parent_handle_dic:
 				win_title = self.win.get_title(parent_handle_dic[h])
+				self.logger.warn('parent ' + str((custom_loc_x, custom_loc_y)) + ' ' + str(win_title))
 				try:
 					if window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'boolean'] == True:
 						try:
@@ -634,7 +628,8 @@ class LYBWorker(threading.Thread):
 				except:
 					pass
 			else:
-				win_title = self.win.get_title(h)	
+				win_title = self.win.get_title(h)
+				self.logger.warn('side ' + str((custom_loc_x, custom_loc_y)) + ' ' + str(win_title))
 				try:
 					if window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'boolean'] == True:
 						try:
@@ -649,16 +644,22 @@ class LYBWorker(threading.Thread):
 					pass
 
 			if h in side_handle_dic:
-				win_title = self.win.get_title(h)	
+				win_title = self.win.get_title(h)
+				self.logger.info('----------------------->' + win_title)
+				# adjust_x = 4
+				# adjust_y = 30
+				# 20190807 Nox 사이드바 변경됨('Form')
+				adjust_x = 0
+				adjust_y = 0
 				try:
 					if window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'boolean'] == True:
 						win_width, win_height = self.win.get_player_size(h)
-						try:		
-							win_loc_x = int(window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'x']) + win_width + 4 + custom_loc_x
-							win_loc_y =	int(window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'y']) + 30 + custom_loc_y
-						except:								
-							win_loc_x = win_width + 4 + custom_loc_x
-							win_loc_y = 30 + custom_loc_y
+						try:
+							win_loc_x = int(window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'x']) + win_width + adjust_x + custom_loc_x
+							win_loc_y =	int(window_config[win_title][lybconstant.LYB_DO_BOOLEAN_FIX_WINDOW_LOCATION + 'y']) + adjust_y + custom_loc_y
+						except:
+							win_loc_x = win_width + adjust_x + custom_loc_x
+							win_loc_y = adjust_y + custom_loc_y
 
 						self.win.set_window_pos(side_handle_dic[h], win_loc_x, win_loc_y)
 				except:

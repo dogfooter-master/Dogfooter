@@ -585,7 +585,8 @@ class LYBGame():
             self.telegram_send('창 이름 [' + str(self.window_title) + ']에서 화면 프리징이 감지되어 게임을 강제 종료합니다.')
             png_name = self.save_image('freeze')
             self.telegram_send('', image=png_name)
-            return True
+            return False
+            # return True
         else:
             if elapsed_time > 10:
                 self.logger.warn('화면 프리징 감지됨...(' + str(int(elapsed_time)) + '/' + str(freezing_limit) + '초)')

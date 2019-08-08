@@ -132,7 +132,7 @@ class LYBWin:
             (s_x, s_y, e_x, e_y) = win32gui.GetWindowRect(hwnd)
             w_width = e_x - s_x
             w_height = e_y - s_y
-            #print(str(win32gui.GetWindowText(hwnd)) + '[' + str ( (s_x, s_y) ) + '] [' + str( (w_width, w_height) ) + ']')
+            # print(str(win32gui.GetWindowText(hwnd)) + '[' + str ( (s_x, s_y) ) + '] [' + str( (w_width, w_height) ) + ']')
 
         if re.match(wildcard, str(win32gui.GetWindowText(hwnd))) != None and win32gui.IsWindowVisible(hwnd) != 0:
             # print('--------------------> !!! found window DEBUG2 new : ', wildcard, str(win32gui.GetWindowText(hwnd)), ':', self.handle_list, ':')
@@ -161,12 +161,14 @@ class LYBWin:
 
         if win32gui.IsWindowVisible(hwnd) != 0:
             # 녹스 사이드 바 이름 변경됨 6.0.5.1
-            if (re.match('nox', str(win32gui.GetWindowText(hwnd))) != None or
-                        re.match('Nox', str(win32gui.GetWindowText(hwnd))) != None):
-                # print('--------------------> !!! found window DEBUG4 Nox : ')
+            if (    re.match('nox', str(win32gui.GetWindowText(hwnd))) != None or
+                    re.match('Nox', str(win32gui.GetWindowText(hwnd))) != None or
+                    re.match('Form', str(win32gui.GetWindowText(hwnd))) != None
+                ):
+                print('--------------------> !!! found window DEBUG4 Nox : ', str(win32gui.GetWindowText(hwnd)))
                 if not hwnd in self.side_window_handle_list:
                     (top_left_x, top_left_y, bottom_right_x, bottom_right_y) = win32gui.GetWindowRect(hwnd)
-                    # print('--------------------> !!! found window DEBUG5 Nox : ', (top_left_x, top_left_y, bottom_right_x, bottom_right_y))
+                    print('--------------------> !!! found window DEBUG5 Nox : ', (top_left_x, top_left_y, bottom_right_x, bottom_right_y))
                     if abs(bottom_right_x - top_left_x) - 36 < 40 and abs(
                                             bottom_right_y - top_left_y - LYBWin.HEIGHT) < 40:
                         self.side_window_handle_list.append(hwnd)
