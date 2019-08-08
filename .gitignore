@@ -1,3 +1,5 @@
+.idea/*
+*workspace*
 test_*.py
 screenshot
 log
