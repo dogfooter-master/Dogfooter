@@ -9,8 +9,7 @@ import cv2
 import numpy as np
 from likeyoubot_configure import LYBConstant as lybconstant
 
-import likeyoubot_darkeden
-import likeyoubot_hundredsoul
+import likeyoubot_rohan
 
 
 import likeyoubot_logger
@@ -328,10 +327,10 @@ class LYBWorker(threading.Thread):
 					# 무슨 게임이냐에 따라서
 					try:
 
-						if self.game_name == lybconstant.LYB_GAME_DARKEDEN:
-							self.game = likeyoubot_darkeden.LYBDarkEden(None, None, self.win)
-						elif self.game_name == lybconstant.LYB_GAME_HUNDREDSOUL:
-							self.game = likeyoubot_hundredsoul.LYBHundredSoul(None, None, self.win)
+						if self.game_name == lybconstant.LYB_GAME_ROHAN:
+							self.game = likeyoubot_rohan.LYBRohan(None, None, self.win)
+						# elif self.game_name == lybconstant.LYB_GAME_HUNDREDSOUL:
+						# 	self.game = likeyoubot_hundredsoul.LYBHundredSoul(None, None, self.win)
 
 
 
@@ -645,7 +644,7 @@ class LYBWorker(threading.Thread):
 
 			if h in side_handle_dic:
 				win_title = self.win.get_title(h)
-				self.logger.info('----------------------->' + win_title)
+				# self.logger.info('----------------------->' + win_title)
 				# adjust_x = 4
 				# adjust_y = 30
 				# 20190807 Nox 사이드바 변경됨('Form')

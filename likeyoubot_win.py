@@ -53,7 +53,7 @@ class LYBWin:
         s = win32gui.GetWindowText(hwnd)
         if len(s) > 0:
             if not hwnd in self.current_window_list:
-                print(win32gui.GetWindowText(lParam), '  :  ', win32gui.GetWindowText(hwnd))
+                # print(win32gui.GetWindowText(lParam), '  :  ', win32gui.GetWindowText(hwnd))
                 self.current_window_list.append(hwnd)
 
         return 1
@@ -76,9 +76,9 @@ class LYBWin:
         (s_x, s_y, e_x, e_y) = win32gui.GetWindowRect(hwnd)
         w_width = e_x - s_x
         w_height = e_y - s_y
-        print(
-        "MEMU Render: " + str(win32gui.GetWindowText(hwnd)) + '[' + str(hwnd) + '] [' + str((s_x, s_y)) + '] [' + str(
-            (w_width, w_height)) + ']')
+        # print(
+        # "MEMU Render: " + str(win32gui.GetWindowText(hwnd)) + '[' + str(hwnd) + '] [' + str((s_x, s_y)) + '] [' + str(
+        #     (w_width, w_height)) + ']')
         if 'RenderWindowWindow' in s:
             if not hwnd in self.handle_list:
                 self.handle_list.append(hwnd)
@@ -165,10 +165,10 @@ class LYBWin:
                     re.match('Nox', str(win32gui.GetWindowText(hwnd))) != None or
                     re.match('Form', str(win32gui.GetWindowText(hwnd))) != None
                 ):
-                print('--------------------> !!! found window DEBUG4 Nox : ', str(win32gui.GetWindowText(hwnd)))
+                # print('--------------------> !!! found window DEBUG4 Nox : ', str(win32gui.GetWindowText(hwnd)))
                 if not hwnd in self.side_window_handle_list:
                     (top_left_x, top_left_y, bottom_right_x, bottom_right_y) = win32gui.GetWindowRect(hwnd)
-                    print('--------------------> !!! found window DEBUG5 Nox : ', (top_left_x, top_left_y, bottom_right_x, bottom_right_y))
+                    # print('--------------------> !!! found window DEBUG5 Nox : ', (top_left_x, top_left_y, bottom_right_x, bottom_right_y))
                     if abs(bottom_right_x - top_left_x) - 36 < 40 and abs(
                                             bottom_right_y - top_left_y - LYBWin.HEIGHT) < 40:
                         self.side_window_handle_list.append(hwnd)
@@ -388,9 +388,9 @@ class LYBWin:
         w_width = e_x - s_x
         w_height = e_y - s_y
 
-        # print('[APP PLAYER]', win32gui.GetWindowText(hwnd), '[', s_x, s_y, ']', '[', w_width, 'x', w_height, ']')
+        #print('[APP PLAYER]', win32gui.GetWindowText(hwnd), '[', s_x, s_y, ']', '[', w_width, 'x', w_height, ']')
 
-        if w_width == (LYBWin.WIDTH + 4) and w_height == (LYBWin.HEIGHT + 32):
+        if w_width == (LYBWin.WIDTH + 4) and w_height == (LYBWin.HEIGHT + 34):
             return 'nox'
         elif w_width == LYBWin.WIDTH and w_height == LYBWin.HEIGHT and process_name == 'TheRender':
             return 'momo'

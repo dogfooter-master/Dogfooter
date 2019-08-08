@@ -11,8 +11,7 @@ import sys
 import os
 import likeyoubot_message
 
-import likeyoubot_darkeden as LYBDARKEDEN
-import likeyoubot_hundredsoul as LYBHUNDREDSOUL
+import likeyoubot_rohan as LYBROHAN
 
 from likeyoubot_configure import LYBConstant as lybconstant
 import datetime
@@ -388,21 +387,21 @@ class LYBGUI:
         self.gui_config_dic = {}
 
         self.games = [
-            lybconstant.LYB_GAME_DARKEDEN,
+            lybconstant.LYB_GAME_ROHAN,
             # lybconstant.LYB_GAME_LIN2REV,
             # lybconstant.LYB_GAME_CLANS,
             # lybconstant.LYB_GAME_YEOLHYUL
         ]
         # 헌드레드 소울
-        lybhttp = self.login_gnu_board()
-        base_point = lybhttp.get_elem('hundredsoul_point')
-        if base_point == None:
-            base_point = 0
-        else:
-            base_point = int(base_point)
-        
-        if int(self.get_mb_point()) >= base_point:
-            self.games.append(lybconstant.LYB_GAME_HUNDREDSOUL)
+        # lybhttp = self.login_gnu_board()
+        # base_point = lybhttp.get_elem('hundredsoul_point')
+        # if base_point == None:
+        #     base_point = 0
+        # else:
+        #     base_point = int(base_point)
+        #
+        # if int(self.get_mb_point()) >= base_point:
+        #     self.games.append(lybconstant.LYB_GAME_HUNDREDSOUL)
 
         # # 검은사막
         # lybhttp = self.login_gnu_board()
@@ -2249,7 +2248,7 @@ class LYBGUI:
         # 다크에덴M
 
         game_index = 0
-        lyb_game_tab = LYBDARKEDEN.LYBDarkEdenTab(
+        lyb_game_tab = LYBROHAN.LYBRohanTab(
             self.tab_frame[game_index + 1],
             self.configure,
             self.game_options[self.games[game_index]],
@@ -2257,27 +2256,27 @@ class LYBGUI:
             self.width,
             self.height
         )
-        self.game_tab_dic[lybconstant.LYB_GAME_DARKEDEN] = lyb_game_tab
+        self.game_tab_dic[lybconstant.LYB_GAME_ROHAN] = lyb_game_tab
 
-        # 헌드레드 소울
-        lybhttp = self.login_gnu_board()
-        base_point = lybhttp.get_elem('hundredsoul_point')
-        if base_point == None:
-            base_point = 0
-        else:
-            base_point = int(base_point)
-
-        if int(self.get_mb_point()) >= base_point:
-            game_index += 1
-            lyb_game_tab = LYBHUNDREDSOUL.LYBHundredSoulTab(
-                self.tab_frame[game_index + 1],
-                self.configure,
-                self.game_options[self.games[game_index]],
-                self.game_frame[self.games[game_index]],
-                self.width,
-                self.height
-            )
-            self.game_tab_dic[lybconstant.LYB_GAME_HUNDREDSOUL] = lyb_game_tab
+        # # 헌드레드 소울
+        # lybhttp = self.login_gnu_board()
+        # base_point = lybhttp.get_elem('hundredsoul_point')
+        # if base_point == None:
+        #     base_point = 0
+        # else:
+        #     base_point = int(base_point)
+        #
+        # if int(self.get_mb_point()) >= base_point:
+        #     game_index += 1
+        #     lyb_game_tab = LYBHUNDREDSOUL.LYBHundredSoulTab(
+        #         self.tab_frame[game_index + 1],
+        #         self.configure,
+        #         self.game_options[self.games[game_index]],
+        #         self.game_frame[self.games[game_index]],
+        #         self.width,
+        #         self.height
+        #     )
+        #     self.game_tab_dic[lybconstant.LYB_GAME_HUNDREDSOUL] = lyb_game_tab
 
         # # 테라M
         #

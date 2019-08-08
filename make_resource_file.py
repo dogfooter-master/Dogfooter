@@ -42,19 +42,22 @@ class LYBMakeResource():
 		for k, v in lybconfigure.LYBConstant.LYB_GAMES.items():
 			game_name_list.append(k)
 
-		if len(sys.argv) > 1:
-			game_number = int(sys.argv[1])
+		if len(game_name_list) > 1:
+			if len(sys.argv) > 1:
+				game_number = int(sys.argv[1])
+			else:
+				print('----------------------')
+				for game_name in game_name_list:
+					print(game_name_list.index(game_name) + 1, game_name)
+
+				print('----------------------')
+				print("Select Game: ", end='')
+				game_number = input()
 		else:
-			print('----------------------')
-			for game_name in game_name_list:
-				print(game_name_list.index(game_name) + 1, game_name)
+			game_number = 0
 
-			print('----------------------')
-			print("Select Game: ", end='')
-			game_number = input()
-
-		if int(game_number) == 0:
-			game_number = 5
+		if len(str(game_number)) == 0:
+			game_number = 0
 
 		self.filename = lybconfigure.LYBConstant.LYB_GAMES[game_name_list[int(game_number) - 1]] + '.lyb'
 		print("filename: ", self.filename)
@@ -96,7 +99,7 @@ class LYBMakeResource():
 		print("'Q' : Save & Quit")
 
 		window.set_foreground_console(window.handle_list[0])
-		print(window.get_player(window.handle_list[0]), game_name_list[game_number - 1])
+		print(window.get_player(window.handle_list[0]), game_name_list[int(game_number) - 1])
 		adj_x, adj_y = window.get_player_adjust(window.handle_list[0])
 		self.anchor_x, self.anchor_y, self.bx, self.by = win32gui.GetWindowRect(window.handle_list[0])
 		self.anchor_x += adj_x
