@@ -12,7 +12,7 @@ import likeyoubot_configure
 import likeyoubot_license
 import copy
 import webbrowser
-import likeyoubot_http
+import likeyoubot_rest
 import requests
 import shutil
 from subprocess import Popen, PIPE
@@ -35,7 +35,7 @@ class LYBLoginGUI:
 		self.lyblicense = likeyoubot_license.LYBLicense()
 		self.progress_bar = None
 		self.num_of_file = 0
-		self.lybhttp = None
+		self.rest = None
 		self.worker_thread = None
 		self.waiting_queue = None
 		self.download_label = None
@@ -215,7 +215,8 @@ class LYBLoginGUI:
 		self.master.bind('<Return>', self.callback_login_button)
 
 	def callback_hompage(self, event):
-		webbrowser.open_new(likeyoubot_http.LYBHttp.getMacroBaseUrl() + '/bbs/register.php')
+		return
+		# webbrowser.open_new(likeyoubot_http.LYBHttp.getMacroBaseUrl() + '/bbs/register.php')
 
 	def callback_close_button(self, event):
 		self.logger.info('closed')
@@ -226,18 +227,25 @@ class LYBLoginGUI:
 
 		user_id = self.option_dic[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_id'].get()
 		user_password = self.option_dic[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_passwd'].get()
-		self.lybhttp = likeyoubot_http.LYBHttp(user_id, user_password)
-		error_message = self.lybhttp.login()
+		# self.lybhttp = likeyoubot_http.LYBHttp(user_id, user_password)
+		self.rest = likeyoubot_rest.LYBRest(self.configure.root_url, user_id, user_password)
+		self.rest.login()
+
+		# error_message = self.lybhttp.login()
+		error_message = self.rest.login()
 		if error_message == '':
-			login_point = self.lybhttp.get_login_point()
-			if int(self.lybhttp.mb_point) < int(login_point):
-				error_message = '포인트가 부족합니다.(현재: ' + str(self.lybhttp.mb_point) + '점, 필요: ' + str(login_point) + '점)'
+			# login_point = self.lybhttp.get_login_point()
+			# login_point = self.rest.get_login_point()
+			# if int(self.lybhttp.mb_point) < int(login_point):
+			if self.rest.get_point() < self.rest.get_login_point():
+				error_message = '포인트가 부족합니다.(현재: ' + str(self.rest.get_point()) + '점, 필요: ' + str(self.rest.get_login_point()) + '점)'
 				self.option_dic[lybconstant.LYB_DO_STRING_LOGIN_MESSAGE].set(error_message)
 				return
 
 			self.main_frame.pack_forget()
 
-			chatid = self.lybhttp.get_chatid()
+			# chatid = self.lybhttp.get_chatid()
+			chatid = self.rest.get_chatid()
 
 			if chatid != None:
 				self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_chatid'] = chatid
@@ -246,14 +254,12 @@ class LYBLoginGUI:
 				self.auto_update()
 			else:	
 				try:
-					likeyoubot_gui.LYBGUI(self.master, self.configure, self.lybhttp)
+					likeyoubot_gui.LYBGUI(self.master, self.configure, self.rest)
 				except:
 					self.logger.error(traceback.format_exc())
 		else:
 			self.shake_frame()
-
 			self.option_dic[lybconstant.LYB_DO_STRING_LOGIN_MESSAGE].set(error_message)
-
 
 	def shake_frame(self):
 		(w, h, x, y) = self.configure.getGeometryLogin()
@@ -295,8 +301,14 @@ class LYBLoginGUI:
 
 	def auto_update(self):
 
-		last_version = self.lybhttp.get_version()
-		self.patch_urls = self.lybhttp.get_update_file()
+		# last_version = self.lybhttp.get_version()
+		# self.patch_urls = self.lybhttp.get_update_file()
+		self.logger.info('DEBUG-1')
+		last_version = self.rest.get_version()
+		self.logger.info('DEBUG-2')
+		self.logger.info(last_version)
+		self.patch_urls = self.rest.get_update_file()
+		self.logger.info('DEBUG-3')
 
 		self.logger.debug('last_version: ' + last_version + ', ' + lybconstant.LYB_VERSION)
 
@@ -343,7 +355,7 @@ class LYBLoginGUI:
 			self.worker_thread = LYBUpdateWorker('Update', 
 													self.configure, 
 													self.waiting_queue, 
-													self.lybhttp, 
+													self.rest,
 													self.patch_urls, 
 													self.progress_bar,
 													self.download_label,
@@ -405,14 +417,14 @@ class LYBLoginGUI:
 
 	def start_gui(self):
 		self.main_frame.pack_forget()
-		likeyoubot_gui.LYBGUI(self.master, self.configure, self.lybhttp)
+		likeyoubot_gui.LYBGUI(self.master, self.configure, self.rest)
 
 
 class LYBUpdateWorker(threading.Thread):
 	def __init__(self, name, configure, queue, pHttp, patch_urls, progress_bar, download_label, download_file_label):
 		super().__init__()
 		self.name = name
-		self.lybhttp = pHttp
+		self.rest = pHttp
 		self.response_queue = queue
 		self.logger = likeyoubot_logger.LYBLogger.getLogger()
 		self.configure = configure
@@ -425,7 +437,7 @@ class LYBUpdateWorker(threading.Thread):
 	def run(self):
 		threading.currentThread().setName(self.name)
 
-		self.dropbox_access_token = self.lybhttp.get_elem('dropbox_access_token')
+		self.dropbox_access_token = self.rest.get_elem('dropbox_access_token')
 		self.logger.debug('dropbox_access_token:' + str(self.dropbox_access_token))
 
 		# patch_url_list = list(self.patch_urls)

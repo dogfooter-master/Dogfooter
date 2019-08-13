@@ -8,7 +8,7 @@ import likeyoubot_win
 import likeyoubot_configure
 import likeyoubot_worker
 import likeyoubot_message
-import likeyoubot_http
+import likeyoubot_rest
 import webbrowser
 import signal
 from PIL import ImageGrab
@@ -343,7 +343,8 @@ class MainWindow(QMainWindow, form_class):
 		worker_thread.command_queue.put_nowait(likeyoubot_message.LYBMessage('watchout2', [self.configure, 'hide', self.appPlayer_comboBox.currentText(), self.win, self.hwnd_dic]))
 
 	def callback_homepage_pushButton_clicked(self):
-		webbrowser.open_new(likeyoubot_http.LYBHttp.getMacroBaseUrl())
+		return
+		# webbrowser.open_new(likeyoubot_rest.LYBHttp.getMacroBaseUrl())
 
 	def callback_appPlayer_comboBox_currentIndexChanged(self):
 		dogfootermacro_logger.debug('callback_appPlayer_comboBox_currentIndexChanged called()')

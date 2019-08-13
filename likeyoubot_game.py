@@ -25,7 +25,7 @@ from belfrywidgets import ToolTip
 import os
 
 from likeyoubot_configure import LYBConstant as lybconstant
-import likeyoubot_http
+import likeyoubot_rest
 import likeyoubot_license
 import likeyoubot_logger
 import traceback
@@ -80,7 +80,7 @@ class LYBGame():
         self.current_matched_event['rate'] = 0
 
         self.main_scene = None
-        self.lybhttp = None
+        self.rest = None
         self.options = {}
         self.statistics = {}
         self.statistics[lybconstant.LYB_STATISTIC_0] = 0
@@ -454,23 +454,23 @@ class LYBGame():
         return self.getStatistic(self.statistics_iterator)
 
     def telegram_send(self, message, image=None):
-        if self.lybhttp == None:
-            self.lybhttp = self.login_gnu_board()
-        chat_id = self.lybhttp.get_chatid()
+        if self.rest == None:
+            self.rest = self.login()
+        chat_id = self.rest.get_chatid()
 
         if image == None:
-            self.lybhttp.send_telegram_message(chat_id, message)
+            self.rest.send_telegram_message(chat_id, message)
         else:
-            self.lybhttp.send_telegram_image(chat_id, image)
+            self.rest.send_telegram_image(chat_id, image)
 
-    def login_gnu_board(self):
+    def login(self):
         user_id = self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_id']
         user_password = likeyoubot_license.LYBLicense().get_decrypt(
             self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_passwd'])
 
-        lybhttp = likeyoubot_http.LYBHttp(user_id, user_password)
+        rest = likeyoubot_rest.LYBRest(self.configure.root_url, user_id, user_password)
 
-        return lybhttp
+        return rest
 
     def save_image(self, png_name):
 

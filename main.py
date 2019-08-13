@@ -85,6 +85,12 @@ except FileNotFoundError:
 except:
     dogfooter_logger.error(str(sys.exc_info()[0]) + '(' + str(sys.exc_info()[1]) + ')')
 
+try:
+    with open(resource_path('host'), 'r') as host_file:
+        configure.root_url = host_file.readline()
+except FileNotFoundError:
+    configure.root_url = 'https://dogfooter.io'
+
 configure.merge()
 root.update()
 

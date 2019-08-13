@@ -19,6 +19,7 @@ class LYBConfigure():
         self.game_config = {}
         self.window_title = 'DogFooter'
         self.version = '1.3.5'
+        self.root_url = ''
 
     def merge(self):
         merge_file = 'lyb.cfg.merge'

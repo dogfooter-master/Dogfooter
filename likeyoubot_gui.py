@@ -20,7 +20,7 @@ import webbrowser
 import likeyoubot_license
 from belfrywidgets import ToolTip
 from PIL import Image, ImageTk, ImageGrab
-import likeyoubot_http
+import likeyoubot_rest
 import likeyoubot_logger
 import traceback
 import random
@@ -56,7 +56,7 @@ class LYBGUI:
         except:
             self.logger.error(traceback.format_exc())
 
-        self.lybhttp = httplogin
+        self.rest = httplogin
         self.last_check_telegram = time.time()
         self.last_check_ip = time.time()
         self.last_check_server = 0
@@ -269,7 +269,7 @@ class LYBGUI:
         )
         self.search_button.pack(side=tkinter.LEFT, padx=5)
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         base_point = lybhttp.get_elem('dogfootermacro_point')
         if base_point == None:
             base_point = 0
@@ -293,7 +293,7 @@ class LYBGUI:
             )
             self.dogfootermacro_button.pack(side=tkinter.LEFT, padx=5)
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         base_point = lybhttp.get_elem('lybcfg_point')
         if base_point == None:
             base_point = 0
@@ -393,7 +393,7 @@ class LYBGUI:
             # lybconstant.LYB_GAME_YEOLHYUL
         ]
         # 헌드레드 소울
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('hundredsoul_point')
         # if base_point == None:
         #     base_point = 0
@@ -404,7 +404,7 @@ class LYBGUI:
         #     self.games.append(lybconstant.LYB_GAME_HUNDREDSOUL)
 
         # # 검은사막
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('blackdesert_point')
         # if base_point == None:
         #     base_point = 0
@@ -787,7 +787,7 @@ class LYBGUI:
 
         # usage_list = lybconstant.LYB_USAGE.split('\n')
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         notice_count = int(lybhttp.get_elem('notice_count'))
         notice_index = int(lybhttp.get_elem('notice_index'))
         notice_dic = lybhttp.get_notice()
@@ -2259,7 +2259,7 @@ class LYBGUI:
         self.game_tab_dic[lybconstant.LYB_GAME_ROHAN] = lyb_game_tab
 
         # # 헌드레드 소울
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('hundredsoul_point')
         # if base_point == None:
         #     base_point = 0
@@ -2292,7 +2292,7 @@ class LYBGUI:
         # self.game_tab_dic[lybconstant.LYB_GAME_TERA] = lyb_l2r_tab
         #
         # # 검은 사막M
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('blackdesert_point')
         # if base_point == None:
         #     base_point = 0
@@ -2311,7 +2311,7 @@ class LYBGUI:
         #     self.game_tab_dic[lybconstant.LYB_GAME_BLACKDESERT] = lyb_game_tab
         #
         # # 블레이드2
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('blade2_point')
         # if base_point == None:
         #     base_point = 0
@@ -2330,7 +2330,7 @@ class LYBGUI:
         #     self.game_tab_dic[lybconstant.LYB_GAME_BLADE2] = lyb_game_tab
         #
         # # 이카루스
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('icarus_point')
         # if base_point == None:
         #     base_point = 0
@@ -2349,7 +2349,7 @@ class LYBGUI:
         #     self.game_tab_dic[lybconstant.LYB_GAME_ICARUS] = lyb_game_tab
         #
         # # 탈리온
-        # lybhttp = self.login_gnu_board()
+        # lybhttp = self.login()
         # base_point = lybhttp.get_elem('talion_point')
         # if base_point == None:
         #     base_point = 0
@@ -2635,7 +2635,7 @@ class LYBGUI:
             if currentHour >= 9 and currentHour < 24 and len(self.workers) > 0:
                 if self.check_ads() == False:
                     self.terminateWorker(None)
-                    lybhttp = self.login_gnu_board()
+                    lybhttp = self.login()
                     chat_id = lybhttp.get_chatid()
                     lybhttp.send_telegram_message(chat_id, '※ 광고가 팝업되면서 프로그램이 중지되었습니다.')
 
@@ -2656,7 +2656,7 @@ class LYBGUI:
 
         return True
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         ads_interval = int(lybhttp.get_elem('ads_interval'))
         # 한 시간에 한 번만 뜨게, 10초 이상 광고를 보지 않았다면 계속 뜰 것이다!!
         elapsedTimeAdsClicked = time.time() - self.timeClickedAds
@@ -2777,7 +2777,7 @@ class LYBGUI:
         self.ready_to_search_queue.append('__all__')
 
     def check_ip(self):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         if time.time() - self.last_check_ip < int(lybhttp.get_elem('ip_check_period')):
             return
 
@@ -2807,7 +2807,7 @@ class LYBGUI:
             return
         self.last_check_telegram = time.time()
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         chat_id = lybhttp.get_chatid()
         if chat_id == None or len(str(chat_id)) == 0:
             return
@@ -2828,12 +2828,12 @@ class LYBGUI:
 
         game_count_sub_title = ""
         for each_game in self.games:
-            game_count_on_playing = int(self.lybhttp.getGameCountOnPlaying(each_game))
+            game_count_on_playing = int(self.rest.getGameCountOnPlaying(each_game))
             if game_count_on_playing > 0:
                 game_count_sub_title += " " + each_game[0] + "(" + str(game_count_on_playing) + ")"
 
         self.master.title(self.configure.window_title + ' ' + str(
-            lybconstant.LYB_VERSION) + ' ' + self.lybhttp.getConnectCount() + game_count_sub_title)
+            lybconstant.LYB_VERSION) + ' ' + self.rest.getConnectCount() + game_count_sub_title)
 
     def update_information(self):
 
@@ -2897,7 +2897,7 @@ class LYBGUI:
         if command == None or command[0] != '/':
             self.logger.error('올바르지 않은 형식의 명령: ' + str(command))
         else:
-            lybhttp = self.login_gnu_board()
+            lybhttp = self.login()
             base_point = lybhttp.get_elem('telegram_point')
             if base_point == None:
                 base_point = 0
@@ -2933,7 +2933,7 @@ class LYBGUI:
                 '※ 명령어 입력 후 응답까지 1 ~ 20초가 걸립니다. 응답이 올 때까지 기다리세요.\n' \
                 '※ 명령어 입력 후 응답이 오지 않는다면 전송에 실패 한 것입니다. 다시 입력하세요.\n'
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         chat_id = lybhttp.get_chatid()
         lybhttp.send_telegram_message(chat_id, message_to_return)
 
@@ -2943,7 +2943,7 @@ class LYBGUI:
             self.logging_message('INFO', message.message + " 작업 종료")
             if message.message != None and len(message.message) > 0 and not message.message in self.worker_dic:
                 if self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_COMMON_TELEGRAM_NOTIFY + 'recovery'] == True:
-                    lybhttp = self.login_gnu_board()
+                    lybhttp = self.login()
                     chat_id = lybhttp.get_chatid()
                     lybhttp.send_telegram_message(chat_id, '매크로 재실행됨 - ' + str(message.message))
 
@@ -3022,7 +3022,7 @@ class LYBGUI:
             self.logging_message("INFO", message.message)
         elif message.type == 'error':
             if self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_COMMON_TELEGRAM_NOTIFY + 'recovery'] == True:
-                lybhttp = self.login_gnu_board()
+                lybhttp = self.login()
                 chat_id = lybhttp.get_chatid()
                 lybhttp.send_telegram_message(chat_id, '[오류 발생] ' + message.message)
 
@@ -3239,7 +3239,7 @@ class LYBGUI:
                                                )
         self.logging_message('INFO', window_name + ' 작업 시작')
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         error_message = lybhttp.login(mb_6=started_game_name)
         self.last_check_server = 0
 
@@ -3326,7 +3326,7 @@ class LYBGUI:
         worker_thread.command_queue.put_nowait(likeyoubot_message.LYBMessage('search', self.configure.window_config))
 
     def callback_download_lybcfg(self, e):
-        dropbox_access_token = self.lybhttp.get_elem('dropbox_access_token')
+        dropbox_access_token = self.rest.get_elem('dropbox_access_token')
 
         file_name = "lyb.cfg.merge"
 
@@ -3347,7 +3347,7 @@ class LYBGUI:
 
         self.logger.debug(file_name)
 
-        lybcfg_information = self.lybhttp.get_elem('lybcfg')
+        lybcfg_information = self.rest.get_elem('lybcfg')
 
         self.logger.debug('TEST: ' + str(lybcfg_information))
         path = resource_path(file_name)
@@ -3778,37 +3778,37 @@ class LYBGUI:
         webbrowser.open_new(r"https://numaking.cafe24.com")
 
     def callback_docs(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         docs_url = lybhttp.get_elem('docs_url')
         webbrowser.open_new(docs_url)
 
     def callback_tera_kakaotalk(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         kakao_url = lybhttp.get_elem('tera_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_blackdesert_kakaotalk(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         kakao_url = lybhttp.get_elem('blackdesert_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_kaiser_kakaotalk(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         kakao_url = lybhttp.get_elem('kaiser_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_blade2_kakaotalk(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         kakao_url = lybhttp.get_elem('blade2_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_icarus_kakaotalk(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         kakao_url = lybhttp.get_elem('icarus_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_talion_kakaotalk(self, event):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         kakao_url = lybhttp.get_elem('talion_kakao_url')
         webbrowser.open_new(kakao_url)
 
@@ -3846,7 +3846,7 @@ class LYBGUI:
 
         self.notice_text.delete(1.0, tkinter.END)
 
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         # self.logger.warn(self.notice_link_list[index])
         content_list = lybhttp.get_notice_content(self.notice_link_list[index])
         for each_line in content_list:
@@ -4800,7 +4800,7 @@ class LYBGUI:
                 self.logging_message("NORMAL", "연동하기 버튼 위 입력란에 아무거나 입력하세요.")
                 self.logging_message("NORMAL", "입력한 내용을 텔레그램 도그푸터 봇 대화창에 똑같이 입력하고 연동 버튼을 누르세요.")
                 return
-            lybhttp = self.login_gnu_board()
+            lybhttp = self.login()
 
             chat_id = lybhttp.connect_telegram(self.telegram_entry.get())
             if chat_id != '':
@@ -4822,7 +4822,7 @@ class LYBGUI:
             self.logging_message("FAIL", "텔레그램 연동에 실패했습니다.")
             self.logging_message("FAIL", "[" + self.telegram_entry.get() + "]를 텔레그램 대화창에 제대로 입력했는지 확인하세요.")
         else:
-            lybhttp = self.login_gnu_board()
+            lybhttp = self.login()
 
             error_message = lybhttp.login(mb_3='-1')
             if error_message == '':
@@ -4836,28 +4836,28 @@ class LYBGUI:
         if self.mb_point != None:
             return self.mb_point
 
-        lybhttp = self.login_gnu_board()
-        error_message = lybhttp.login()
+        rest = self.login()
+        error_message = rest.login()
 
-        self.mb_point = lybhttp.mb_point
+        self.mb_point = rest.get_point()
 
         return self.mb_point
 
     def get_mb_ip(self):
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         return lybhttp.get_ip()
 
-    def login_gnu_board(self):
-        if self.lybhttp != None:
-            return self.lybhttp
+    def login(self):
+        if self.rest is not None:
+            return self.rest
 
         user_id = self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_id']
         user_password = likeyoubot_license.LYBLicense().get_decrypt(
             self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_passwd'])
 
-        self.lybhttp = likeyoubot_http.LYBHttp(user_id, user_password)
+        self.rest = likeyoubot_rest.LYBRest(self.configure.root_url, user_id, user_password)
 
-        return self.lybhttp
+        return self.rest
 
     def generate_token(self):
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -4866,9 +4866,9 @@ class LYBGUI:
         self.logger.debug('/SS')
         screenShot = ImageGrab.grab()
         png_name = self.save_image(screenShot, 'ss_command')
-        lybhttp = self.login_gnu_board()
+        lybhttp = self.login()
         chat_id = lybhttp.get_chatid()
-        self.lybhttp.send_telegram_image(chat_id, png_name)
+        self.rest.send_telegram_image(chat_id, png_name)
 
     def save_image(self, image, png_name):
 
