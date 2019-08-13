@@ -787,81 +787,82 @@ class LYBGUI:
 
         # usage_list = lybconstant.LYB_USAGE.split('\n')
 
-        lybhttp = self.login()
-        notice_count = int(lybhttp.get_elem('notice_count'))
-        notice_index = int(lybhttp.get_elem('notice_index'))
-        notice_dic = lybhttp.get_notice()
-        self.notice_link_list = []
-        self.notice_subject_list = []
-        i = 0
-        for key, value in notice_dic.items():
-            label = ttk.Label(
-                master=frame_label,
-                text=key,
-                font=lybconstant.LYB_FONT,
-                cursor='hand2',
-                width=17
-            )
-            label.pack(anchor=tkinter.NW)
+        # lybhttp = self.login()
+        # notice_count = int(lybhttp.get_elem('notice_count'))
+        # notice_index = int(lybhttp.get_elem('notice_index'))
+        # notice_dic = lybhttp.get_notice()
 
-            f = font.Font(label, label.cget("font"))
-            f.configure(underline=True)
-            label.configure(font=f)
-            self.notice_subject_list.append(key)
-            self.notice_link_list.append(value)
-            if i == 0:
-                label.bind("<Button-1>", lambda event: self.callback_link_url0(event, url=self.notice_link_list[0]))
-            elif i == 1:
-                label.bind("<Button-1>", lambda event: self.callback_link_url1(event, url=self.notice_link_list[1]))
-            elif i == 2:
-                label.bind("<Button-1>", lambda event: self.callback_link_url2(event, url=self.notice_link_list[2]))
-            elif i == 3:
-                label.bind("<Button-1>", lambda event: self.callback_link_url3(event, url=self.notice_link_list[3]))
-            elif i == 4:
-                label.bind("<Button-1>", lambda event: self.callback_link_url3(event, url=self.notice_link_list[4]))
-            elif i == 5:
-                label.bind("<Button-1>", lambda event: self.callback_link_url4(event, url=self.notice_link_list[5]))
-            else:
-                break
-
-            if i == notice_index:
-                label.configure(foreground='red')
-
-            i += 1
-
-            if i >= notice_count:
-                break
-
-            # usage_text.insert('end', usage_list)
-            # for each_usage in usage_list:
-            # usage_text.insert('end', each_usage + '\n')
-
+        # self.notice_link_list = []
+        # self.notice_subject_list = []
+        # i = 0
+        # for key, value in notice_dic.items():
+        #     label = ttk.Label(
+        #         master=frame_label,
+        #         text=key,
+        #         font=lybconstant.LYB_FONT,
+        #         cursor='hand2',
+        #         width=17
+        #     )
+        #     label.pack(anchor=tkinter.NW)
+        #
+        #     f = font.Font(label, label.cget("font"))
+        #     f.configure(underline=True)
+        #     label.configure(font=f)
+        #     self.notice_subject_list.append(key)
+        #     self.notice_link_list.append(value)
+        #     if i == 0:
+        #         label.bind("<Button-1>", lambda event: self.callback_link_url0(event, url=self.notice_link_list[0]))
+        #     elif i == 1:
+        #         label.bind("<Button-1>", lambda event: self.callback_link_url1(event, url=self.notice_link_list[1]))
+        #     elif i == 2:
+        #         label.bind("<Button-1>", lambda event: self.callback_link_url2(event, url=self.notice_link_list[2]))
+        #     elif i == 3:
+        #         label.bind("<Button-1>", lambda event: self.callback_link_url3(event, url=self.notice_link_list[3]))
+        #     elif i == 4:
+        #         label.bind("<Button-1>", lambda event: self.callback_link_url3(event, url=self.notice_link_list[4]))
+        #     elif i == 5:
+        #         label.bind("<Button-1>", lambda event: self.callback_link_url4(event, url=self.notice_link_list[5]))
+        #     else:
+        #         break
+        #
+        #     if i == notice_index:
+        #         label.configure(foreground='red')
+        #
+        #     i += 1
+        #
+        #     if i >= notice_count:
+        #         break
+        #
+        #     # usage_text.insert('end', usage_list)
+        #     # for each_usage in usage_list:
+        #     # usage_text.insert('end', each_usage + '\n')
+        #
         frame_label.pack(anchor=tkinter.NW, side=tkinter.LEFT)
 
-        frame_inner = ttk.Frame(frame_r)
-        frame_inner.pack(side=tkinter.LEFT, padx=2)
-
-        self.notice_frame_label = ttk.LabelFrame(
-            master=frame_r,
-            text=self.notice_subject_list[notice_index]
-        )
-
-        frame_notice_text = ttk.Frame(self.notice_frame_label)
-        self.notice_text = tkinter.Text(
-            master=frame_notice_text,
-            spacing1=3,
-            wrap=None,
-            height=6,
-            font=lybconstant.LYB_FONT
-        )
-
-        vsb = tkinter.Scrollbar(
-            master=frame_notice_text,
-            orient='vertical',
-            command=self.notice_text.yview
-        )
-        self.notice_text.configure(yscrollcommand=vsb.set)
-        vsb.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+        # frame_inner = ttk.Frame(frame_r)
+        # frame_inner.pack(side=tkinter.LEFT, padx=2)
+        #
+        # self.notice_frame_label = ttk.LabelFrame(
+        #     master=frame_r,
+        #     text='공지'
+        # )
+        #
+        # frame_notice_text = ttk.Frame(self.notice_frame_label)
+        # self.notice_text = tkinter.Text(
+        #     master=frame_notice_text,
+        #     spacing1=3,
+        #     wrap=None,
+        #     height=6,
+        #     font=lybconstant.LYB_FONT
+        # )
+        #
+        # vsb = tkinter.Scrollbar(
+        #     master=frame_notice_text,
+        #     orient='vertical',
+        #     command=self.notice_text.yview
+        # )
+        # self.notice_text.configure(yscrollcommand=vsb.set)
+        # vsb.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 
         # self.information_scrollbar = ttk.Scrollbar(self.information_frame)
         # self.information.configure(yscrollcommand=self.information_scrollbar.set)
@@ -876,19 +877,19 @@ class LYBGUI:
         # frame_notice_text.configure(xscrollcommand=hsb.set)
         # hsb.pack(side='bottom', fill='x')
 
-        self.notice_text.pack(anchor=tkinter.NW, fill=tkinter.BOTH, expand=True)
-
-        content_list = lybhttp.get_notice_content(self.notice_link_list[notice_index])
-
-        # usage_text.insert('end', usage_list)
-        # for each_usage in usage_list:
-        # usage_text.insert('end', each_usage + '\n')
-        for each_line in content_list:
-            self.notice_text.insert('end', each_line + '\n')
-
-        frame_notice_text.pack(anchor=tkinter.NW, fill=tkinter.BOTH, expand=True)
-        self.notice_frame_label.pack(anchor=tkinter.NW, side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-
+        # self.notice_text.pack(anchor=tkinter.NW, fill=tkinter.BOTH, expand=True)
+        #
+        # content_list = lybhttp.get_notice_content(self.notice_link_list[notice_index])
+        #
+        # # usage_text.insert('end', usage_list)
+        # # for each_usage in usage_list:
+        # # usage_text.insert('end', each_usage + '\n')
+        # for each_line in content_list:
+        #     self.notice_text.insert('end', each_line + '\n')
+        #
+        # frame_notice_text.pack(anchor=tkinter.NW, fill=tkinter.BOTH, expand=True)
+        # self.notice_frame_label.pack(anchor=tkinter.NW, side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        #
         frame_r.pack(side=tkinter.LEFT, anchor=tkinter.NW, fill=tkinter.BOTH, expand=True, padx=5, pady=5)
         frame_s.pack(anchor=tkinter.NW, fill=tkinter.BOTH, pady=5)
 
@@ -2617,7 +2618,7 @@ class LYBGUI:
                     self.logger.error(traceback.format_exc())
 
         self.update_information()
-        self.update_server_information()
+        # self.update_server_information()
 
         try:
             self.update_monitor_master()
@@ -2635,9 +2636,9 @@ class LYBGUI:
             if currentHour >= 9 and currentHour < 24 and len(self.workers) > 0:
                 if self.check_ads() == False:
                     self.terminateWorker(None)
-                    lybhttp = self.login()
-                    chat_id = lybhttp.get_chatid()
-                    lybhttp.send_telegram_message(chat_id, '※ 광고가 팝업되면서 프로그램이 중지되었습니다.')
+                    rest = self.login()
+                    chat_id = rest.get_chatid()
+                    rest.send_telegram_message(chat_id, '※ 광고가 팝업되면서 프로그램이 중지되었습니다.')
 
         # self.update_telegram()
 
@@ -2656,8 +2657,8 @@ class LYBGUI:
 
         return True
 
-        lybhttp = self.login()
-        ads_interval = int(lybhttp.get_elem('ads_interval'))
+        rest = self.login()
+        ads_interval = int(rest.get_elem('ads_interval'))
         # 한 시간에 한 번만 뜨게, 10초 이상 광고를 보지 않았다면 계속 뜰 것이다!!
         elapsedTimeAdsClicked = time.time() - self.timeClickedAds
         if elapsedTimeAdsClicked > ads_interval:
@@ -2777,25 +2778,25 @@ class LYBGUI:
         self.ready_to_search_queue.append('__all__')
 
     def check_ip(self):
-        lybhttp = self.login()
-        if time.time() - self.last_check_ip < int(lybhttp.get_elem('ip_check_period')):
+        rest = self.login()
+        if time.time() - self.last_check_ip < int(rest.get_elem('ip_check_period')):
             return
 
         game_count_sub_title = ""
         for each_game in self.games:
-            game_count_on_playing = int(lybhttp.getGameCountOnPlaying(each_game))
+            game_count_on_playing = int(rest.getGameCountOnPlaying(each_game))
             if game_count_on_playing > 0:
                 game_count_sub_title += " " + each_game[0] + "(" + str(game_count_on_playing) + ")"
 
         self.master.title(self.configure.window_title + ' ' + str(
-            lybconstant.LYB_VERSION) + ' ' + lybhttp.getConnectCount() + game_count_sub_title)
+            lybconstant.LYB_VERSION) + ' ' + rest.getConnectCount() + game_count_sub_title)
 
         self.last_check_ip = time.time()
-        base_point = lybhttp.get_elem('ip_free_point')
+        base_point = rest.get_elem('ip_free_point')
         # 로그인 요청 보내려고
         self.mb_point = None
         if int(self.get_mb_point()) < int(base_point):
-            if lybhttp.is_ip_free() == False:
+            if rest.is_ip_free() == False:
                 self.logger.error('프로그램이 다른 컴퓨터에서 사용 중입니다.')
                 # '(포인트 ' + str(self.get_mb_point()) + '점 필요)')
                 self.terminateWorker(None)
@@ -2807,12 +2808,12 @@ class LYBGUI:
             return
         self.last_check_telegram = time.time()
 
-        lybhttp = self.login()
-        chat_id = lybhttp.get_chatid()
-        if chat_id == None or len(str(chat_id)) == 0:
+        rest = self.login()
+        chat_id = rest.get_chatid()
+        if chat_id is None or len(str(chat_id)) == 0:
             return
 
-        update = lybhttp.getTelegramUpdates(chat_id)
+        update = rest.getTelegramUpdates(chat_id)
         if update == None:
             return
 
@@ -2897,8 +2898,8 @@ class LYBGUI:
         if command == None or command[0] != '/':
             self.logger.error('올바르지 않은 형식의 명령: ' + str(command))
         else:
-            lybhttp = self.login()
-            base_point = lybhttp.get_elem('telegram_point')
+            rest = self.login()
+            base_point = rest.get_elem('telegram_point')
             if base_point == None:
                 base_point = 0
             else:
@@ -2933,9 +2934,9 @@ class LYBGUI:
                 '※ 명령어 입력 후 응답까지 1 ~ 20초가 걸립니다. 응답이 올 때까지 기다리세요.\n' \
                 '※ 명령어 입력 후 응답이 오지 않는다면 전송에 실패 한 것입니다. 다시 입력하세요.\n'
 
-        lybhttp = self.login()
-        chat_id = lybhttp.get_chatid()
-        lybhttp.send_telegram_message(chat_id, message_to_return)
+        rest = self.login()
+        chat_id = rest.get_chatid()
+        rest.send_telegram_message(chat_id, message_to_return)
 
     def process_message(self, worker, message):
 
@@ -2943,9 +2944,9 @@ class LYBGUI:
             self.logging_message('INFO', message.message + " 작업 종료")
             if message.message != None and len(message.message) > 0 and not message.message in self.worker_dic:
                 if self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_COMMON_TELEGRAM_NOTIFY + 'recovery'] == True:
-                    lybhttp = self.login()
-                    chat_id = lybhttp.get_chatid()
-                    lybhttp.send_telegram_message(chat_id, '매크로 재실행됨 - ' + str(message.message))
+                    rest = self.login()
+                    chat_id = rest.get_chatid()
+                    rest.send_telegram_message(chat_id, '매크로 재실행됨 - ' + str(message.message))
 
                 max_recovery_count = self.configure.common_config[lybconstant.LYB_DO_STRING_RECOVERY_COUNT]
                 for window_name, worker_thread in self.worker_dic.items():
@@ -3022,9 +3023,9 @@ class LYBGUI:
             self.logging_message("INFO", message.message)
         elif message.type == 'error':
             if self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_COMMON_TELEGRAM_NOTIFY + 'recovery'] == True:
-                lybhttp = self.login()
-                chat_id = lybhttp.get_chatid()
-                lybhttp.send_telegram_message(chat_id, '[오류 발생] ' + message.message)
+                rest = self.login()
+                chat_id = rest.get_chatid()
+                rest.send_telegram_message(chat_id, '[오류 발생] ' + message.message)
 
             self.logging_message("FAIL", message.message)
         elif message.type == 'game_object':
@@ -3239,8 +3240,8 @@ class LYBGUI:
                                                )
         self.logging_message('INFO', window_name + ' 작업 시작')
 
-        lybhttp = self.login()
-        error_message = lybhttp.login(mb_6=started_game_name)
+        rest = self.login()
+        error_message = rest.login(mb_6=started_game_name)
         self.last_check_server = 0
 
         try:
@@ -3778,38 +3779,38 @@ class LYBGUI:
         webbrowser.open_new(r"https://numaking.cafe24.com")
 
     def callback_docs(self, event):
-        lybhttp = self.login()
-        docs_url = lybhttp.get_elem('docs_url')
+        rest = self.login()
+        docs_url = rest.get_elem('docs_url')
         webbrowser.open_new(docs_url)
 
     def callback_tera_kakaotalk(self, event):
-        lybhttp = self.login()
-        kakao_url = lybhttp.get_elem('tera_kakao_url')
+        rest = self.login()
+        kakao_url = rest.get_elem('tera_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_blackdesert_kakaotalk(self, event):
-        lybhttp = self.login()
-        kakao_url = lybhttp.get_elem('blackdesert_kakao_url')
+        rest = self.login()
+        kakao_url = rest.get_elem('blackdesert_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_kaiser_kakaotalk(self, event):
-        lybhttp = self.login()
-        kakao_url = lybhttp.get_elem('kaiser_kakao_url')
+        rest = self.login()
+        kakao_url = rest.get_elem('kaiser_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_blade2_kakaotalk(self, event):
-        lybhttp = self.login()
-        kakao_url = lybhttp.get_elem('blade2_kakao_url')
+        rest = self.login()
+        kakao_url = rest.get_elem('blade2_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_icarus_kakaotalk(self, event):
-        lybhttp = self.login()
-        kakao_url = lybhttp.get_elem('icarus_kakao_url')
+        rest = self.login()
+        kakao_url = rest.get_elem('icarus_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_talion_kakaotalk(self, event):
-        lybhttp = self.login()
-        kakao_url = lybhttp.get_elem('talion_kakao_url')
+        rest = self.login()
+        kakao_url = rest.get_elem('talion_kakao_url')
         webbrowser.open_new(kakao_url)
 
     def callback_bitbucket(self, event):
@@ -3841,17 +3842,18 @@ class LYBGUI:
     # webbrowser.open_new(url)
 
     def common_link_url(self, url):
-        index = self.notice_link_list.index(url)
-        self.notice_frame_label.configure(text=self.notice_subject_list[index])
+        return
+        # index = self.notice_link_list.index(url)
+        # self.notice_frame_label.configure(text=self.notice_subject_list[index])
+        #
+        # self.notice_text.delete(1.0, tkinter.END)
 
-        self.notice_text.delete(1.0, tkinter.END)
-
-        lybhttp = self.login()
-        # self.logger.warn(self.notice_link_list[index])
-        content_list = lybhttp.get_notice_content(self.notice_link_list[index])
-        for each_line in content_list:
-            # self.logger.warn(each_line)
-            self.notice_text.insert('end', each_line + '\n')
+        # rest = self.login()
+        # # self.logger.warn(self.notice_link_list[index])
+        # content_list = rest.get_notice_content(self.notice_link_list[index])
+        # for each_line in content_list:
+        #     # self.logger.warn(each_line)
+        #     self.notice_text.insert('end', each_line + '\n')
 
     def callback_wakeup_period_entry(self, args):
 
@@ -4800,15 +4802,15 @@ class LYBGUI:
                 self.logging_message("NORMAL", "연동하기 버튼 위 입력란에 아무거나 입력하세요.")
                 self.logging_message("NORMAL", "입력한 내용을 텔레그램 도그푸터 봇 대화창에 똑같이 입력하고 연동 버튼을 누르세요.")
                 return
-            lybhttp = self.login()
+            rest = self.login()
 
-            chat_id = lybhttp.connect_telegram(self.telegram_entry.get())
+            chat_id = rest.connect_telegram(self.telegram_entry.get())
             if chat_id != '':
-                error_message = lybhttp.login(mb_3=chat_id)
+                error_message = rest.login(mb_3=chat_id)
                 if error_message == '':
                     self.telegram_button_label.set('연동해제')
                     self.telegram_chatid_label.set(chat_id)
-                    lybhttp.send_telegram_message(chat_id,
+                    rest.send_telegram_message(chat_id,
                                                   self.telegram_entry.get() + ' from DogFooter Macro ' + lybconstant.LYB_VERSION)
 
                     self.logging_message("SUCCESS", "텔레그램 연동에 성공했습니다.")
@@ -4816,21 +4818,21 @@ class LYBGUI:
                     self.logging_message("SUCCESS", "텔레그램 알람이 온다면 텔레그램 연동에 성공한 것입니다.")
                     self.logging_message("SUCCESS", "연동해제 버튼을 눌러서 언제든지 해제 할 수 있습니다.")
                     self.telegram_entry.set('')
-                    chat_id = lybhttp.get_chatid(refresh=True)
+                    chat_id = rest.get_chatid(refresh=True)
                     self.logger.debug('update chatting id: ' + str(chat_id))
                     return
             self.logging_message("FAIL", "텔레그램 연동에 실패했습니다.")
             self.logging_message("FAIL", "[" + self.telegram_entry.get() + "]를 텔레그램 대화창에 제대로 입력했는지 확인하세요.")
         else:
-            lybhttp = self.login()
+            rest = self.login()
 
-            error_message = lybhttp.login(mb_3='-1')
+            error_message = rest.login(mb_3='-1')
             if error_message == '':
                 self.logging_message("SUCCESS", "텔레그램 연동을 해제했습니다.")
                 self.telegram_button_label.set('연동하기')
                 self.telegram_chatid_label.set('')
                 self.telegram_entry.set(self.generate_token())
-                chat_id = lybhttp.get_chatid(refresh=True)
+                chat_id = rest.get_chatid(refresh=True)
 
     def get_mb_point(self):
         if self.mb_point != None:
@@ -4843,9 +4845,9 @@ class LYBGUI:
 
         return self.mb_point
 
-    def get_mb_ip(self):
-        lybhttp = self.login()
-        return lybhttp.get_ip()
+    # def get_mb_ip(self):
+        # rest = self.login()
+        # return rest.get_ip()
 
     def login(self):
         if self.rest is not None:
@@ -4866,8 +4868,8 @@ class LYBGUI:
         self.logger.debug('/SS')
         screenShot = ImageGrab.grab()
         png_name = self.save_image(screenShot, 'ss_command')
-        lybhttp = self.login()
-        chat_id = lybhttp.get_chatid()
+        rest = self.login()
+        chat_id = rest.get_chatid()
         self.rest.send_telegram_image(chat_id, png_name)
 
     def save_image(self, image, png_name):

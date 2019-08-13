@@ -18,6 +18,7 @@ class LYBRest:
         self.point = -1
         self.chat_id = -1
         self.logger = likeyoubot_logger.LYBLogger.getLogger()
+        self.token = ''
         self.rest = API(
             api_root_url=root_url,
             timeout=2,
@@ -108,7 +109,7 @@ class LYBRest:
             r = res.body
             if r['err'] is None:
                 data = r['data']
-                self.chat_id = data['chat_id']
+                self.chat_id = int(data['chat_id'])
                 return self.chat_id
             else:
                 return r['err']
@@ -174,6 +175,12 @@ class LYBRest:
                 return r['err']
         except:
             self.logger.error(traceback.format_exc())
+
+    def get_token(self):
+        if len(self.token) == 0:
+            self.token = self.get_elem('token')
+
+        return self.token
 
     def getConnectCount(self):
         return ""

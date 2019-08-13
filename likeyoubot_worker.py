@@ -562,7 +562,7 @@ class LYBWorker(threading.Thread):
 
 		try:
 			self.ui.update_telegram()
-			self.ui.check_ip()
+			# self.ui.check_ip()
 
 			# f2 = win32api.GetAsyncKeyState(win32con.VK_F2)
 			# shift = win32api.GetAsyncKeyState(win32con.VK_SHIFT)
