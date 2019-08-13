@@ -8,6 +8,7 @@ import pyautogui
 import operator
 import random
 import likeyoubot_game as lybgame
+import traceback
 import likeyoubot_rohan as lybgamerohan
 from likeyoubot_configure import LYBConstant as lybconstant
 import likeyoubot_scene
@@ -31,6 +32,11 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             rc = self.login_scene()
         elif self.scene_name == 'character_scene':
             rc = self.character_scene()
+        elif self.scene_name == 'jeoljeon_scene':
+            rc = self.jeoljeon_scene()
+        elif self.scene_name == 'bunhe_select_scene':
+            rc = self.bunhe_select_scene()
+
         else:
             rc = self.else_scene()
 
@@ -43,6 +49,56 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def bunhe_select_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 0 < self.status < 60:
+            self.status += 1
+            resource_name = 'bunhe_scene_option_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+                self.logger.debug(pb_name + ' ' + str(match_rate))
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def jeoljeon_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 0 < self.status < 6000:
+            self.status += 1
+            # elapsed_time = self.get_elapsed_time()
+            # self.logger.info(str(elapsed_time))
+            if self.isJeolJeonHpEmpty():
+                self.game_object.get_scene('main_scene').set_option('hp_potion_empty', True)
+                self.status = 99999
+            if self.isJeolJeonMpEmpty():
+                self.game_object.get_scene('main_scene').set_option('mp_potion_empty', True)
+                self.status = 99999
+            if self.isJeolJeonQuestComplete():
+                self.game_object.get_scene('main_scene').set_option('quest_complete', True)
+                self.status = 99999
+
+            current_work = self.game_object.get_scene('main_scene').current_work
+            if current_work == '자동 사냥':
+                cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'))
+                elapsed_time = time.time() - self.game_object.get_scene('main_scene').get_checkpoint(current_work + '_check_start')
+                self.loggingElapsedTime('[' + str(current_work) + '] 경과 시간', elapsed_time, cfg_duration, period=0)
+                if elapsed_time > self.period_bot(cfg_duration):
+                    self.status = 99999
+                    self.game_object.get_scene('main_scene').set_option(current_work + '_end_flag', True)
+        else:
+            for i in range(3):
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+                self.period_bot(0.1)
             self.status = 0
         return self.status
 
@@ -173,11 +229,60 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             if elapsed_time > self.period_bot(600):
                 self.set_option(self.current_work + '_end_flag', True)
 
-            if self.get_option(self.current_work + '_end_flag') == True:
+            if self.get_option(self.current_work + '_end_flag'):
                 self.set_option(self.current_work + '_end_flag', False)
                 self.set_option(self.current_work + '_inner_status', None)
                 self.status = self.last_status[self.current_work] + 1
                 return self.status
+
+        elif self.status == self.get_work_status('자동 사냥'):
+
+            cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'))
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(cfg_duration):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.set_option(self.current_work + '_inner_status', None)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            self.loggingElapsedTime('[' + str(self.current_work) + '] 경과 시간', elapsed_time, cfg_duration, period=60)
+
+            inner_status = self.get_option(self.current_work + '_inner_status')
+            if inner_status is None:
+                inner_status = 0
+
+            if 0 <= inner_status <= 240:
+                if self.isMenuOpen():
+                    self.game_object.get_scene('jeoljeon_scene').status = 0
+                    self.lyb_mouse_click('menu_jeoljeon', custom_threshold=0)
+                else:
+                    self.lyb_mouse_click('main_scene_menu', custom_threshold=0)
+                self.set_option(self.current_work + '_inner_status', inner_status + 1)
+
+        elif self.status == self.get_work_status('분해'):
+
+            elapsed_time = self.get_elapsed_time()
+            if elapsed_time > self.period_bot(10):
+                self.set_option(self.current_work + '_end_flag', True)
+
+            if self.get_option(self.current_work + '_end_flag'):
+                self.set_option(self.current_work + '_end_flag', False)
+                self.set_option(self.current_work + '_inner_status', None)
+                self.status = self.last_status[self.current_work] + 1
+                return self.status
+
+            if self.isGabangOpen():
+                self.lyb_mouse_click('gabang_bunhe', custom_threshold=0)
+            else:
+                if self.isGabangSelect():
+                    self.lyb_mouse_click('gabang_select', custom_threshold=0)
+                    self.game_object.get_scene('bunhe_select_scene').status = 0
+                else:
+                    self.lyb_mouse_click('menu_scene_gabang', custom_threshold=0)
 
         elif self.status == self.get_work_status('알림'):
 
@@ -250,6 +355,15 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
 
     def pre_process_main_scene(self):
 
+        if self.is_complete_quest():
+            return True
+
+        if self.is_move_to_quest():
+            return True
+
+        cfg_bunhe_period = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_period'))
+        self.logger.info(cfg_bunhe_period)
+
         return False
 
     def get_work_status(self, work_name):
@@ -277,3 +391,132 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             return True, match_rate
 
         return False, match_rate
+
+    def is_complete_quest(self, limit=3):
+        complete_list = [
+            'quest_complete_loc',
+        ]
+
+        for pb_name in complete_list:
+            if '_loc' in pb_name:
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                    self.window_image,
+                    pb_name,
+                    custom_threshold=0.1,
+                    custom_flag=1,
+                    custom_top_level=(255, 255, 10),
+                    custom_below_level=(125, 90, 0),
+                    custom_rect=(10, 160, 40, 300),
+                    average=True,
+                )
+            else:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.1,
+                    custom_flag=1,
+                    custom_top_level=(255, 255, 10),
+                    custom_below_level=(125, 90, 0),
+                    custom_rect=(10, 160, 40, 300),
+                )
+
+            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                threshold = self.get_option(pb_name + '_threshold')
+                if threshold is None:
+                    threshold = 0
+
+                self.logger.info('퀘스트 완료 감지됨: ' + str(threshold) + '/' + str(limit))
+
+                if threshold >= limit:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                    self.set_option(pb_name + '_threshold', 0)
+
+                    return True
+                else:
+                    self.set_option(pb_name + '_threshold', threshold + 1)
+            else:
+                self.set_option(pb_name + '_threshold', 0)
+        return False
+
+    def is_move_to_quest(self, limit=3):
+        complete_list = [
+            'quest_move_loc',
+        ]
+
+        for pb_name in complete_list:
+            if '_loc' in pb_name:
+                (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                    self.window_image,
+                    pb_name,
+                    custom_threshold=0.7,
+                    custom_flag=1,
+                    custom_rect=(150, 120, 230, 180),
+                )
+
+            self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                threshold = self.get_option(pb_name + '_threshold')
+                if threshold is None:
+                    threshold = 0
+
+                self.logger.info('즉시 이동 감지됨: ' + str(threshold) + '/' + str(limit))
+
+                if threshold >= limit:
+                    temp_loc_x = loc_x - 100
+                    if temp_loc_x <= 50:
+                        temp_loc_x = 50
+                    self.lyb_mouse_click_location(temp_loc_x, loc_y)
+                    self.set_option(pb_name + '_threshold', 0)
+
+                    return True
+                else:
+                    self.set_option(pb_name + '_threshold', threshold + 1)
+            else:
+                self.set_option(pb_name + '_threshold', 0)
+
+        return False
+
+
+    def isGabangSelect(self):
+        return self.isStatusByResource2('일괄 선택 감지', 'gabang_select_loc', 0.7, -1, reverse=True)
+
+    def isGabangOpen(self):
+        return self.isStatusByResource2('가방 열림 감지', 'gabang_open_loc', 0.7, -1, reverse=True)
+
+    def isMenuOpen(self):
+        return self.isStatusByResource2('메뉴 열림 감지', 'menu_open_loc', 0.7, -1, reverse=True)
+
+    def isJeolJeonMpEmpty(self):
+        return self.isStatusByResource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.95, 3, reverse=True)
+
+    def isJeolJeonHpEmpty(self):
+        return self.isStatusByResource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.95, 3, reverse=True)
+
+    def isJeolJeonQuestComplete(self):
+        return self.isStatusByResource2('절전모드 퀘스트 완료 감지', 'jeoljeon_scene_quest_complete_loc', 0.9, 3, reverse=True)
+
+    def isStatusByResource2(self, log_message, resource_name, custom_threshold, limit_count=-1, reverse=False):
+        match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+        self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+        if match_rate > custom_threshold and reverse == False:
+            self.set_option(resource_name + 'check_count', 0)
+            return False
+
+        if match_rate < custom_threshold and reverse == True:
+            self.set_option(resource_name + 'check_count', 0)
+            return False
+
+        check_count = self.get_option(resource_name + 'check_count')
+        if check_count == None:
+            check_count = 0
+
+        if check_count > limit_count:
+            self.set_option(resource_name + 'check_count', 0)
+            return True
+
+        if check_count > 0:
+            self.logger.debug(log_message + '..(' + str(check_count) + '/' + str(limit_count) + ')')
+        self.set_option(resource_name + 'check_count', check_count + 1)
+
+        return False
