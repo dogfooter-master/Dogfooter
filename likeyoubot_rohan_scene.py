@@ -575,10 +575,10 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         return self.isStatusByResource2('메뉴 열림 감지', 'menu_open_loc', 0.7, -1, reverse=True)
 
     def isJeolJeonMpEmpty(self):
-        return self.isStatusByResource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.95, 3, reverse=True)
+        return self.isStatusByResource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.9, 2, reverse=True)
 
     def isJeolJeonHpEmpty(self):
-        return self.isStatusByResource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.95, 3, reverse=True)
+        return self.isStatusByResource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.9, 2, reverse=True)
 
     def isJeolJeonQuestComplete(self):
         return self.isStatusByResource2('절전모드 퀘스트 완료 감지', 'jeoljeon_scene_quest_complete_loc', 0.9, 3, reverse=True)
