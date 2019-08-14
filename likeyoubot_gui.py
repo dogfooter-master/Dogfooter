@@ -1313,10 +1313,14 @@ class LYBGUI:
 
         frame_br = ttk.Frame(frame_log)
 
-        login_frame = ttk.LabelFrame(frame_br, text='아이디')
+        login_frame = ttk.LabelFrame(frame_br, text='계정')
+        user_account = self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_id']
+        if len(user_account) > 10:
+            user_account = user_account[0:10]
+
         label = ttk.Label(
             master=login_frame,
-            text=self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_SAVE_LOGIN_ACCOUNT + '_id']
+            text=user_account
         )
         label.pack()
         login_frame.pack(fill=tkinter.X, padx=2)

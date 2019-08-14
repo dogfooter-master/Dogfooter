@@ -451,6 +451,12 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.game_object.get_scene('japhwajeom_scene').set_option('potion_name', 'japhwajeom_scene_hp_potion')
             return True
 
+        if self.get_option('mp_potion_empty') is True:
+            self.set_option('mp_potion_empty', False)
+            self.lyb_mouse_click('main_scene_shop', custom_threshold=0)
+            self.game_object.get_scene('japhwajeom_scene').status = 0
+            self.game_object.get_scene('japhwajeom_scene').set_option('potion_name', 'japhwajeom_scene_mp_potion')
+            return True
         return False
 
     def get_work_status(self, work_name):

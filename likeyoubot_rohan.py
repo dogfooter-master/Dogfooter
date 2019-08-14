@@ -24,7 +24,7 @@ class LYBRohan(lybgame.LYBGame):
         '[작업 예약]',
         '']
 
-    rohan_icon_list = ['nox_rohan_icon']
+    rohan_icon_list = ['nox_rohan_icon', 'momo_rohan_icon']
 
     item_select_option_list = [
         '무기',

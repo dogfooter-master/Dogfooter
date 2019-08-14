@@ -60,7 +60,7 @@ class LYBLoginGUI:
 		frame = ttk.Frame(frame_left)
 		label = ttk.Label(
 			master 				= frame,
-			text 				= "아이디",
+			text 				= "계정",
 			justify 			= tkinter.LEFT,
 			width 				= 10
 			)
