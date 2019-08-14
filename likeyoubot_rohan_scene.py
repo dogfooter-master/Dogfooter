@@ -36,6 +36,10 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             rc = self.jeoljeon_scene()
         elif self.scene_name == 'bunhe_select_scene':
             rc = self.bunhe_select_scene()
+        elif self.scene_name == 'japhwajeom_scene':
+            rc = self.japhwajeom_scene()
+        elif self.scene_name == 'japhwajeom_popup_scene':
+            rc = self.japhwajeom_popup_scene()
 
         else:
             rc = self.else_scene()
@@ -52,17 +56,79 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.status = 0
         return self.status
 
+    def japhwajeom_popup_scene(self):
+        self.game_object.current_matched_scene['name'] = ''
+
+        if self.status == 0:
+            self.game_object.get_scene('japhwajeom_scene').status = 99999
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 5:
+            self.lyb_mouse_click('japhwajeom_scene_numpad_100', custom_threshold=0)
+            self.status = 5
+        elif 5 <= self.status < 10:
+            pb_name = 'japhwajeom_scene_numpad'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.9:
+                self.lyb_mouse_click('japhwajeom_scene_numpad_confirm', custom_threshold=0)
+                self.status += 1
+            else:
+                self.status = 10
+        elif 10 <= self.status < 15:
+            pb_name = 'japhwajeom_scene_buy_title'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.9:
+                self.lyb_mouse_click('japhwajeom_scene_buy', custom_threshold=0)
+                self.status += 1
+            else:
+                self.status = 99999
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def japhwajeom_scene(self):
+
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.game_object.get_scene('japhwajeom_popup_scene').status = 0
+            potion_pb_name = self.get_option('potion_name')
+            if potion_pb_name is None:
+                potion_pb_name = 'japhwajeom_scene_hp_potion'
+
+            self.lyb_mouse_click(potion_pb_name, custom_threshold=0)
+            self.status += 1
+        elif self.status == 10:
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
     def bunhe_select_scene(self):
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
-        elif 0 < self.status < 60:
+        elif 0 < self.status < 10:
             self.status += 1
             resource_name = 'bunhe_scene_option_loc'
             resource = self.game_object.resource_manager.resource_dic[resource_name]
+            i = 0
             for pb_name in resource:
                 match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
-                self.logger.debug(pb_name + ' ' + str(match_rate))
+                cfg_check = self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(i))
+                if cfg_check is True and match_rate > 0.9:
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                    return self.status
+                elif cfg_check is False and match_rate < 0.9:
+                    self.lyb_mouse_click(pb_name, custom_threshold=0)
+                    return self.status
+                i += 1
+            self.status = 99999
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -96,10 +162,8 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                     self.status = 99999
                     self.game_object.get_scene('main_scene').set_option(current_work + '_end_flag', True)
         else:
-            for i in range(3):
-                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
-                self.period_bot(0.1)
-            self.status = 0
+            self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.game_object.interval = self.period_bot(0.1)
         return self.status
 
     def character_scene(self):
@@ -266,7 +330,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         elif self.status == self.get_work_status('분해'):
 
             elapsed_time = self.get_elapsed_time()
-            if elapsed_time > self.period_bot(10):
+            if elapsed_time > self.period_bot(30):
                 self.set_option(self.current_work + '_end_flag', True)
 
             if self.get_option(self.current_work + '_end_flag'):
@@ -275,14 +339,33 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 self.status = self.last_status[self.current_work] + 1
                 return self.status
 
-            if self.isGabangOpen():
-                self.lyb_mouse_click('gabang_bunhe', custom_threshold=0)
-            else:
-                if self.isGabangSelect():
-                    self.lyb_mouse_click('gabang_select', custom_threshold=0)
-                    self.game_object.get_scene('bunhe_select_scene').status = 0
+            inner_status = self.get_option(self.current_work + '_inner_status')
+            if inner_status is None:
+                inner_status = 0
+
+            self.logger.info(inner_status)
+            if 0 <= inner_status < 100:
+                self.set_option(self.current_work + '_inner_status', inner_status + 1)
+                if self.isGabangOpen():
+                    self.lyb_mouse_click('gabang_bunhe', custom_threshold=0)
                 else:
-                    self.lyb_mouse_click('menu_scene_gabang', custom_threshold=0)
+                    if self.isGabangSelect():
+                        self.lyb_mouse_click('gabang_select', custom_threshold=0)
+                        self.game_object.get_scene('bunhe_select_scene').status = 0
+                        self.set_option(self.current_work + '_inner_status', 100)
+                    else:
+                        self.lyb_mouse_click('menu_scene_gabang', custom_threshold=0)
+            elif 100 <= inner_status < 102:
+                self.lyb_mouse_click('gabang_select_ok', custom_threshold=0)
+                self.set_option(self.current_work + '_inner_status', inner_status + 1)
+            elif 102 <= inner_status < 110:
+                if self.isGabangOpen():
+                    self.lyb_mouse_click('gabang_close', custom_threshold=0)
+                    self.set_option(self.current_work + '_end_flag', True)
+                    return self.status
+
+                self.lyb_mouse_click('gabang_select_cancel', custom_threshold=0)
+                self.set_option(self.current_work + '_inner_status', inner_status + 1)
 
         elif self.status == self.get_work_status('알림'):
 
@@ -361,8 +444,12 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         if self.is_move_to_quest():
             return True
 
-        cfg_bunhe_period = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_period'))
-        self.logger.info(cfg_bunhe_period)
+        if self.get_option('hp_potion_empty') is True:
+            self.set_option('hp_potion_empty', False)
+            self.lyb_mouse_click('main_scene_shop', custom_threshold=0)
+            self.game_object.get_scene('japhwajeom_scene').status = 0
+            self.game_object.get_scene('japhwajeom_scene').set_option('potion_name', 'japhwajeom_scene_hp_potion')
+            return True
 
         return False
 

@@ -26,6 +26,15 @@ class LYBRohan(lybgame.LYBGame):
 
     rohan_icon_list = ['nox_rohan_icon']
 
+    item_select_option_list = [
+        '무기',
+        '방어구',
+        '장신구',
+        '일반',
+        '고급',
+        '희귀',
+        '강화된 장비 포함',
+    ]
     def __init__(self, game_name, game_data_name, window):
         lybgame.LYBGame.__init__(self, lybconstant.LYB_GAME_ROHAN, lybconstant.LYB_GAME_DATA_ROHAN, window)
 
@@ -107,6 +116,7 @@ class LYBRohan(lybgame.LYBGame):
 
         confirm_list = [
             'accept_20190809_loc',
+            'confirm_20190814_loc',
         ]
         for resource_name in confirm_list:
             elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
@@ -344,6 +354,57 @@ class LYBRohanTab(lybgame.LYBGameTab):
             self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'])
         combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)        
+
+        frame_label = ttk.LabelFrame(frame_l, text='분해')
+        frame = ttk.Frame(frame_label)
+        for i in range(len(LYBRohan.item_select_option_list)):
+            self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(i)] = tkinter.BooleanVar(frame)
+            if i == 0:
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(0)].trace(
+                    'w', lambda *args: self.bunhe_item_option_0(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(0))
+                    )
+            elif i == 1:
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(1)].trace(
+                    'w', lambda *args: self.bunhe_item_option_1(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(1))
+                    )
+            elif i == 2:
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(2)].trace(
+                    'w', lambda *args: self.bunhe_item_option_2(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(2))
+                    )
+            elif i == 3:
+                frame.pack(anchor=tkinter.W)
+                frame = ttk.Frame(frame_label)
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(3)].trace(
+                    'w', lambda *args: self.bunhe_item_option_3(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(3))
+                    )
+            elif i == 4:
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(4)].trace(
+                    'w', lambda *args: self.bunhe_item_option_4(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(4))
+                    )
+            elif i == 5:
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(5)].trace(
+                    'w', lambda *args: self.bunhe_item_option_5(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(5))
+                    )
+            elif i == 6:
+                frame.pack(anchor=tkinter.W)
+                frame = ttk.Frame(frame_label)
+                self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(6)].trace(
+                    'w', lambda *args: self.bunhe_item_option_6(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(6))
+                    )
+            if not lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(i) in self.configure.common_config[self.game_name]:
+                self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(i)] = False
+
+            check_box = ttk.Checkbutton(
+                master              = frame,
+                text                = self.get_option_text(LYBRohan.item_select_option_list[i], 6),
+                variable            = self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(i)],
+                onvalue             = True, 
+                offvalue            = False
+            )
+            check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
         frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
 
         # 작업 탭 중간
@@ -378,4 +439,25 @@ class LYBRohanTab(lybgame.LYBGameTab):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def auto_duration(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_0(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_1(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_2(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_3(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_4(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_5(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def bunhe_item_option_6(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
