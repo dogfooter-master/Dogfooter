@@ -20,6 +20,8 @@ import random
 class LYBWin:
     WIDTH = 800
     HEIGHT = 450
+    NOX_EXTRA_WIDTH = 2
+    NOX_EXTRA_HEIGHT = 30
 
     def __init__(self, my_name, configure=None):
         # self.logger = likeyoubot_logger.LYBLogger.getLogger()
@@ -388,9 +390,10 @@ class LYBWin:
         w_width = e_x - s_x
         w_height = e_y - s_y
 
-        #print('[APP PLAYER]', win32gui.GetWindowText(hwnd), '[', s_x, s_y, ']', '[', w_width, 'x', w_height, ']')
-
-        if w_width == (LYBWin.WIDTH + 4) and w_height == (LYBWin.HEIGHT + 34):
+        # print('[APP PLAYER]', win32gui.GetWindowText(hwnd), '[', s_x, s_y, ']', '[', w_width, 'x', w_height, ']')
+        extra_width = LYBWin.NOX_EXTRA_WIDTH * 2
+        extra_height = LYBWin.NOX_EXTRA_HEIGHT + extra_width
+        if w_width == (LYBWin.WIDTH + extra_width) and w_height == (LYBWin.HEIGHT + extra_height):
             return 'nox'
         elif w_width == LYBWin.WIDTH and w_height == LYBWin.HEIGHT and process_name == 'TheRender':
             return 'momo'
@@ -403,7 +406,7 @@ class LYBWin:
         player_name = self.get_player(hwnd)
 
         if player_name == 'nox':
-            return 2, 30, 2 + LYBWin.WIDTH, 30 + LYBWin.HEIGHT
+            return LYBWin.NOX_EXTRA_WIDTH, LYBWin.NOX_EXTRA_HEIGHT + LYBWin.NOX_EXTRA_WIDTH, LYBWin.NOX_EXTRA_WIDTH + LYBWin.WIDTH, LYBWin.NOX_EXTRA_HEIGHT + LYBWin.NOX_EXTRA_WIDTH + LYBWin.HEIGHT
         else:
             return 0, 0, LYBWin.WIDTH, LYBWin.HEIGHT
 
@@ -415,7 +418,7 @@ class LYBWin:
         if player_name == 'nox':
             return (anchor_x, anchor_y, end_x, end_y)
         else:
-            return (anchor_x - 2, anchor_y - 30, end_x, end_y)
+            return (anchor_x - LYBWin.NOX_EXTRA_WIDTH, anchor_y - (LYBWin.NOX_EXTRA_HEIGHT + LYBWin.NOX_EXTRA_WIDTH), end_x, end_y)
 
         return anchor_x, anchor_y, end_x, end_y
 
@@ -427,9 +430,11 @@ class LYBWin:
         w = end_x - anchor_x
         h = end_y - anchor_y
 
+        extra_width = LYBWin.NOX_EXTRA_WIDTH * 2
+        extra_height = LYBWin.NOX_EXTRA_HEIGHT + extra_width
         if player_name == 'nox':
-            w = end_x - anchor_x - 4
-            h = end_y - anchor_y - 32
+            w = end_x - anchor_x - extra_width
+            h = end_y - anchor_y - extra_height
         else:
             w = end_x - anchor_x
             h = end_y - anchor_y
@@ -442,7 +447,7 @@ class LYBWin:
         if player_name == 'nox':
             return (0, 0)
         else:
-            return (-2, -30)
+            return (-LYBWin.NOX_EXTRA_WIDTH, -(LYBWin.NOX_EXTRA_WIDTH + LYBWin.NOX_EXTRA_HEIGHT))
 
     def get_window_screenshot(self, hwnd, flag):
 

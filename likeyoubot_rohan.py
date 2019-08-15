@@ -88,7 +88,7 @@ class LYBRohan(lybgame.LYBGame):
                 custom_flag=1,
                 custom_rect=(360, 140, 440, 200),
             )
-            self.logger.warn(resource_name + ' ' + str(match_rate))
+            # self.logger.warn(resource_name + ' ' + str(match_rate))
             if loc_x != -1:
                 # self.get_scene('quest_scene').status = 20
                 self.get_scene('main_scene').set_checkpoint(resource_name)

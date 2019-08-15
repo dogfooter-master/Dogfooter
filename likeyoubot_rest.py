@@ -146,7 +146,6 @@ class LYBRest:
         try:
             res = self.rest.api.create(body=payload)
             r = res.body
-            self.logger.info(r)
             if r['err'] is None:
                 data = r['data']
                 return data['update_file_list']
@@ -167,7 +166,6 @@ class LYBRest:
         try:
             res = self.rest.api.create(body=payload)
             r = res.body
-            self.logger.info(r)
             if r['err'] is None:
                 data = r['data']
                 return data['value']
@@ -216,7 +214,7 @@ class LYBRest:
         return ''
 
     def send_telegram_message(self, chat_id, message):
-        if chat_id == None or len(chat_id) < 1:
+        if chat_id < 0:
             return
 
         try:
@@ -232,7 +230,7 @@ class LYBRest:
             return ''
 
     def send_telegram_image(self, chat_id, image_url):
-        if chat_id == None or len(chat_id) < 1:
+        if chat_id < 0:
             return
         try:
             m_token = self.get_token()

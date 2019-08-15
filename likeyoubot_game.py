@@ -101,16 +101,13 @@ class LYBGame():
         return self.work_list
 
     def process(self, window_image):
-
         # self.process_restart_app_player()
-
-        if self.start_time == None:
+        if self.start_time is None:
             self.start_time = time.time()
             if self.start_status != 0:
                 self.get_scene('main_scene').status = self.start_status
 
-        self.statistics[lybconstant.LYB_STATISTIC_1] = str(
-            datetime.timedelta(seconds=int(time.time() - self.start_time)))
+        self.statistics[lybconstant.LYB_STATISTIC_1] = str(datetime.timedelta(seconds=int(time.time() - self.start_time)))
 
         if self.weight_threshold < 0.9:
             self.weight_threshold = 1.0
@@ -121,13 +118,13 @@ class LYBGame():
         self.window_image = window_image
 
         window_pixels = window_image.load()
-        if self.request_terminate == True:
+        if self.request_terminate is True:
             self.process_terminate_applications()
             return 0
 
         restart_app = self.configure.common_config[lybconstant.LYB_DO_BOOLEAN_USE_RESTART_APP_PLAYER]
-        if restart_app == True:
-            if self.get_option('restart_app_player_checkpoint') == None:
+        if restart_app is True:
+            if self.get_option('restart_app_player_checkpoint') is None:
                 self.set_option('restart_app_player_checkpoint', time.time())
 
             period_restart = int(
@@ -454,8 +451,9 @@ class LYBGame():
         return self.getStatistic(self.statistics_iterator)
 
     def telegram_send(self, message, image=None):
-        if self.rest == None:
+        if self.rest is None:
             self.rest = self.login()
+            self.rest.login()
         chat_id = self.rest.get_chatid()
 
         if image == None:
@@ -1511,6 +1509,8 @@ class LYBGame():
 
         start_x = start_x - adj_x
         start_y = start_y - adj_y
+
+        # self.logger.info(str(adj_x) + ', ' + str(adj_y))
 
         compare_pixel_len = 0
 

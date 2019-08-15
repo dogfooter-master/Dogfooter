@@ -3245,7 +3245,7 @@ class LYBGUI:
         self.logging_message('INFO', window_name + ' 작업 시작')
 
         rest = self.login()
-        error_message = rest.login(mb_6=started_game_name)
+        error_message = rest.login()
         self.last_check_server = 0
 
         try:

@@ -157,7 +157,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             if current_work == '자동 사냥':
                 cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'))
                 elapsed_time = time.time() - self.game_object.get_scene('main_scene').get_checkpoint(current_work + '_check_start')
-                self.loggingElapsedTime('[' + str(current_work) + '] 경과 시간', elapsed_time, cfg_duration, period=0)
+                self.loggingElapsedTime('[' + str(current_work) + '] 경과 시간', elapsed_time, cfg_duration, period=30)
                 if elapsed_time > self.period_bot(cfg_duration):
                     self.status = 99999
                     self.game_object.get_scene('main_scene').set_option(current_work + '_end_flag', True)
@@ -221,6 +221,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         return 0
 
     def login_scene(self):
+        self.game_object.telegram_send('테스트')
         self.game_object.current_matched_scene['name'] = ''
         self.schedule_list = self.get_game_config('schedule_list')
 
@@ -578,20 +579,67 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         return self.isStatusByResource2('가방 열림 감지', 'gabang_open_loc', 0.7, -1, reverse=True)
 
     def isMenuOpen(self):
-        return self.isStatusByResource2('메뉴 열림 감지', 'menu_open_loc', 0.7, -1, reverse=True)
+            return self.isStatusByResource(
+                '[메뉴 열림 감지]',
+                'menu_open_loc',
+                custom_top_level=(255, 250, 210),
+                custom_below_level=(140, 130, 100),
+                custom_rect=(740, 60, 790, 100),
+                custom_threshold=0.8,
+                limit_count=-1,
+                reverse=True,
+            )
 
     def isJeolJeonMpEmpty(self):
-        return self.isStatusByResource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.9, 2, reverse=True)
+        return self.isStatusByResource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.95, 2, reverse=True)
 
     def isJeolJeonHpEmpty(self):
-        return self.isStatusByResource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.9, 2, reverse=True)
+        return self.isStatusByResource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.95, 2, reverse=True)
 
     def isJeolJeonQuestComplete(self):
         return self.isStatusByResource2('절전모드 퀘스트 완료 감지', 'jeoljeon_scene_quest_complete_loc', 0.9, 3, reverse=True)
 
+    def isStatusByResource(self, log_message, resource_name, custom_threshold, custom_top_level, custom_below_level,
+                           custom_rect, limit_count=-1, reverse=False):
+        # if limit_count == -1:
+        #     limit_count = int(self.get_game_config(lybconstant.LYB_DO_STRING_L2R_ETC + 'auto_limit'))
+
+        (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+            self.window_image,
+            resource_name,
+            custom_threshold=custom_threshold,
+            custom_top_level=custom_top_level,
+            custom_below_level=custom_below_level,
+            custom_flag=1,
+            custom_rect=custom_rect,
+            average=True
+        )
+        # self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        if loc_x != -1 and reverse == False:
+            self.set_option(resource_name + 'check_count', 0)
+            return False
+
+        if loc_x == -1 and reverse == True:
+            self.set_option(resource_name + 'check_count', 0)
+            return False
+
+        check_count = self.get_option(resource_name + 'check_count')
+        if check_count == None:
+            check_count = 0
+
+        if check_count > limit_count:
+            self.set_option(resource_name + 'check_count', 0)
+            return True
+
+        if check_count > 0:
+            self.logger.debug(log_message + '..(' + str(check_count) + '/' + str(limit_count) + ')')
+        self.set_option(resource_name + 'check_count', check_count + 1)
+
+        return False
+
     def isStatusByResource2(self, log_message, resource_name, custom_threshold, limit_count=-1, reverse=False):
         match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
-        self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+        # self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
         if match_rate > custom_threshold and reverse == False:
             self.set_option(resource_name + 'check_count', 0)
             return False
