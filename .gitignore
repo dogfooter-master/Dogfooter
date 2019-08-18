@@ -6,3 +6,5 @@ log
 account*.dat
 __pycache__/*
 *.pyc
+dist
+build

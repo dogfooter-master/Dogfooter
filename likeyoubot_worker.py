@@ -118,6 +118,8 @@ class LYBWorker(threading.Thread):
 				elif recv_msg.type =='search':
 					window_config = recv_msg.message
 					(handle_list, side_handle_dic, parent_handle_dic, multi_handle_dic) = self.findWindows()
+					self.logger.info(handle_list)
+					self.logger.info(parent_handle_dic)
 
 					window_list, rhwnds_dic = self.set_location(window_config, handle_list, side_handle_dic, parent_handle_dic)
 
@@ -190,7 +192,7 @@ class LYBWorker(threading.Thread):
 						custom_loc_x = 0
 						custom_loc_y = 0
 					else:
-						self.logger.warn('창 숨기기')
+						self.logger.warn('창 숨기기' + ' ' + str(resolution_w) + ', ' + str(resolution_h))
 						custom_loc_x = resolution_w
 						custom_loc_y = resolution_h
 

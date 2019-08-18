@@ -236,6 +236,9 @@ class LYBGame():
                     self.last_time = time.time()
 
                 if time.time() - self.last_time > 180:
+                    self.telegram_send('창 이름 [' + str(self.window_title) + ']에서 인식 불가 화면이 3분간 감지되어 게임을 강제 종료합니다.')
+                    png_name = self.save_image('freeze')
+                    self.telegram_send('인식 불가', image=png_name)
                     return -1
                 else:
                     # self.weight_threshold = self.weight_threshold - int(self.get_window_config('adjust_entry'))*0.001

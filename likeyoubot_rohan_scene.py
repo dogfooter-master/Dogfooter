@@ -300,6 +300,12 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 self.status = self.last_status[self.current_work] + 1
                 return self.status
 
+            if self.is_complete_quest():
+                return True
+
+            if self.is_move_to_quest():
+                return True
+
         elif self.status == self.get_work_status('자동 사냥'):
 
             cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'))
@@ -438,12 +444,6 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         return self.status
 
     def pre_process_main_scene(self):
-
-        if self.is_complete_quest():
-            return True
-
-        if self.is_move_to_quest():
-            return True
 
         if self.get_option('hp_potion_empty') is True:
             self.set_option('hp_potion_empty', False)

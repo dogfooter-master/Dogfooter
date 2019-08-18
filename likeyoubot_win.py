@@ -78,14 +78,13 @@ class LYBWin:
         (s_x, s_y, e_x, e_y) = win32gui.GetWindowRect(hwnd)
         w_width = e_x - s_x
         w_height = e_y - s_y
-        # print(
-        # "MEMU Render: " + str(win32gui.GetWindowText(hwnd)) + '[' + str(hwnd) + '] [' + str((s_x, s_y)) + '] [' + str(
-        #     (w_width, w_height)) + ']')
+        # print("MEMU Render: " + str(win32gui.GetWindowText(hwnd)) + '[' + str(hwnd) + '] [' + str((s_x, s_y)) + '] [' + str((w_width, w_height)) + ']')
         if 'RenderWindowWindow' in s:
             if not hwnd in self.handle_list:
                 self.handle_list.append(hwnd)
                 # print(lParam)
                 self.parent_handle_dic[hwnd] = lParam
+
         return 1
 
     def callback_nox_child_process(self, hwnd, lParam):
@@ -213,6 +212,7 @@ class LYBWin:
     def setInvisible(self, hwnd):
         try:
             win32gui.ShowWindow(hwnd, win32con.SW_HIDE)
+            win32gui.SetWindowPos(hwnd, win32con.HWND_BOTTOM, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
             win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,
                                    win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_TOOLWINDOW);
             win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
@@ -450,7 +450,6 @@ class LYBWin:
             return (-LYBWin.NOX_EXTRA_WIDTH, -(LYBWin.NOX_EXTRA_WIDTH + LYBWin.NOX_EXTRA_HEIGHT))
 
     def get_window_screenshot(self, hwnd, flag):
-
         # hwnd = win32gui.FindWindow(None, '계산기')
 
         # Change the line below depending on whether you want the whole window
@@ -473,7 +472,6 @@ class LYBWin:
         # or just the client area.
         result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), flag)
         # result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 0)
-        # print(result)
 
         bmpinfo = saveBitMap.GetInfo()
         bmpstr = saveBitMap.GetBitmapBits(True)

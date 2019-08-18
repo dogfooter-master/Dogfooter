@@ -117,6 +117,7 @@ class LYBRohan(lybgame.LYBGame):
         confirm_list = [
             'accept_20190809_loc',
             'confirm_20190814_loc',
+            'buhwal_confirm_loc',
         ]
         for resource_name in confirm_list:
             elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)

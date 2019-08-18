@@ -21,7 +21,7 @@ class LYBRest:
         self.token = ''
         self.rest = API(
             api_root_url=root_url,
-            timeout=2,
+            timeout=2000,
             json_encode_body=True,
         )
         self.rest.add_resource(resource_name='api')
@@ -45,7 +45,7 @@ class LYBRest:
             else:
                 return r['err']
         except:
-            self.logger.error(traceback.format_exc())
+            return 'error'
 
     def get_login_point(self):
         if self.login_point >= 0:
