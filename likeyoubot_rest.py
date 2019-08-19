@@ -25,6 +25,7 @@ class LYBRest:
             json_encode_body=True,
         )
         self.rest.add_resource(resource_name='api')
+        self.adjustTime = 0
 
     def login(self):
         payload = {

@@ -117,6 +117,7 @@ class LYBRohan(lybgame.LYBGame):
         confirm_list = [
             'accept_20190809_loc',
             'confirm_20190814_loc',
+            'confirm_20190819_loc',
             'buhwal_confirm_loc',
         ]
         for resource_name in confirm_list:
@@ -319,6 +320,44 @@ class LYBRohanTab(lybgame.LYBGameTab):
         # 작업 탭 좌측
         frame_l = ttk.Frame(self.inner_frame_dic['work_tab_frame'])
 
+        frame_label = ttk.LabelFrame(frame_l, text='메인 퀘스트')
+        frame = ttk.Frame(frame_label)
+        label = ttk.Label(
+            master=frame,
+            text=self.get_option_text('진행 시간(초)', width=27)
+        )
+        label.pack(side=tkinter.LEFT)
+
+        self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration'] = tkinter.StringVar(frame)
+        self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration'].trace(
+            'w', lambda *args: self.main_quest_duration(args, lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration')
+        )
+
+        combobox_list = []
+
+        for i in range(0, 86401, 60):
+            combobox_list.append(str(i))
+
+        if not lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration' in self.configure.common_config[
+            self.game_name]:
+            self.configure.common_config[self.game_name][
+                lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration'] = 600
+
+        combobox = ttk.Combobox(
+            master=frame,
+            values=combobox_list,
+            textvariable=self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration'],
+            state="readonly",
+            height=10,
+            width=7,
+            font=lybconstant.LYB_FONT
+        )
+        combobox.set(
+            self.configure.common_config[self.game_name][lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration'])
+        combobox.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        frame.pack(anchor=tkinter.W)
+        frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
+
         frame_label = ttk.LabelFrame(frame_l, text='자동 사냥')
         frame = ttk.Frame(frame_label)
         label = ttk.Label(
@@ -340,7 +379,7 @@ class LYBRohanTab(lybgame.LYBGameTab):
         if not lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration' in self.configure.common_config[
             self.game_name]:
             self.configure.common_config[self.game_name][
-                lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'] = 3600
+                lybconstant.LYB_DO_STRING_ROHAN_WORK + 'auto_duration'] = 600
 
         combobox = ttk.Combobox(
             master=frame,
@@ -400,10 +439,16 @@ class LYBRohanTab(lybgame.LYBGameTab):
                 master              = frame,
                 text                = self.get_option_text(LYBRohan.item_select_option_list[i], 6),
                 variable            = self.option_dic[lybconstant.LYB_DO_STRING_ROHAN_WORK + 'bunhe_item_option_' + str(i)],
-                onvalue             = True, 
+                onvalue             = True,
                 offvalue            = False
             )
+
             check_box.pack(anchor=tkinter.W, side=tkinter.LEFT)
+        label = ttk.Label(
+            master=frame,
+            text=self.get_option_text('', width=17)
+        )
+        label.pack(side=tkinter.LEFT)
         frame.pack(anchor=tkinter.W)
         frame_label.pack(anchor=tkinter.NW, padx=5, pady=5)
         frame_l.pack(side=tkinter.LEFT, anchor=tkinter.NW)
@@ -437,6 +482,9 @@ class LYBRohanTab(lybgame.LYBGameTab):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def callback_main_quest_each_stringvar(self, args, option_name):
+        self.set_game_config(option_name, self.option_dic[option_name].get())
+
+    def main_quest_duration(self, args, option_name):
         self.set_game_config(option_name, self.option_dic[option_name].get())
 
     def auto_duration(self, args, option_name):

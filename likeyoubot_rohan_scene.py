@@ -40,6 +40,8 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             rc = self.japhwajeom_scene()
         elif self.scene_name == 'japhwajeom_popup_scene':
             rc = self.japhwajeom_popup_scene()
+        elif self.scene_name == 'event_scene':
+            rc = self.event_scene()
 
         else:
             rc = self.else_scene()
@@ -50,6 +52,50 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
             self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def event_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            resource_name = 'event_scene_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.7,
+                    custom_flag=1,
+                    custom_rect=(120, 70, 170, 180))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 10, loc_y + 10)
+                    self.set_option('last_status', self.status)
+                    self.status = 20
+                    return self.status
+            self.status = 99999
+        elif 20 <= self.status < 30:
+            self.status += 1
+            resource_name = 'event_scene_bosang_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.7,
+                    custom_flag=1,
+                    custom_rect=(170, 360, 790, 460))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                    self.status = self.get_option('last_status')
+                    return self.status
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
@@ -290,8 +336,10 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
 
         elif self.status == self.get_work_status('메인 퀘스트'):
 
+            cfg_duration = int(self.get_game_config(lybconstant.LYB_DO_STRING_ROHAN_WORK + 'main_quest_duration'))
+
             elapsed_time = self.get_elapsed_time()
-            if elapsed_time > self.period_bot(600):
+            if elapsed_time > self.period_bot(cfg_duration):
                 self.set_option(self.current_work + '_end_flag', True)
 
             if self.get_option(self.current_work + '_end_flag'):
@@ -458,6 +506,12 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.game_object.get_scene('japhwajeom_scene').status = 0
             self.game_object.get_scene('japhwajeom_scene').set_option('potion_name', 'japhwajeom_scene_mp_potion')
             return True
+
+        if self.isThereNewEvent() is True:
+            if self.click_resource2('main_scene_event_new_loc') is True:
+                self.game_object.get_scene('event_scene').status = 0;
+                return True
+
         return False
 
     def get_work_status(self, work_name):
@@ -571,6 +625,9 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
 
         return False
 
+
+    def isThereNewEvent(self):
+        return self.isStatusByResource2('Event 알림 감지', 'main_scene_event_new_loc', 0.8, 0, reverse=True)
 
     def isGabangSelect(self):
         return self.isStatusByResource2('일괄 선택 감지', 'gabang_select_loc', 0.7, -1, reverse=True)
