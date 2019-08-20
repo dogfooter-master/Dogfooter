@@ -70,7 +70,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                     self.window_image,
                     self.game_object.resource_manager.pixel_box_dic[pb_name],
-                    custom_threshold=0.7,
+                    custom_threshold=0.6,
                     custom_flag=1,
                     custom_rect=(120, 70, 170, 180))
                 self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
@@ -88,14 +88,14 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
                     self.window_image,
                     self.game_object.resource_manager.pixel_box_dic[pb_name],
-                    custom_threshold=0.7,
+                    custom_threshold=0.6,
                     custom_flag=1,
                     custom_rect=(170, 360, 790, 460))
                 self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                 if loc_x != -1:
                     self.lyb_mouse_click_location(loc_x, loc_y)
-                    self.status = self.get_option('last_status')
                     return self.status
+            self.status = self.get_option('last_status')
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
                 self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
