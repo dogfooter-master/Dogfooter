@@ -118,6 +118,9 @@ class LYBRohan(lybgame.LYBGame):
             'accept_20190809_loc',
             'confirm_20190814_loc',
             'confirm_20190819_loc',
+            'confirm_20190822_loc',
+            'download_20190822_loc',
+            'confirm_20190823_loc',
             'buhwal_confirm_loc',
         ]
         for resource_name in confirm_list:
