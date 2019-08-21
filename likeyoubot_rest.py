@@ -19,6 +19,7 @@ class LYBRest:
         self.chat_id = -1
         self.logger = likeyoubot_logger.LYBLogger.getLogger()
         self.token = ''
+        self.last_id = -1
         self.rest = API(
             api_root_url=root_url,
             timeout=2000,

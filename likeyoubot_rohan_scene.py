@@ -42,6 +42,10 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             rc = self.japhwajeom_popup_scene()
         elif self.scene_name == 'event_scene':
             rc = self.event_scene()
+        elif self.scene_name == 'guild_scene':
+            rc = self.guild_scene()
+        elif self.scene_name == 'amsijang_scene':
+            rc = self.amsijang_scene()
 
         else:
             rc = self.else_scene()
@@ -51,6 +55,59 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
     def else_scene(self):
         if self.status == 0:
             self.logger.info('unknown scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def amsijang_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            resource_name = 'amsijang_scene_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.6,
+                    custom_flag=1,
+                    custom_rect=(110, 120, 170, 340))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 10, loc_y + 10)
+                    self.set_option('last_status', self.status)
+                    self.status = 20
+                    return self.status
+            self.status = 99999
+        elif 20 <= self.status < 30:
+            self.status = self.get_option('last_status')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def guild_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif self.status == 1:
+            self.lyb_mouse_click('guild_scene_check', custom_threshold=0)
+            self.status += 1
+        elif 2 <= self.status < 5:
+            self.status += 1
+        elif 5 <= self.status < 15:
+            self.status += 1
+            is_clicked, match_rate = self.click_resource2('guild_scene_gift_new_loc')
+            if is_clicked is False:
+                self.status = 15
+        elif self.status == 15:
+            # 기부
             self.status += 1
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -189,13 +246,13 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.status += 1
             # elapsed_time = self.get_elapsed_time()
             # self.logger.info(str(elapsed_time))
-            if self.isJeolJeonHpEmpty():
+            if self.is_jeoljeon_hp_empty():
                 self.game_object.get_scene('main_scene').set_option('hp_potion_empty', True)
                 self.status = 99999
-            if self.isJeolJeonMpEmpty():
+            if self.is_jeoljeon_mp_empty():
                 self.game_object.get_scene('main_scene').set_option('mp_potion_empty', True)
                 self.status = 99999
-            if self.isJeolJeonQuestComplete():
+            if self.is_jeoljeon_quest_complete():
                 self.game_object.get_scene('main_scene').set_option('quest_complete', True)
                 self.status = 99999
 
@@ -320,7 +377,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         self.game_object.main_scene = self
 
         is_clicked = self.pre_process_main_scene()
-        if is_clicked == True:
+        if is_clicked is True:
             return self.status
 
         self.schedule_list = self.get_game_config('schedule_list')
@@ -375,7 +432,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 inner_status = 0
 
             if 0 <= inner_status <= 240:
-                if self.isMenuOpen():
+                if self.is_menu_open():
                     self.game_object.get_scene('jeoljeon_scene').status = 0
                     self.lyb_mouse_click('menu_jeoljeon', custom_threshold=0)
                 else:
@@ -401,10 +458,10 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.logger.info(inner_status)
             if 0 <= inner_status < 100:
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)
-                if self.isGabangOpen():
+                if self.is_gabang_open():
                     self.lyb_mouse_click('gabang_bunhe', custom_threshold=0)
                 else:
-                    if self.isGabangSelect():
+                    if self.is_gabang_select():
                         self.lyb_mouse_click('gabang_select', custom_threshold=0)
                         self.game_object.get_scene('bunhe_select_scene').status = 0
                         self.set_option(self.current_work + '_inner_status', 100)
@@ -414,7 +471,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 self.lyb_mouse_click('gabang_select_ok', custom_threshold=0)
                 self.set_option(self.current_work + '_inner_status', inner_status + 1)
             elif 102 <= inner_status < 110:
-                if self.isGabangOpen():
+                if self.is_gabang_open():
                     self.lyb_mouse_click('gabang_close', custom_threshold=0)
                     self.set_option(self.current_work + '_end_flag', True)
                     return self.status
@@ -507,12 +564,37 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.game_object.get_scene('japhwajeom_scene').set_option('potion_name', 'japhwajeom_scene_mp_potion')
             return True
 
-        if self.isThereNewEvent() is True:
+        if self.is_there_new_event() is True:
             if self.click_resource2('main_scene_event_new_loc') is True:
-                self.game_object.get_scene('event_scene').status = 0;
+                self.game_object.get_scene('event_scene').status = 0
                 return True
 
+        # if self.is_there_new_menu() is True:
+        #     if self.is_menu_open() is True:
+        #         resource_name = 'menu_new_loc'
+        #         resource = self.game_object.resource_manager.resource_dic[resource_name]
+        #         for pb_name in resource:
+        #             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+        #                 self.window_image,
+        #                 self.game_object.resource_manager.pixel_box_dic[pb_name],
+        #                 custom_threshold=0.6,
+        #                 custom_flag=1,
+        #                 custom_rect=(540, 80, 795, 385))
+        #             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+        #             if loc_x != -1:
+        #                 self.lyb_mouse_click_location(loc_x - 5, loc_y + 5)
+        #                 self.init_menu_scene()
+        #                 return True
+        #     else:
+        #         if self.click_resource2('menu_new_loc') is True:
+        #             self.game_object.get_scene('event_scene').status = 0
+        #             return True
+
         return False
+
+    def init_menu_scene(self):
+        self.game_object.get_scene('guild_scene').status = 0
+        self.game_object.get_scene('amsijang_scene').status = 0
 
     def get_work_status(self, work_name):
         if work_name in lybgamerohan.LYBRohan.work_list:
@@ -625,18 +707,20 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
 
         return False
 
+    def is_there_new_menu(self):
+        return self.is_status_by_resource2('메뉴 알림 감지', 'menu_new_loc', 0.6, 0, reverse=True)
 
-    def isThereNewEvent(self):
-        return self.isStatusByResource2('Event 알림 감지', 'main_scene_event_new_loc', 0.8, 0, reverse=True)
+    def is_there_new_event(self):
+        return self.is_status_by_resource2('Event 알림 감지', 'main_scene_event_new_loc', 0.6, 0, reverse=True)
 
-    def isGabangSelect(self):
-        return self.isStatusByResource2('일괄 선택 감지', 'gabang_select_loc', 0.7, -1, reverse=True)
+    def is_gabang_select(self):
+        return self.is_status_by_resource2('일괄 선택 감지', 'gabang_select_loc', 0.7, -1, reverse=True)
 
-    def isGabangOpen(self):
-        return self.isStatusByResource2('가방 열림 감지', 'gabang_open_loc', 0.7, -1, reverse=True)
+    def is_gabang_open(self):
+        return self.is_status_by_resource2('가방 열림 감지', 'gabang_open_loc', 0.7, -1, reverse=True)
 
-    def isMenuOpen(self):
-            return self.isStatusByResource(
+    def is_menu_open(self):
+            return self.is_status_by_resource(
                 '[메뉴 열림 감지]',
                 'menu_open_loc',
                 custom_top_level=(255, 250, 210),
@@ -647,16 +731,16 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                 reverse=True,
             )
 
-    def isJeolJeonMpEmpty(self):
-        return self.isStatusByResource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.95, 2, reverse=True)
+    def is_jeoljeon_mp_empty(self):
+        return self.is_status_by_resource2('절전모드 MP 포션 부족 감지', 'jeoljeon_scene_mp_potion_empty_loc', 0.95, 2, reverse=True)
 
-    def isJeolJeonHpEmpty(self):
-        return self.isStatusByResource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.95, 2, reverse=True)
+    def is_jeoljeon_hp_empty(self):
+        return self.is_status_by_resource2('절전모드 HP 포션 부족 감지', 'jeoljeon_scene_hp_potion_empty_loc', 0.95, 2, reverse=True)
 
-    def isJeolJeonQuestComplete(self):
-        return self.isStatusByResource2('절전모드 퀘스트 완료 감지', 'jeoljeon_scene_quest_complete_loc', 0.9, 3, reverse=True)
+    def is_jeoljeon_quest_complete(self):
+        return self.is_status_by_resource2('절전모드 퀘스트 완료 감지', 'jeoljeon_scene_quest_complete_loc', 0.9, 3, reverse=True)
 
-    def isStatusByResource(self, log_message, resource_name, custom_threshold, custom_top_level, custom_below_level,
+    def is_status_by_resource(self, log_message, resource_name, custom_threshold, custom_top_level, custom_below_level,
                            custom_rect, limit_count=-1, reverse=False):
         # if limit_count == -1:
         #     limit_count = int(self.get_game_config(lybconstant.LYB_DO_STRING_L2R_ETC + 'auto_limit'))
@@ -681,7 +765,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             return False
 
         check_count = self.get_option(resource_name + 'check_count')
-        if check_count == None:
+        if check_count is None:
             check_count = 0
 
         if check_count > limit_count:
@@ -694,9 +778,9 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
 
         return False
 
-    def isStatusByResource2(self, log_message, resource_name, custom_threshold, limit_count=-1, reverse=False):
+    def is_status_by_resource2(self, log_message, resource_name, custom_threshold, limit_count=-1, reverse=False):
         match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
-        # self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
+        self.logger.debug(resource_name + ' ' + str(round(match_rate, 2)))
         if match_rate > custom_threshold and reverse == False:
             self.set_option(resource_name + 'check_count', 0)
             return False
@@ -706,7 +790,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             return False
 
         check_count = self.get_option(resource_name + 'check_count')
-        if check_count == None:
+        if check_count is None:
             check_count = 0
 
         if check_count > limit_count:
