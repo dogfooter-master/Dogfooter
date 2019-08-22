@@ -15,15 +15,16 @@ a = Analysis(['main.py'],
              cipher=block_cipher)
 
 a.datas += [ ('rohan.lyb', '.\\rohan.lyb', 'DATA')]
-a.datas += [ ('.\\images\\t_logo.png', '.\\t_logo.png', 'DATA')]
-a.datas += [ ('.\\images\\dogfooterbot_icon.ico', '.\\dogfooterbot_icon.ico', 'DATA')]
+a.datas += [ ('.\\images\\t_logo.png', '.\\images\\t_logo.png', 'DATA')]
+a.datas += [ ('.\\images\\dogfooterbot_icon.ico', '.\\images\\dogfooterbot_icon.ico', 'DATA')]
+a.datas += [ ('.\\host', '.\\host', 'DATA')]
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='dogfooterbot',
+          name='dogfooter',
           debug=False,
           strip=False,
           upx=True,
@@ -35,4 +36,4 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=True,
-               name='dogfooterbot2')
+               name='dogfooter')
