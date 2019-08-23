@@ -46,6 +46,14 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             rc = self.guild_scene()
         elif self.scene_name == 'amsijang_scene':
             rc = self.amsijang_scene()
+        elif self.scene_name == 'costume_scene':
+            rc = self.costume_scene()
+        elif self.scene_name == 'quest_scene':
+            rc = self.quest_scene()
+        elif self.scene_name == 'georeso_scene':
+            rc = self.georeso_scene()
+        elif self.scene_name == 'rune_scene':
+            rc = self.rune_scene()
 
         else:
             rc = self.else_scene()
@@ -62,7 +70,210 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.status = 0
         return self.status
 
+    def rune_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def georeso_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.set_option('not_found', 0)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            resource_name = 'georeso_scene_tab_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(60, 60, 600, 110))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 10, loc_y + 10)
+                    self.set_option('last_status', self.status)
+                    self.status = 10
+                    return self.status
+
+            not_found = self.get_option('not_found')
+            if not_found > 1:
+                self.status = 99999
+            else:
+                self.set_option('not_found', not_found + 1)
+        elif 10 <= self.status < 20:
+            self.status += 1
+            resource_name = 'georeso_scene_jeongsan_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.6,
+                custom_flag=1,
+                custom_rect=(480, 140, 580, 240),
+                average=True
+            )
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+                return self.status
+            self.status = self.get_option('last_status')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def quest_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.set_option('not_found', 0)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            resource_name = 'quest_scene_tab_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.8,
+                    custom_flag=1,
+                    custom_rect=(60, 60, 600, 110))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 10, loc_y + 10)
+                    self.set_option('last_status', self.status)
+                    self.status = 10
+                    return self.status
+
+            not_found = self.get_option('not_found')
+            if not_found > 1:
+                self.status = 99999
+            else:
+                self.set_option('not_found', not_found + 1)
+        elif 10 <= self.status < 20:
+            self.status += 1
+            resource_name = 'quest_scene_bosang_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.6,
+                custom_top_level=(255, 255, 255),
+                custom_below_level=(0, 0, 230),
+                custom_flag=1,
+                custom_rect=(680, 110, 780, 460),
+                average=True
+            )
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+                return self.status
+
+            resource_name = 'quest_scene_bosang_loc'
+            (loc_x, loc_y), match_rate = self.game_object.locationResourceOnWindowPart(
+                self.window_image,
+                resource_name,
+                custom_threshold=0.6,
+                custom_top_level=(255, 255, 255),
+                custom_below_level=(0, 0, 230),
+                custom_flag=1,
+                custom_rect=(320, 110, 400, 460),
+                average=True
+            )
+            self.logger.debug(resource_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+            if loc_x != -1:
+                self.lyb_mouse_click_location(loc_x, loc_y)
+                return self.status
+
+            resource_name = 'quest_scene_bosang_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.6,
+                    custom_flag=1,
+                    custom_rect=(140, 120, 790, 170))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 5, loc_y + 5)
+                    return self.status
+
+            resource_name = 'quest_scene_side_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.6,
+                    custom_flag=1,
+                    custom_rect=(100, 115, 140, 470))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 10, loc_y + 10)
+                    return self.status
+
+            self.status = self.get_option('last_status')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
+    def costume_scene(self):
+        if self.status == 0:
+            self.logger.info('scene: ' + self.scene_name)
+            self.status += 1
+        elif 1 <= self.status < 10:
+            self.status += 1
+            resource_name = 'costume_scene_side_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.6,
+                    custom_flag=1,
+                    custom_rect=(110, 110, 170, 340))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 10, loc_y + 10)
+                    self.set_option('last_status', self.status)
+                    self.status = 20
+                    return self.status
+            self.status = 99999
+        elif 20 <= self.status < 30:
+            self.status += 1
+            resource_name = 'costume_scene_dogam_new_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.6,
+                    custom_flag=1,
+                    custom_rect=(420, 120, 470, 190))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x - 15, loc_y - 15)
+                    self.status = self.get_option('last_status')
+                    return self.status
+            self.status = self.get_option('last_status')
+        else:
+            if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
+                self.lyb_mouse_click(self.scene_name + '_close_icon', custom_threshold=0)
+            self.status = 0
+        return self.status
+
     def amsijang_scene(self):
+
         if self.status == 0:
             self.logger.info('scene: ' + self.scene_name)
             self.status += 1
@@ -85,6 +296,40 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                     return self.status
             self.status = 99999
         elif 20 <= self.status < 30:
+            self.status += 1
+            pb_name = 'amsijang_free_refresh'
+            match_rate = self.game_object.rateMatchedPixelBox(self.window_pixels, pb_name)
+            if match_rate > 0.9:
+                self.lyb_mouse_click('amsijang_free_refresh', custom_threshold=0)
+                self.status = self.get_option('last_status')
+                return self.status
+
+            resource_name = 'amsijang_free_upgrade_go_loc'
+            match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+            if match_rate > 0.9:
+                self.click_resource2('amsijang_free_upgrade_go_loc', custom_threshold=0)
+                return self.status
+
+            resource_name = 'amsijang_free_upgrade_loc'
+            match_rate = self.game_object.rateMatchedResource(self.window_pixels, resource_name)
+            if match_rate > 0.9:
+                self.lyb_mouse_click('amsijang_free_upgrade_item', custom_threshold=0)
+                return self.status
+
+            resource_name = 'amsijang_free_gotcha_loc'
+            resource = self.game_object.resource_manager.resource_dic[resource_name]
+            for pb_name in resource:
+                (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                    self.window_image,
+                    self.game_object.resource_manager.pixel_box_dic[pb_name],
+                    custom_threshold=0.6,
+                    custom_flag=1,
+                    custom_rect=(160, 400, 780, 460))
+                self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                if loc_x != -1:
+                    self.lyb_mouse_click_location(loc_x, loc_y)
+                    self.status = self.get_option('last_status')
+                    return self.status
             self.status = self.get_option('last_status')
         else:
             if self.scene_name + '_close_icon' in self.game_object.resource_manager.pixel_box_dic:
@@ -104,7 +349,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         elif 5 <= self.status < 15:
             self.status += 1
             is_clicked, match_rate = self.click_resource2('guild_scene_gift_new_loc')
-            if is_clicked is False:
+            if is_clicked is True:
                 self.status = 15
         elif self.status == 15:
             # 기부
@@ -564,31 +809,35 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
             self.game_object.get_scene('japhwajeom_scene').set_option('potion_name', 'japhwajeom_scene_mp_potion')
             return True
 
+        if self.is_there_mail() is True:
+            if self.click_resource2('main_scene_mail_receive_loc') is True:
+                return True
+
         if self.is_there_new_event() is True:
             if self.click_resource2('main_scene_event_new_loc') is True:
                 self.game_object.get_scene('event_scene').status = 0
                 return True
 
-        # if self.is_there_new_menu() is True:
-        #     if self.is_menu_open() is True:
-        #         resource_name = 'menu_new_loc'
-        #         resource = self.game_object.resource_manager.resource_dic[resource_name]
-        #         for pb_name in resource:
-        #             (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
-        #                 self.window_image,
-        #                 self.game_object.resource_manager.pixel_box_dic[pb_name],
-        #                 custom_threshold=0.6,
-        #                 custom_flag=1,
-        #                 custom_rect=(540, 80, 795, 385))
-        #             self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
-        #             if loc_x != -1:
-        #                 self.lyb_mouse_click_location(loc_x - 5, loc_y + 5)
-        #                 self.init_menu_scene()
-        #                 return True
-        #     else:
-        #         if self.click_resource2('menu_new_loc') is True:
-        #             self.game_object.get_scene('event_scene').status = 0
-        #             return True
+        if self.is_there_new_menu() is True:
+            if self.is_menu_open() is True:
+                resource_name = 'menu_new_loc'
+                resource = self.game_object.resource_manager.resource_dic[resource_name]
+                for pb_name in resource:
+                    (loc_x, loc_y), match_rate = self.game_object.locationOnWindowPart(
+                        self.window_image,
+                        self.game_object.resource_manager.pixel_box_dic[pb_name],
+                        custom_threshold=0.6,
+                        custom_flag=1,
+                        custom_rect=(540, 80, 795, 385))
+                    self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
+                    if loc_x != -1:
+                        self.lyb_mouse_click_location(loc_x - 5, loc_y + 5)
+                        self.init_menu_scene()
+                        return True
+            else:
+                if self.click_resource2('menu_new_loc') is True:
+                    self.game_object.get_scene('event_scene').status = 0
+                    return True
 
         return False
 
@@ -718,6 +967,9 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
 
     def is_gabang_open(self):
         return self.is_status_by_resource2('가방 열림 감지', 'gabang_open_loc', 0.7, -1, reverse=True)
+
+    def is_there_mail(self):
+        return self.is_status_by_resource2('우편 받기 감지', 'main_scene_mail_receive_loc', 0.7, -1, reverse=True)
 
     def is_menu_open(self):
             return self.is_status_by_resource(

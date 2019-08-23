@@ -63,7 +63,7 @@ class LYBRohan(lybgame.LYBGame):
 
         resource_name = 'popup_close_icon_loc'
         elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(5):
+        if elapsed_time > self.period_bot(2):
             (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
@@ -80,7 +80,7 @@ class LYBRohan(lybgame.LYBGame):
 
         resource_name = 'quest_complete_confirm_loc'
         elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(5):
+        if elapsed_time > self.period_bot(2):
             (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
@@ -98,7 +98,7 @@ class LYBRohan(lybgame.LYBGame):
 
         resource_name = 'skip_20190809_loc'
         elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-        if elapsed_time > self.period_bot(5):
+        if elapsed_time > self.period_bot(2):
             (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                 self.window_image,
                 resource_name,
@@ -121,17 +121,19 @@ class LYBRohan(lybgame.LYBGame):
             'confirm_20190822_loc',
             'download_20190822_loc',
             'confirm_20190823_loc',
+            'touch_screen_20190822_loc',
             'buhwal_confirm_loc',
+            'modu_open_loc',
         ]
         for resource_name in confirm_list:
             elapsed_time = time.time() - self.get_scene('main_scene').get_checkpoint(resource_name)
-            if elapsed_time > self.period_bot(3):
+            if elapsed_time > self.period_bot(2):
                 (loc_x, loc_y), match_rate = self.locationResourceOnWindowPart(
                     self.window_image,
                     resource_name,
                     custom_threshold=0.8,
                     custom_flag=1,
-                    custom_rect=(340, 300, 460, 420)
+                    custom_rect=(330, 300, 440, 450)
                 )
                 # self.logger.warn(resource_name + ' ' + str(match_rate))
                 if loc_x != -1:
