@@ -569,7 +569,6 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
         return 0
 
     def login_scene(self):
-        self.game_object.telegram_send('테스트')
         self.game_object.current_matched_scene['name'] = ''
         self.schedule_list = self.get_game_config('schedule_list')
 
