@@ -262,7 +262,7 @@ class LYBRohanScene(likeyoubot_scene.LYBScene):
                     custom_rect=(420, 120, 470, 190))
                 self.logger.debug(pb_name + ' ' + str((loc_x, loc_y)) + ' ' + str(match_rate))
                 if loc_x != -1:
-                    self.lyb_mouse_click_location(loc_x - 15, loc_y - 15)
+                    self.lyb_mouse_click_location(loc_x - 5, loc_y + 15)
                     self.status = self.get_option('last_status')
                     return self.status
             self.status = self.get_option('last_status')
