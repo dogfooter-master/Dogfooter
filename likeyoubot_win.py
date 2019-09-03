@@ -213,8 +213,12 @@ class LYBWin:
         try:
             win32gui.ShowWindow(hwnd, win32con.SW_HIDE)
             win32gui.SetWindowPos(hwnd, win32con.HWND_BOTTOM, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            # win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,
+            #                        win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_TOOLWINDOW);
+
             win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,
-                                   win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_TOOLWINDOW);
+                                   win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED | win32con.WS_EX_TOOLWINDOW);
+            win32gui.SetLayeredWindowAttributes(hwnd, 0, 0, 2)
             win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
         except:
             print('fail: ' + str(sys.exc_info()[0]) + '(' + str(sys.exc_info()[1]) + ')')
@@ -223,8 +227,10 @@ class LYBWin:
         try:
             win32gui.ShowWindow(hwnd, win32con.SW_HIDE)
             # win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_APPWINDOW);
+            # win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,
+            #                        win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) & ~win32con.WS_EX_TOOLWINDOW);
             win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,
-                                   win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) & ~win32con.WS_EX_TOOLWINDOW);
+                                   win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) & ~win32con.WS_EX_LAYERED & ~win32con.WS_EX_TOOLWINDOW );
             win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
             self.set_foreground(hwnd)
         except:
