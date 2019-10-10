@@ -421,10 +421,11 @@ class LYBWorker(threading.Thread):
 							)
 
 					else:
-						self.response_queue.put_nowait(
-							likeyoubot_message.LYBMessage('log',
-								'[' + self.window_title + '] 창 크기: ' + str((win_width, win_height)) +' - (840, 450) 불일치')
-							)
+                        self.response_queue.put_nowait(
+                            likeyoubot_message.LYBMessage('log',
+                                                          '[' + self.window_title + '] 창 크기: ' + str(
+                                                              (win_width, win_height)) + ' - (' + str(likeyoubot_win.LYBWin.WIDTH) + 'x' + str(likeyoubot_win.LYBWin.HEIGHT) + ') 불일치')
+                        )
 						self.response_queue.put_nowait(likeyoubot_message.LYBMessage('end_return', 'Fail to initialize'))
 						self.response_queue.join()
 						break
